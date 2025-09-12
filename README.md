@@ -1,4 +1,5 @@
 
+[中文](https://github.com/jokerknight/SubscribeManager/blob/main/REAME_ZH.md)|English
 ### Overview
 SubscribeManager is a Node.js version of [Sub-Hub](https://github.com/shiyi11yi/Sub-Hub), a lightweight proxy subscription manager. It can now be deployed locally using Docker Compose, no Cloudflare Workers needed. It provides an intuitive web interface to manage multiple subscriptions and nodes, supporting various proxy protocols and subscription formats.
 
