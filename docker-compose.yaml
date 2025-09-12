@@ -3,7 +3,7 @@ version: '3.8'
 services:
   app:
     build: .
-    container_name: sub-hub
+    container_name: subscribe-manager
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -23,8 +23,8 @@ services:
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - DB_PATH=${DB_PATH}
     networks:
-      - sub-hub-network
+      - subscribe-manager-network
 
 networks:
-  sub-hub-network:
+  subscribe-manager-network:
     driver: bridge

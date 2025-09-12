@@ -402,7 +402,7 @@ function generateClashConfig(proxies) {
     }
   };
 
-  return `# Clash 配置文件 - Sub-Hub 自动生成
+  return `# Clash 配置文件 - Subscribe-Manager 自动生成
 # 生成时间: ${new Date().toISOString()}
 
 ${convertToYaml(config)}`;
