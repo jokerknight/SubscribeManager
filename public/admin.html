@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sub-Hub</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <style>
+    :root {
+      --primary-color: #4e73df;
+      --success-color: #1cc88a;
+      --danger-color: #e74a3b;
+      --transition-timing: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      --box-shadow-light: 0 2px 10px rgba(0, 0, 0, 0.05);
+      --box-shadow-medium: 0 4px 15px rgba(0, 0, 0, 0.08);
+      --font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      --text-color: #2d3748;
+      --text-color-secondary: #444;
+      --border-radius-sm: 8px;
+      --border-radius-md: 12px;
+      --border-radius-lg: 16px;
+    }
+
+    * {
+      transition: all var(--transition-timing);
+      font-family: var(--font-family);
+    }
+
+    html {
+      scrollbar-gutter: stable;
+    }
+
+    body {
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background-color: #f8f9fc;
+      padding: 20px 0;
+      overflow-y: scroll;
+    }
+
+    /* 防止模态框打开时页面偏移 */
+    .modal-open {
+      padding-right: 0 !important;
+    }
+
+    /* 修复模态框背景遮罩的宽度 */
+    .modal-backdrop {
+      width: 100vw !important;
+    }
+
+    /* 优化模态框布局 */
+    .modal-dialog {
+      margin-right: auto !important;
+      margin-left: auto !important;
+      padding-right: 0 !important;
+    }
+
+    /* 标题和重要文字样式 */
+    .navbar-brand,
+    .subscription-name,
+    .modal-title,
+    .form-label {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    /* 按钮统一样式 */
+    .btn,
+    .logout-btn {
+      font-weight: 500;
+    }
+
+    /* 次要文字样式 */
+    .subscription-meta,
+    .link-label,
+    .form-text {
+      color: var(--text-color-secondary);
+    }
+
+    /* 链接标签文字加粗 */
+    .link-label small>span>span {
+      font-weight: 600;
+    }
+
+    .navbar {
+      background-color: white;
+      box-shadow: var(--box-shadow-light);
+      padding: 1rem 1.5rem;
+      margin-bottom: 0.5rem;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      transform: translateY(0);
+    }
+
+    .navbar:hover {
+      box-shadow: var(--box-shadow-medium);
+    }
+
+    .navbar-brand {
+      font-weight: bold;
+      color: #000;
+      display: flex;
+      align-items: center;
+      font-size: 1.8rem;
+    }
+
+    .navbar-brand i {
+      font-size: 2.2rem;
+      margin-right: 0.8rem;
+      color: #000;
+    }
+
+    .navbar-user {
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar-user .user-name {
+      font-weight: 500;
+    }
+
+    .logout-btn {
+      color: #4a4a4a;
+      background: none;
+      border: none;
+      margin-left: 1rem;
+      padding: 0.375rem 0.75rem;
+      border-radius: 0.25rem;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .logout-btn:hover {
+      background-color: #f8f9fa;
+      color: var(--danger-color);
+      text-decoration: none;
+    }
+
+    .logout-btn:focus {
+      text-decoration: none;
+      outline: none;
+    }
+
+    .container {
+      max-width: 1100px;
+    }
+
+    textarea {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      resize: vertical;
+      min-height: 300px;
+      max-height: 800px;
+      height: 300px;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      padding: 12px;
+    }
+
+    .link-label {
+      display: flex;
+      flex-direction: column;
+      margin-top: 1rem;
+      color: #444;
+      font-size: 0.9rem;
+    }
+
+    .link-label small {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .link-label small>span {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    .link-label small>span>span {
+      display: inline-block;
+      width: 90px;
+      color: var(--text-color);
+      font-weight: 600;
+      text-align: justify;
+      text-align-last: justify;
+      font-size: 0.9rem;
+    }
+
+    .link-label a {
+      margin-left: 0;
+      color: var(--primary-color);
+      text-decoration: none;
+      word-break: break-all;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .link-label .link:hover {
+      text-decoration: underline;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .toast-container {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1050;
+    }
+
+    @media (max-width: 767px) {
+      .btn-group {
+        flex-direction: column;
+      }
+    }
+
+    .subscription-list {
+      margin-bottom: 2rem;
+    }
+
+    .subscription-item {
+      background: #fff;
+      border-radius: var(--border-radius-md);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--box-shadow-light);
+      border: 1px solid #eaeaea;
+      overflow: hidden;
+      transition: margin-bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .edit-button {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1;
+    }
+
+    .edit-button .btn {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .subscription-item:hover {
+      box-shadow: var(--box-shadow-medium);
+    }
+
+    .subscription-edit-area {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(-10px);
+      padding: 0;
+      margin: 0;
+      will-change: max-height, opacity, transform, padding, margin;
+    }
+
+    .subscription-edit-area.active {
+      max-height: 300px;
+      opacity: 1;
+      transform: translateY(0);
+      padding: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .subscription-edit-area textarea {
+      width: 100%;
+      height: 200px;
+      min-height: 200px;
+      max-height: 200px;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border: 1px solid #e5e7eb;
+      border-radius: var(--border-radius-sm);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      resize: none;
+      box-shadow: var(--box-shadow-light);
+      opacity: 0;
+      transform: translateY(5px);
+    }
+
+    .subscription-edit-area.active textarea {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .subscription-edit-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+      opacity: 0;
+      transform: translateY(5px);
+    }
+
+    .subscription-edit-area.active .subscription-edit-actions {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 0.05s;
+    }
+
+    .toast {
+      transform: translateY(0);
+    }
+
+    .toast.hide {
+      transform: translateY(-100%);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .subscription-item {
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .path-error {
+      color: #dc3545;
+      font-size: 0.875em;
+      margin-top: 0.25rem;
+      display: none;
+    }
+
+    .form-control.is-invalid {
+      border-color: #dc3545;
+      padding-right: calc(1.5em + 0.75rem);
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right calc(0.375em + 0.1875rem) center;
+      background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+
+    .form-control.is-valid {
+      border-color: #198754;
+      padding-right: calc(1.5em + 0.75rem);
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right calc(0.375em + 0.1875rem) center;
+      background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+
+    .subscription-name {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 0.75rem;
+      line-height: 1.2;
+    }
+
+    .node-count {
+      display: inline-flex;
+      align-items: center;
+      color: var(--text-color-secondary);
+      font-size: 1rem;
+      margin-left: 0.75rem;
+    }
+
+    .node-count i {
+      margin-right: 0.35rem;
+      font-size: 1rem;
+    }
+
+    .subscription-actions {
+      margin-top: 1.25rem;
+      padding-top: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .subscription-actions .btn {
+      width: 100%;
+      padding: 0.5rem 1.25rem;
+      font-weight: 500;
+      border-radius: 8px;
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .subscription-actions .btn i {
+      margin-right: 0.5rem;
+    }
+
+    /* 操作按钮样式 */
+    .node-actions {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .node-actions .btn {
+      padding: 4px 8px !important;
+      min-width: 32px !important;
+      height: 28px !important;
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      margin: 0 !important;
+    }
+
+    .node-actions .btn i {
+      font-size: 14px;
+      line-height: 1;
+      margin: 0 !important;
+    }
+
+    .node-checkbox {
+      vertical-align: top;
+      margin: 0;
+      margin-top: 1.5px;
+    }
+
+    /* 移动端适配样式 */
+    @media (max-width: 767px) {
+      .container {
+        padding: 0 15px;
+      }
+
+      .navbar {
+        margin-bottom: 2rem;
+        padding: 0.8rem 1rem;
+      }
+
+      .btn-group {
+        flex-direction: column;
+      }
+
+      .subscription-item {
+        padding: 1rem;
+      }
+
+      .subscription-item>div {
+        flex-direction: column;
+        align-items: flex-start !important;
+      }
+
+      .subscription-item .link-label {
+        margin: 1rem 0 0;
+        width: 100%;
+      }
+
+      .subscription-actions {
+        margin-top: 1rem;
+        width: 100%;
+        flex-direction: row !important;
+        gap: 0.5rem;
+      }
+
+      .subscription-actions .btn {
+        flex: 1;
+        font-size: 0.875rem;
+        padding: 0.5rem;
+      }
+
+      .subscription-actions .btn i {
+        margin-right: 0.25rem;
+        font-size: 0.875rem;
+      }
+
+      .modal-dialog {
+        margin: 0.5rem;
+      }
+
+      .modal-content {
+        border-radius: 1rem;
+      }
+
+      .toast-container {
+        right: 0;
+        left: 0;
+        bottom: 1rem;
+        top: auto;
+        margin: 0 1rem;
+      }
+
+      .toast {
+        width: 100%;
+      }
+
+      .table {
+        table-layout: fixed;
+        width: 100%;
+        margin-bottom: 0 !important;
+      }
+
+      .table thead th:first-child {
+        padding-left: 1rem !important;
+        width: 100% !important;
+      }
+
+      .table thead th:last-child {
+        display: none !important;
+      }
+
+      .node-row td {
+        padding: 0.5rem !important;
+      }
+
+      .node-row td:first-child {
+        font-size: 0.85rem;
+        padding-right: 0 !important;
+        width: calc(100% - 90px) !important;
+      }
+
+      .node-row td:first-child .text-truncate {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding-right: 8px !important;
+      }
+
+      .node-row td:last-child {
+        padding-left: 0 !important;
+        width: 90px !important;
+        position: relative !important;
+      }
+
+      .node-row td:last-child .text-truncate {
+        display: none !important;
+      }
+
+      .node-actions {
+        margin: 0 !important;
+        gap: 2px !important;
+        justify-content: flex-end !important;
+        width: 90px !important;
+        position: absolute !important;
+        right: 4px !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+      }
+
+      .node-actions .btn {
+        padding: 2px 4px !important;
+        min-width: 28px !important;
+        height: 28px !important;
+        margin: 0 !important;
+      }
+
+      .node-actions .btn i {
+        font-size: 12px;
+        line-height: 1;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+
+      .batch-action-buttons {
+        flex-wrap: wrap !important;
+        gap: 0.25rem !important;
+        width: 100% !important;
+      }
+
+      .batch-action-buttons .btn {
+        font-size: 0.75rem !important;
+        padding: 0.25rem 0.5rem !important;
+        margin: 0 !important;
+        flex: 1 !important;
+        min-width: 0 !important;
+        white-space: nowrap !important;
+      }
+
+      .batch-action-button .btn i {
+        font-size: 0.75rem !important;
+        margin-right: 0.25rem !important;
+      }
+    }
+
+    /* 模态框按钮样式 */
+    .modal .btn-secondary {
+      background-color: #e2e8f0;
+      border-color: #e2e8f0;
+      color: var(--text-color);
+    }
+
+    .modal .btn-secondary:hover {
+      background-color: #cbd5e0;
+      border-color: #cbd5e0;
+    }
+
+    /* 添加通用按钮样式 */
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.625rem 1.25rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      min-width: 140px;
+      height: 42px;
+      gap: 0.5rem;
+      line-height: 1;
+    }
+
+    .action-btn i {
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1rem;
+      height: 1rem;
+    }
+
+    /* 按钮颜色变体 */
+    .action-btn.btn-primary,
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+    }
+
+    .action-btn.btn-success,
+    .btn-success {
+      background-color: var(--success-color);
+      border-color: var(--success-color);
+      color: white;
+    }
+
+    .btn-edit {
+      background-color: #1cc88a;
+      border-color: #1cc88a;
+      color: white;
+    }
+
+    /* 按钮悬停效果 */
+    .action-btn:hover,
+    .btn-edit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-edit:hover {
+      background-color: #19b57c;
+      border-color: #19b57c;
+    }
+
+    .btn-edit:focus {
+      background-color: #19b57c;
+      border-color: #19b57c;
+      box-shadow: 0 0 0 0.25rem rgba(28, 200, 138, 0.25);
+    }
+
+    .action-btn:active {
+      transform: translateY(0);
+    }
+
+    /* 调整容器样式 */
+    .container {
+      max-width: 1100px;
+      padding: 2rem 1rem;
+    }
+
+    .d-flex.justify-content-between.align-items-center.mb-4 {
+      margin-bottom: 2rem !important;
+    }
+
+    /* 节点列表区域样式 */
+    .node-list-area {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      background: #fff;
+      border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+      will-change: max-height;
+      font-size: 0.875rem;
+      color: var(--text-color);
+    }
+
+    .node-list-area.expanded {
+      max-height: none;
+      overflow: visible;
+    }
+
+    .node-list-area .table-responsive {
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: top;
+    }
+
+    .node-list-area .link {
+      font-size: 0.875rem;
+      color: var(--text-color-secondary);
+      text-decoration: none;
+    }
+
+    .node-list-area .link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand navbar-light bg-white">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <i class="fas fa-cube"></i>
+        Sub-Hub
+      </a>
+      <div class="navbar-user ms-auto">
+        <a href="/admin/logout" class="logout-btn">
+          <i class="fas fa-sign-out-alt me-1"></i>
+          退出
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="subscription-item"
+      style="padding-bottom: 0; border: none; box-shadow: none; margin-bottom: 1rem; background: transparent;">
+      <div class="d-flex justify-content-end">
+        <button class="btn btn-primary action-btn" data-bs-toggle="modal" data-bs-target="#addSubscriptionModal">
+          <i class="fas fa-plus"></i>
+          <span>添加订阅</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 订阅列表 -->
+    <div class="subscription-list" id="subscriptionList">
+      <!-- 订阅项将通过JavaScript动态添加 -->
+    </div>
+  </div>
+
+  <!-- 添加订阅模态框 -->
+  <div class="modal fade" id="addSubscriptionModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">添加新订阅</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addSubscriptionForm" onsubmit="return false;">
+            <div class="mb-3">
+              <label class="form-label">订阅名称 <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="name" required>
+              <div class="invalid-feedback">请输入订阅名称</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">订阅路径 <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="path" required pattern="^[a-z0-9-]+$" minlength="5"
+                maxlength="50">
+              <div class="form-text">路径只能包含小写字母、数字和连字符，长度在5-50个字符之间</div>
+              <div class="path-error text-danger"></div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <button type="button" class="btn btn-primary" onclick="createSubscription()">创建</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 添加节点模态框 -->
+  <div class="modal fade" id="addNodeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">添加节点</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addNodeForm" onsubmit="return false;">
+            <input type="hidden" name="subscriptionPath" value="">
+            <div class="mb-3">
+              <label class="form-label">节点内容 <span class="text-danger">*</span></label>
+              <textarea class="form-control" name="content" rows="6" required
+                placeholder="请输入节点内容，支持以下格式：&#10;1. ss://... &#10;2. vless://...（除Surge） &#10;3. vmess://... &#10;4. trojan://... &#10;5. socks://... &#10;6. hysteria2://... &#10;7. tuic://... &#10;8. snell格式（仅Surge）&#10;9. Base64编码格式"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <button type="button" class="btn btn-primary" onclick="createNode()">
+            <i class="fas fa-plus me-1"></i>添加
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 编辑名称和路径模态框 -->
+  <div class="modal fade" id="editNameModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">编辑订阅信息</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editNameForm" onsubmit="return false;">
+            <input type="hidden" name="originalPath">
+            <div class="mb-3">
+              <label class="form-label">订阅名称 <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="name" required>
+              <div class="invalid-feedback">请输入订阅名称</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">订阅路径 <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="path" required>
+              <div class="form-text">路径只能包含小写字母、数字和连字符，长度在5-50个字符之间</div>
+              <div class="path-error text-danger"></div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+            <i class="fas fa-trash"></i> 删除订阅
+          </button>
+          <div>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-primary" onclick="updateSubscriptionInfo()">保存</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 编辑节点模态框 -->
+  <div class="modal fade" id="editNodeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">编辑节点</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editNodeForm" onsubmit="return false;">
+            <input type="hidden" name="subscriptionPath" value="">
+            <input type="hidden" name="nodeId" value="">
+            <div class="mb-3">
+              <label class="form-label">节点内容 <span class="text-danger">*</span></label>
+              <textarea class="form-control" name="content" rows="6" required
+                placeholder="请输入节点内容，支持以下格式：&#10;1. ss://... &#10;2. vless://...（除Surge） &#10;3. vmess://... &#10;4. trojan://... &#10;5. socks://... &#10;6. hysteria2://... &#10;7. tuic://... &#10;8. snell格式（仅Surge）&#10;9. Base64编码格式"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <button type="button" class="btn btn-primary" onclick="updateNode()">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast提示 -->
+  <div class="toast-container">
+    <div id="toast" class="toast align-items-center text-white bg-success" role="alert" aria-live="assertive"
+      aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="toastMessage">
+          操作成功!
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+          aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // 定义 adminPath 变量
+    const adminPath = 'admin';
+    // 优化的loadSubscriptions函数
+    async function loadSubscriptions() {
+      try {
+        const response = await fetch('/' + adminPath + '/api/subscriptions');
+        if (!response.ok) throw new Error('加载失败');
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.message || '加载失败');
+        }
+
+        const subscriptions = result.data || [];
+        const listElement = document.getElementById('subscriptionList');
+        listElement.innerHTML = '';
+
+        const fragment = document.createDocumentFragment();
+
+        for (const sub of subscriptions) {
+          const item = document.createElement('div');
+          item.className = 'subscription-item';
+          item.innerHTML = `
+            <div class="d-flex justify-content-between align-items-start">
+              <button class="btn btn-sm btn-link text-primary edit-button" onclick="showEditNameModal('${sub.path}', '${sub.name}')">
+                <i class="fas fa-edit"></i>
+              </button>
+              <div class="subscription-content">
+                <div class="d-flex align-items-center">
+                  <h5 class="subscription-name mb-1">${sub.name}</h5>
+                  <span class="node-count ms-2"><i class="fas fa-server"></i>${sub.nodeCount}</span>
+                </div>
+                <div class="link-label">
+                  <small>
+                    <span>
+                      <span class="address-label">订阅地址1：</span> <a href="${sub.path}" target="_blank">${sub.path}</a>
+                    </span>
+                    <span>
+                      <span class="address-label">订阅地址2：</span> <a href="${sub.path}/v2ray" target="_blank">${sub.path}/v2ray</a>
+                    </span>
+                    <span>
+                      <span class="address-label">订阅地址3：</span> <a href="${sub.path}/surge" target="_blank">${sub.path}/surge</a>
+                    </span>
+                    <span>
+                      <span class="address-label">订阅地址4：</span> <a href="${sub.path}/clash" target="_blank">${sub.path}/clash</a>
+                    </span>
+                  </small>
+                </div>
+              </div>
+              <div class="subscription-actions">
+                <button class="btn btn-success action-btn" onclick="showAddNodeModal('${sub.path}')">
+                  <i class="fas fa-plus"></i>
+                  <span>添加节点</span>
+                </button>
+                <button class="btn btn-primary action-btn" onclick="showNodeList('${sub.path}')">
+                  <i class="fas fa-list"></i>
+                  <span>节点列表</span>
+                </button>
+              </div>
+            </div>
+            <div class="node-list-area" id="node-list-${sub.path}">
+              <div class="table-responsive mt-3">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th style="min-width: 300px; width: 35%; padding-left: 0.75rem;">节点名称</th>
+                      <th style="padding-left: 4.5rem;">节点链接</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+                <div class="d-flex justify-content-between align-items-center mt-3 px-2 pb-2">
+                  <div class="batch-operation-buttons" id="batch-operation-buttons-${sub.path}">
+                    <button class="btn btn-primary btn-sm rounded-3" onclick="enterBatchMode('${sub.path}')" id="batch-mode-btn-${sub.path}" style="padding: 0.5rem 1rem;">
+                      <i class="fas fa-tasks me-1"></i>批量操作
+                    </button>
+                  </div>
+                  <div class="batch-action-buttons" id="batch-action-buttons-${sub.path}" style="display: none;">
+                    <button class="btn btn-success btn-sm rounded-3 me-2" onclick="executeBatchStatusChange('${sub.path}', true)" style="padding: 0.5rem 1rem;">
+                      <i class="fas fa-toggle-on me-1"></i>启用
+                    </button>
+                    <button class="btn btn-warning btn-sm rounded-3 me-2" onclick="executeBatchStatusChange('${sub.path}', false)" style="padding: 0.5rem 1rem;">
+                      <i class="fas fa-toggle-off me-1"></i>禁用
+                    </button>
+                    <button class="btn btn-danger btn-sm rounded-3 me-2" onclick="executeBatchDelete('${sub.path}')" style="padding: 0.5rem 1rem;">
+                      <i class="fas fa-trash-alt me-1"></i>删除
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm rounded-3 me-2" onclick="toggleSelectAll('${sub.path}')" id="select-all-btn-${sub.path}" style="padding: 0.5rem 1rem;">
+                      <i class="fas fa-check-square me-1"></i>全选
+                    </button>
+                    <button class="btn btn-secondary btn-sm rounded-3" onclick="exitBatchMode('${sub.path}')" style="padding: 0.5rem 1rem;">
+                      <i class="fas fa-times me-1"></i>取消
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          fragment.appendChild(item);
+        }
+
+        listElement.appendChild(fragment);
+      } catch (error) {
+        showToast('加载订阅列表失败: ' + error.message, 'danger');
+      }
+    }
+
+    // 页面加载完成后，加载订阅列表
+    window.addEventListener('load', loadSubscriptions);
+
+    // 进入批量操作模式
+    function enterBatchMode(subscriptionPath) {
+      const nodeListArea = document.getElementById('node-list-' + subscriptionPath);
+      const checkboxes = nodeListArea.querySelectorAll('.node-checkbox');
+      const operationButtons = document.getElementById('batch-operation-buttons-' + subscriptionPath);
+      const actionButtons = document.getElementById('batch-action-buttons-' + subscriptionPath);
+
+      // 显示勾选框
+      checkboxes.forEach(checkbox => {
+        checkbox.style.display = 'inline-block';
+      });
+
+      // 切换按钮显示
+      operationButtons.style.display = 'none';
+      actionButtons.style.display = 'flex';
+
+      // 标记为批量模式
+      nodeListArea.classList.add('batch-mode');
+
+      // 重置所有勾选框
+      checkboxes.forEach(cb => {
+        cb.checked = false;
+      });
+
+      // 重置全选按钮状态
+      resetSelectAllButton(subscriptionPath);
+
+      showToast('请选择要操作的节点，然后选择对应的操作', 'info');
+    }
+
+    // 退出批量操作模式
+    function exitBatchMode(subscriptionPath) {
+      const nodeListArea = document.getElementById('node-list-' + subscriptionPath);
+      const checkboxes = nodeListArea.querySelectorAll('.node-checkbox');
+      const operationButtons = document.getElementById('batch-operation-buttons-' + subscriptionPath);
+      const actionButtons = document.getElementById('batch-action-buttons-' + subscriptionPath);
+
+      // 隐藏勾选框
+      checkboxes.forEach(checkbox => {
+        checkbox.style.display = 'none';
+      });
+
+      // 切换按钮显示
+      operationButtons.style.display = 'flex';
+      actionButtons.style.display = 'none';
+
+      // 取消批量模式标记
+      nodeListArea.classList.remove('batch-mode');
+    }
+
+    // 重置全选按钮状态
+    function resetSelectAllButton(subscriptionPath) {
+      const selectAllBtn = document.getElementById('select-all-btn-' + subscriptionPath);
+      if (selectAllBtn) {
+        selectAllBtn.innerHTML = '<i class="fas fa-check-square me-1"></i>全选';
+      }
+    }
+
+    // 全选/取消全选功能
+    function toggleSelectAll(subscriptionPath) {
+      const nodeListArea = document.getElementById('node-list-' + subscriptionPath);
+      const checkboxes = nodeListArea.querySelectorAll('.node-checkbox');
+      const selectAllBtn = document.getElementById('select-all-btn-' + subscriptionPath);
+
+      // 检查当前是否为全选状态
+      const checkedCount = nodeListArea.querySelectorAll('.node-checkbox:checked').length;
+      const isAllSelected = checkedCount === checkboxes.length && checkboxes.length > 0;
+
+      // 切换选择状态
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = !isAllSelected;
+      });
+
+      // 更新按钮状态
+      if (isAllSelected) {
+        selectAllBtn.innerHTML = '<i class="fas fa-check-square me-1"></i>全选';
+      } else {
+        selectAllBtn.innerHTML = '<i class="fas fa-minus-square me-1"></i>取消';
+      }
+    }
+
+    // 执行批量删除
+    async function executeBatchDelete(subscriptionPath) {
+      const nodeListArea = document.getElementById('node-list-' + subscriptionPath);
+      const checkedNodes = nodeListArea.querySelectorAll('.node-checkbox:checked');
+
+      if (checkedNodes.length === 0) {
+        showToast('请选择要删除的节点', 'warning');
+        return;
+      }
+
+      if (!confirm(`确定要删除选中的 ${checkedNodes.length} 个节点吗？`)) {
+        return;
+      }
+
+      try {
+        let successCount = 0;
+        let failCount = 0;
+
+        // 显示进度提示
+        showToast('正在删除节点...', 'info');
+
+        // 批量删除所选节点
+        for (const checkbox of checkedNodes) {
+          const nodeId = checkbox.value;
+          try {
+            const response = await fetch('/' + adminPath + '/api/subscriptions/' + subscriptionPath + '/nodes/' + nodeId, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+              }
+            });
+
+            if (response.ok) {
+              successCount++;
+            } else {
+              failCount++;
+            }
+          } catch (error) {
+            console.error('删除节点失败:', error);
+            failCount++;
+          }
+        }
+
+        // 显示删除结果
+        if (failCount === 0) {
+          showToast(`成功删除 ${successCount} 个节点`, 'success');
+        } else {
+          showToast(`删除完成：成功 ${successCount} 个，失败 ${failCount} 个`, 'warning');
+        }
+
+        // 退出批量操作模式
+        exitBatchMode(subscriptionPath);
+
+        // 重新加载节点列表和订阅信息
+        await loadNodeList(subscriptionPath);
+        await loadSubscriptions();
+
+      } catch (error) {
+        console.error('批量删除失败:', error);
+        showToast('批量删除失败: ' + error.message, 'danger');
+      }
+    };
+
+    // 执行批量状态切换
+    async function executeBatchStatusChange(subscriptionPath, enabled) {
+      const nodeListArea = document.getElementById('node-list-' + subscriptionPath);
+      const checkedNodes = nodeListArea.querySelectorAll('.node-checkbox:checked');
+
+      if (checkedNodes.length === 0) {
+        showToast('请先选择要操作的节点', 'warning');
+        return;
+      }
+
+      const action = enabled ? '启用' : '禁用';
+      if (!confirm('确定要' + action + '选中的 ' + checkedNodes.length + ' 个节点吗？')) {
+        return;
+      }
+
+      try {
+        let successCount = 0;
+        let failCount = 0;
+
+        // 显示进度提示
+        showToast('正在' + action + '节点...', 'info');
+
+        // 批量操作所选节点
+        for (const checkbox of checkedNodes) {
+          const nodeId = checkbox.value;
+          try {
+            const response = await fetch('/' + adminPath + '/api/subscriptions/' + subscriptionPath + '/nodes/' + nodeId, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+              },
+              body: JSON.stringify({ enabled })
+            });
+
+            if (response.ok) {
+              successCount++;
+            } else {
+              failCount++;
+            }
+          } catch (error) {
+            console.error('操作节点失败:', error);
+            failCount++;
+          }
+        }
+
+        // 显示操作结果
+        if (failCount === 0) {
+          showToast('成功' + action + ' ' + successCount + ' 个节点', 'success');
+        } else {
+          showToast(action + '完成：成功 ' + successCount + ' 个，失败 ' + failCount + ' 个', 'warning');
+        }
+
+        // 退出批量操作模式
+        exitBatchMode(subscriptionPath);
+
+        // 重新加载节点列表和订阅信息
+        await loadNodeList(subscriptionPath);
+        await loadSubscriptions();
+
+      } catch (error) {
+        console.error('批量操作失败:', error);
+        showToast('批量' + action + '失败: ' + error.message, 'danger');
+      }
+    }
+
+    // 显示添加节点模态框
+    function showAddNodeModal(subscriptionPath) {
+      const modal = document.getElementById('addNodeModal');
+      const form = document.getElementById('addNodeForm');
+
+      // 重置表单
+      form.reset();
+
+      // 设置订阅路径
+      const pathInput = form.querySelector('[name="subscriptionPath"]');
+      if (pathInput) {
+        pathInput.value = subscriptionPath;
+      }
+
+      // 显示模态框
+      const modalInstance = new bootstrap.Modal(modal);
+      modalInstance.show();
+    }
+
+    // 创建节点
+    async function createNode() {
+      try {
+        const form = document.getElementById('addNodeForm');
+        if (!form) {
+          throw new Error('找不到表单元素');
+        }
+
+        const formData = new FormData(form);
+        const subscriptionPath = formData.get('subscriptionPath');
+        const name = formData.get('name')?.trim();
+        let content = formData.get('content')?.trim();
+
+        if (!subscriptionPath) {
+          throw new Error('缺少订阅路径');
+        }
+
+        if (!content) {
+          throw new Error('请填写节点内容');
+        }
+        console.log('Original content:', content);
+        // 分割成行
+        const lines = content.split(/\r?\n/);
+        const validNodes = [];
+        console.log('Processing lines:', lines);
+
+        // 处理每一行
+        for (const line of lines) {
+          const trimmedLine = line.trim();
+          if (!trimmedLine) continue;
+
+          // 检查是否是Base64编码的完整配置
+          try {
+            const decodedContent = safeBase64DecodeFrontend(trimmedLine);
+            // 如果解码成功，检查是否包含多个节点
+            const decodedLines = decodedContent.split(/\r?\n/);
+            for (const decodedLine of decodedLines) {
+              if (decodedLine.trim() && isValidNodeLink(decodedLine.trim())) {
+                validNodes.push({
+                  name: name || extractNodeNameFrontend(decodedLine.trim()),
+                  content: decodedLine.trim()
+                });
+              }
+            }
+          } catch (e) {
+            // 如果不是Base64编码，直接检查是否是有效的节点链接
+            if (isValidNodeLink(trimmedLine)) {
+              validNodes.push({
+                name: name || extractNodeNameFrontend(trimmedLine),
+                content: trimmedLine
+              });
+            }
+          }
+        }
+
+        if (validNodes.length === 0) {
+          throw new Error('未找到有效的节点链接');
+        }
+
+        // 批量创建节点，按顺序添加
+        const results = [];
+        const timestamp = Date.now(); // 使用时间戳作为基础序号
+
+        for (let i = 0; i < validNodes.length; i++) {
+          const node = validNodes[i];
+          try {
+            // 创建节点，使用时间戳+索引作为顺序值
+            const response = await fetch('/' + adminPath + '/api/subscriptions/' + subscriptionPath + '/nodes', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+              },
+              body: JSON.stringify({
+                name: node.name,
+                content: node.content,
+                type: getNodeType(node.content),
+                order: timestamp + i  // 使用时间戳确保顺序唯一且递增
+              })
+            });
+
+            const result = await response.json();
+            results.push({ success: response.ok, message: result.message, link: node.content, order: i });
+          } catch (error) {
+            results.push({ success: false, message: error.message, link: node.content, order: i });
+          }
+        }
+
+        // 按原始顺序排序结果
+        results.sort((a, b) => a.order - b.order);
+
+        // 统计结果
+        const successful = results.filter(r => r.success).length;
+        const failed = results.filter(r => !r.success).length;
+
+        // 显示结果
+        if (validNodes.length === 1) {
+          showToast(successful > 0 ? '节点添加成功' : '节点添加失败', successful > 0 ? 'success' : 'danger');
+        } else {
+          showToast(`添加完成：成功 ${successful} 个，失败 ${failed} 个`, successful > 0 ? 'success' : 'warning');
+        }
+
+        // 关闭模态框
+        const modal = document.getElementById('addNodeModal');
+        if (modal) {
+          const modalInstance = bootstrap.Modal.getInstance(modal);
+          if (modalInstance) {
+            modalInstance.hide();
+          }
+        }
+
+        // 重置表单
+        form.reset();
+
+        // 刷新订阅列表
+        await loadSubscriptions();
+        if (successful > 0) {
+          await loadNodeList(subscriptionPath);
+        }
+
+      } catch (error) {
+        console.error('添加节点失败:', error);
+        showToast('添加节点失败: ' + error.message, 'danger');
+      }
+    }
+
+    // 提取节点名称（前端版本）
+    function extractNodeNameFrontend(nodeLink) {
+      if (!nodeLink) return '未命名节点';
+
+      // 处理snell节点
+      if (nodeLink.includes('snell,')) {
+        const name = nodeLink.split('=')[0].trim();
+        return name || '未命名节点';
+      }
+
+      // 处理 VMess 链接
+      if (nodeLink.toLowerCase().startsWith('vmess://')) {
+        try {
+          const config = JSON.parse(safeBase64DecodeFrontend(nodeLink.substring(8)));
+          if (config.ps) {
+            return config.ps;
+          }
+        } catch { }
+        return '未命名节点';
+      }
+
+      // 处理其他使用哈希标记名称的链接类型
+      const hashIndex = nodeLink.indexOf('#');
+      if (hashIndex !== -1) {
+        try {
+          return decodeURIComponent(nodeLink.substring(hashIndex + 1));
+        } catch {
+          return nodeLink.substring(hashIndex + 1) || '未命名节点';
+        }
+      }
+      return '未命名节点';
+    }
+
+    // 节点类型常量定义
+    const NODE_TYPES_FRONTEND = {
+      SS: 'ss://',
+      VMESS: 'vmess://',
+      TROJAN: 'trojan://',
+      VLESS: 'vless://',
+      SOCKS: 'socks://',
+      HYSTERIA2: 'hysteria2://',
+      TUIC: 'tuic://',
+      SNELL: 'snell,'
+    };
+
+    // 检查是否是有效的节点链接
+    function isValidNodeLink(link) {
+      const lowerLink = link.toLowerCase();
+      // 检查snell格式
+      if (lowerLink.includes('=') && lowerLink.includes('snell,')) {
+        const parts = link.split('=')[1]?.trim().split(',');
+        return parts && parts.length >= 4 && parts[0].trim() === 'snell';
+      }
+      return Object.values(NODE_TYPES_FRONTEND).some(prefix => lowerLink.startsWith(prefix));
+    }
+
+    // 获取节点类型
+    function getNodeType(link) {
+      const lowerLink = link.toLowerCase();
+      if (lowerLink.includes('=') && lowerLink.includes('snell,')) {
+        return 'snell';
+      }
+      return Object.entries(NODE_TYPES_FRONTEND).find(([key, prefix]) =>
+        lowerLink.startsWith(prefix)
+      )?.[0].toLowerCase() || '';
+    }
+
+    // 安全的Base64解码函数（前端版本）
+    function safeBase64DecodeFrontend(str) {
+      try {
+        // 方法1：使用atob
+        return atob(str);
+      } catch (e) {
+        try {
+          // 方法2：使用Buffer（如果可用）
+          if (typeof Buffer !== 'undefined') {
+            return Buffer.from(str, 'base64').toString('utf-8');
+          }
+        } catch (e2) {
+          // 如果失败，返回原始字符串
+          return str;
+        }
+        return str;
+      }
+    }
+
+    // 显示节点列表
+    async function showNodeList(subscriptionPath) {
+      const nodeListArea = document.getElementById('node-list-' + subscriptionPath);
+      if (!nodeListArea) {
+        console.error('找不到节点列表区域');
+        return;
+      }
+
+      const isHidden = !nodeListArea.classList.contains('expanded');
+      let expandedSubs = JSON.parse(localStorage.getItem('expandedSubscriptions') || '[]');
+
+      if (isHidden) {
+        // 立即添加展开类名触发动画
+        nodeListArea.classList.add('expanded');
+
+        // 更新展开状态
+        if (!expandedSubs.includes(subscriptionPath)) {
+          expandedSubs.push(subscriptionPath);
+          localStorage.setItem('expandedSubscriptions', JSON.stringify(expandedSubs));
+        }
+
+        // 同时开始加载数据
+        loadNodeList(subscriptionPath).catch(error => {
+          console.error('加载节点列表失败:', error);
+          showToast('加载节点列表失败: ' + error.message, 'danger');
+        });
+      } else {
+        nodeListArea.classList.remove('expanded');
+        expandedSubs = expandedSubs.filter(path => path !== subscriptionPath);
+        localStorage.setItem('expandedSubscriptions', JSON.stringify(expandedSubs));
+      }
+    }
+
+    // 加载节点列表
+    async function loadNodeList(subscriptionPath) {
+      const nodeListArea = document.getElementById('node-list-' + subscriptionPath);
+      if (!nodeListArea) {
+        throw new Error('找不到节点列表区域');
+      }
+
+      const tbody = nodeListArea.querySelector('tbody');
+
+      // 先显示加载中的提示
+      tbody.innerHTML = '<tr><td colspan="2" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>加载中...</td></tr>';
+
+      try {
+        const response = await fetch('/' + adminPath + '/api/subscriptions/' + subscriptionPath + '/nodes');
+        if (!response.ok) throw new Error('加载失败');
+
+        const result = await response.json();
+        if (!result.success) {
+          throw new Error(result.message || '加载失败');
+        }
+
+        const nodes = result.data || [];
+
+        // 构建节点列表HTML
+        const nodesHtml = nodes.map(node => {
+          const nodeLink = node.original_link;
+          const escapedNodeLink = nodeLink
+            .replace(/&/g, '&amp;')
+            .replace(/'/g, '\\\'')
+            .replace(/"/g, '\\"');
+          const isEnabled = node.enabled === 1;
+
+          return `
+                <tr class="node-row" data-id="${node.id}" data-order="${node.node_order}" data-enabled="${isEnabled ? '1' : '0'}">
+      <td class="align-middle">
+        <div class="d-flex align-items-center">
+          <input class="node-checkbox me-2" type="checkbox" value="${node.id}" 
+            data-subscription="${subscriptionPath}" style="display: none;">
+          <div class="text-nowrap text-truncate ${!isEnabled ? 'text-danger' : ''}" style="max-width: 320px; ${!isEnabled ? 'text-decoration: line-through;' : ''}" title="${node.name}">
+            ${node.name}
+          </div>
+        </div>
+      </td>
+                <td class="align-middle">
+                  <div class="d-flex justify-content-between align-items-center" style="gap: 8px;">
+                              <div class="text-nowrap text-truncate ${!isEnabled ? 'text-danger' : ''}" style="max-width: 400px; margin-left: 4rem; ${!isEnabled ? 'text-decoration: line-through;' : ''}" title="${nodeLink}">
+            ${nodeLink}
+          </div>
+                    <div class="node-actions d-flex" style="flex-shrink: 0; gap: 4px;">
+                      <button class="btn btn-sm btn-edit" onclick="showEditNodeModal('${subscriptionPath}', '${node.id}', '${escapedNodeLink}')" title="编辑节点">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="btn btn-sm btn-primary" onclick="copyToClipboard('${escapedNodeLink}')" title="复制链接">
+                        <i class="fas fa-copy"></i>
+                      </button>
+                      <button class="btn btn-sm btn-danger" onclick="deleteNode('${subscriptionPath}', ${node.id})" title="删除节点">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            `;
+        }).join('');
+
+        // 更新节点列表内容
+        tbody.innerHTML = nodesHtml || '<tr><td colspan="2" class="text-center py-4">暂无节点</td></tr>';
+
+        // 初始化拖拽排序
+        if (nodes.length > 0) {
+          // 检查是否为移动设备
+          const isMobile = window.innerWidth <= 767;
+
+          // 只在非移动设备上初始化排序
+          if (!isMobile) {
+            initializeSortable(tbody, subscriptionPath);
+          }
+        }
+      } catch (error) {
+        tbody.innerHTML = `<tr><td colspan="2" class="text-center py-4 text-danger">
+          <i class="fas fa-exclamation-circle me-2"></i>${error.message}
+        </td></tr>`;
+        throw error;
+      }
+    }
+
+    // 初始化拖拽排序功能
+    function initializeSortable(tbody, subscriptionPath) {
+      new Sortable(tbody, {
+        animation: 150,
+        handle: '.node-row',
+        ghostClass: 'sortable-ghost',
+        dragClass: 'sortable-drag',
+        onEnd: async function (evt) {
+          try {
+            const rows = Array.from(tbody.querySelectorAll('.node-row'));
+            const newOrders = rows.map((row, index) => ({
+              id: parseInt(row.dataset.id),
+              order: index
+            }));
+
+            await updateNodeOrder(subscriptionPath, newOrders);
+            showToast('节点排序已更新');
+          } catch (error) {
+            console.error('更新节点排序失败:', error);
+            showToast('更新节点排序失败: ' + error.message, 'danger');
+            // 重新加载列表以恢复原始顺序
+            await loadNodeList(subscriptionPath);
+          }
+        }
+      });
+    }
+
+    // 删除节点
+    async function deleteNode(subscriptionPath, nodeId) {
+      if (!confirm('确定要删除这个节点吗？')) return;
+
+      try {
+        const response = await fetch('/' + adminPath + '/api/subscriptions/' + subscriptionPath + '/nodes/' + nodeId, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || '删除失败');
+        }
+
+        showToast('节点已删除');
+        await loadNodeList(subscriptionPath);
+        await loadSubscriptions();
+      } catch (error) {
+        showToast('删除节点失败: ' + error.message, 'danger');
+      }
+    }
+
+    // 创建订阅
+    async function createSubscription() {
+      const form = document.getElementById('addSubscriptionForm');
+      const formData = new FormData(form);
+      const name = formData.get('name').trim();
+      const path = formData.get('path').trim();
+
+      if (!name) {
+        showToast('请输入订阅名称', 'danger');
+        form.querySelector('[name="name"]').focus();
+        return;
+      }
+
+      if (!path || !validateSubscriptionPathFrontend(path)) {
+        const pathInput = form.querySelector('[name="path"]');
+        pathInput.classList.add('is-invalid');
+        pathInput.classList.remove('is-valid');
+        form.querySelector('.path-error').textContent = '路径格式不正确';
+        form.querySelector('.path-error').style.display = 'block';
+        pathInput.focus();
+        return;
+      }
+
+      try {
+        const response = await fetch('/' + adminPath + '/api/subscriptions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({ name, path })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) throw new Error(result.message || '创建失败');
+
+        showToast('订阅创建成功');
+        bootstrap.Modal.getInstance(document.getElementById('addSubscriptionModal')).hide();
+        form.reset();
+        await loadSubscriptions();
+      } catch (error) {
+        showToast('创建失败: ' + error.message, 'danger');
+      }
+    }
+
+    // 显示Toast提示
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+
+      // 设置消息
+      toastMessage.textContent = message;
+
+      // 设置类型
+      toast.className = toast.className.replace(/bg-\w+/, '');
+      toast.classList.add('bg-' + type);
+
+      // 显示Toast
+      const bsToast = new bootstrap.Toast(toast);
+      bsToast.show();
+    }
+
+    // 显示编辑名称模态框
+    function showEditNameModal(path, name) {
+      const form = document.getElementById('editNameForm');
+      form.querySelector('input[name="originalPath"]').value = path;
+      form.querySelector('input[name="name"]').value = name;
+      form.querySelector('input[name="path"]').value = path;
+
+      const modal = new bootstrap.Modal(document.getElementById('editNameModal'));
+      modal.show();
+    }
+
+    // 更新订阅信息
+    async function updateSubscriptionInfo() {
+      const form = document.getElementById('editNameForm');
+      const originalPath = form.querySelector('input[name="originalPath"]').value;
+      const nameInput = form.querySelector('input[name="name"]');
+      const pathInput = form.querySelector('input[name="path"]');
+      const pathError = form.querySelector('.path-error');
+
+      try {
+        // 验证输入
+        if (!nameInput.value.trim()) {
+          showToast('请输入订阅名称', 'danger');
+          nameInput.focus();
+          return;
+        }
+
+        // 验证路径格式
+        const path = pathInput.value.trim();
+        if (!validateSubscriptionPathFrontend(path)) {
+          pathInput.classList.add('is-invalid');
+          pathInput.classList.remove('is-valid');
+          pathError.textContent = '路径格式不正确';
+          pathError.style.display = 'block';
+          pathInput.focus();
+          return;
+        }
+
+        // 如果路径被修改，检查新路径是否已存在
+        if (path !== originalPath) {
+          const checkResponse = await fetch('/' + adminPath + '/api/subscriptions/' + path);
+          if (checkResponse.ok) {
+            pathInput.classList.add('is-invalid');
+            pathInput.classList.remove('is-valid');
+            pathError.textContent = '该路径已被使用';
+            pathError.style.display = 'block';
+            pathInput.focus();
+            return;
+          }
+        }
+
+        const response = await fetch('/' + adminPath + '/api/subscriptions/' + originalPath, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({
+            name: nameInput.value.trim(),
+            path: path,
+            action: 'update_info'
+          })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || '更新失败');
+        }
+
+        showToast('订阅信息已更新');
+        bootstrap.Modal.getInstance(document.getElementById('editNameModal')).hide();
+        await loadSubscriptions();
+      } catch (error) {
+        console.error('更新订阅信息失败:', error);
+        showToast('更新失败: ' + error.message, 'danger');
+      }
+    }
+
+    // 确认删除订阅
+    async function confirmDelete() {
+      try {
+        const form = document.getElementById('editNameForm');
+        const path = form.querySelector('input[name="originalPath"]').value;
+
+        if (!path) {
+          showToast('无效的订阅路径', 'danger');
+          return;
+        }
+
+        if (!confirm('确定要删除这个订阅吗？')) {
+          return;
+        }
+
+        const response = await fetch('/' + adminPath + '/api/subscriptions/' + path, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
+
+        if (!response.ok) {
+          const result = await response.json();
+          throw new Error(result.message || '删除失败');
+        }
+
+        // 关闭编辑模态框
+        const editModal = bootstrap.Modal.getInstance(document.getElementById('editNameModal'));
+        if (editModal) {
+          editModal.hide();
+        }
+
+        showToast('订阅已删除');
+        await loadSubscriptions();
+      } catch (error) {
+        console.error('删除失败:', error);
+        showToast('删除失败: ' + error.message, 'danger');
+      }
+    }
+
+    // 表单验证工具函数（前端验证）
+    function validateSubscriptionPathFrontend(path) {
+      return /^[a-z0-9-]{5,50}$/.test(path);
+    }
+
+    // 复制到剪贴板
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('已复制到剪贴板');
+      }).catch(() => {
+        showToast('复制失败', 'danger');
+      });
+    }
+
+    // 显示编辑节点模态框
+    function showEditNodeModal(subscriptionPath, nodeId, nodeContent) {
+      const modal = document.getElementById('editNodeModal');
+      const form = document.getElementById('editNodeForm');
+
+      if (!modal || !form) {
+        showToast('显示编辑模态框失败：找不到必要的页面元素', 'danger');
+        return;
+      }
+
+      // 设置表单值
+      form.querySelector('[name="subscriptionPath"]').value = subscriptionPath;
+      form.querySelector('[name="nodeId"]').value = nodeId;
+      form.setAttribute('data-original-content', nodeContent);
+      form.querySelector('[name="content"]').value = nodeContent;
+
+      // 显示模态框
+      new bootstrap.Modal(modal).show();
+    }
+
+    // 更新节点
+    async function updateNode() {
+      const form = document.getElementById('editNodeForm');
+      const formData = new FormData(form);
+      const subscriptionPath = formData.get('subscriptionPath');
+      const nodeId = formData.get('nodeId');
+      const content = formData.get('content')?.trim();
+      const originalContent = form.getAttribute('data-original-content');
+
+      if (!subscriptionPath || !nodeId || !content) {
+        showToast('请填写完整的节点信息', 'danger');
+        return;
+      }
+
+      // 检查内容是否被修改
+      if (content === originalContent) {
+        showToast('节点内容未修改');
+        bootstrap.Modal.getInstance(document.getElementById('editNodeModal'))?.hide();
+        return;
+      }
+
+      try {
+        const response = await fetch('/' + adminPath + '/api/subscriptions/' + subscriptionPath + '/nodes/' + nodeId, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({ content })
+        });
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || '更新失败');
+
+        showToast('节点更新成功');
+        bootstrap.Modal.getInstance(document.getElementById('editNodeModal'))?.hide();
+        form.reset();
+
+        // 刷新数据
+        await Promise.all([
+          loadSubscriptions(),
+          loadNodeList(subscriptionPath)
+        ]);
+
+      } catch (error) {
+        showToast('更新节点失败: ' + error.message, 'danger');
+      }
+    }
+
+    // 更新节点顺序
+    async function updateNodeOrder(subscriptionPath, orders) {
+      try {
+        const response = await fetch('/' + adminPath + '/api/subscriptions/' + subscriptionPath + '/nodes/reorder', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({ orders })
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.message || '保存排序失败');
+        }
+
+        return result;
+      } catch (error) {
+        console.error('更新节点排序失败:', error);
+      } finally {
+        // 无论成功还是失败都重新加载节点列表
+        await loadNodeList(subscriptionPath);
+      }
+    }
+  </script>
+</body>
+
+</html>

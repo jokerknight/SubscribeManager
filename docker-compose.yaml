@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: sub-hub
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+      #- .:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    environment:
+      #- NODE_ENV=production
+      - NODE_ENV=development
+      - PORT=3000
+      - SESSION_SECRET=${SESSION_SECRET}
+      - ADMIN_PATH=${ADMIN_PATH}
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - DB_PATH=${DB_PATH}
+    networks:
+      - sub-hub-network
+
+networks:
+  sub-hub-network:
+    driver: bridge
