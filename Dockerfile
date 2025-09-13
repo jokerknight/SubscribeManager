@@ -11,6 +11,7 @@ COPY package*.json ./
 RUN npm install
 # 复制应用源代码
 COPY . .
+RUN rm -rf node_modules && npm install
 
 # 暴露端口
 EXPOSE 3000
