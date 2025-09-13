@@ -51,7 +51,7 @@ Makefile commands:
 - make down        # Stop and remove containers
 - make logs        # View logs
 
-1. Access the admin panel: http://localhost:3000/${ADMIN_PATH}
+5. Access the admin panel: http://localhost:3000/${ADMIN_PATH}
 
 ## Database
 

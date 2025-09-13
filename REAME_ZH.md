@@ -46,13 +46,13 @@ DB_PATH=./data/subscriptions.db
 从源码构建镜像并启动:
 > docker compose up -d --build
 
-> Makefile 方式:
+Makefile 方式:
 - make up          # 使用已构建镜像
 - make build       # 从源码构建并启动
 - make down        # 停止并删除容器
 - make logs        # 查看日志
 
-1. 访问管理面板: http://localhost:3000/${ADMIN_PATH}
+5. 访问管理面板: http://localhost:3000/${ADMIN_PATH}
 
 ## 数据库
 
