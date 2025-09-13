@@ -1,0 +1,97 @@
+{
+  "app": {
+    "name": "Subscribe Manager"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "create": "Create",
+    "delete": "Delete",
+    "loading": "Loading...",
+    "none": "None",
+    "success": "Success!",
+    "close": "Close",
+    "confirm": "Confirm",
+    "copied": "Copied to clipboard",
+    "copy_failed": "Copy failed"
+  },
+  "navbar": {
+    "brand": "Subscribe-Manager",
+    "logout": "Logout"
+  },
+  "login": {
+    "page_title": "SubscribeManager - Login",
+    "title": "Subscribe Manager",
+    "subtitle": "Please sign in to continue",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Sign In",
+    "error": "Incorrect username or password",
+    "request_error": "Login request failed, please try again"
+  },
+  "actions": {
+    "add_subscription": "Add Subscription",
+    "add_node": "Add Node",
+    "node_list": "Node List",
+    "batch": "Batch Actions",
+    "enable": "Enable",
+    "disable": "Disable",
+    "remove": "Delete",
+    "select_all": "Select All",
+    "unselect": "Unselect",
+    "cancel": "Cancel"
+  },
+  "subscription": {
+    "add_title": "Add New Subscription",
+    "name_label": "Subscription Name",
+    "path_label": "Subscription Path",
+    "path_help": "Path can include lowercase letters, numbers and hyphens, 5-50 chars",
+    "name_required": "Please enter subscription name",
+    "path_invalid": "Invalid path format",
+    "created": "Subscription created successfully",
+    "updated": "Subscription updated",
+    "deleted": "Subscription deleted",
+    "delete_confirm": "Are you sure you want to delete this subscription?",
+    "path_used": "This path is already in use",
+    "address_n": "Sub URL {n}:"
+  },
+  "nodes": {
+    "title": "Nodes",
+    "content_label": "Node Content",
+    "placeholder": "Enter node content. Supported formats: ss://, vless:// (except Surge), vmess://, trojan://, socks://, hysteria2://, tuic://, snell (Surge only), Base64",
+    "list": "Node List",
+    "loading": "Loading...",
+    "none": "No nodes",
+    "name": "Node Name",
+    "link": "Node Link",
+    "edit": "Edit Node",
+    "edited": "Node updated successfully",
+    "added": "Node added successfully",
+    "add_result": "Add completed: success {success}, failed {failed}",
+    "deleted": "Node deleted",
+    "delete_confirm": "Are you sure to delete this node?",
+    "batch_select_tip": "Select nodes to operate, then choose an action",
+    "batch_delete_none": "Please select nodes to delete",
+    "batch_delete_confirm": "Delete {count} selected nodes?",
+    "batch_deleting": "Deleting nodes...",
+    "batch_delete_done": "Deleted: success {success}, failed {failed}",
+    "batch_toggle_none": "Please select nodes to operate",
+    "batch_toggle_confirm": "{action} {count} selected nodes?",
+    "batch_toggling": "{action} nodes...",
+    "batch_toggle_done": "{action} completed: success {success}, failed {failed}",
+    "sort_updated": "Node order updated",
+    "sort_failed": "Failed to update node order"
+  },
+  "modal": {
+    "add_node_title": "Add Node",
+    "edit_sub_title": "Edit Subscription",
+    "edit_node_title": "Edit Node"
+  },
+  "lang": {
+    "label": "Language",
+    "en": "English",
+    "zh": "简体中文"
+  }
+}
+
+

@@ -1,0 +1,97 @@
+{
+  "app": {
+    "name": "Subscribe Manager"
+  },
+  "common": {
+    "cancel": "取消",
+    "save": "保存",
+    "create": "创建",
+    "delete": "删除",
+    "loading": "加载中...",
+    "none": "暂无",
+    "success": "操作成功!",
+    "close": "关闭",
+    "confirm": "确认",
+    "copied": "已复制到剪贴板",
+    "copy_failed": "复制失败"
+  },
+  "navbar": {
+    "brand": "Subscribe-Manager",
+    "logout": "退出"
+  },
+  "login": {
+    "page_title": "SubscribeManager - 登录",
+    "title": "Subscribe Manager",
+    "subtitle": "请登录以继续使用",
+    "username": "用户名",
+    "password": "密码",
+    "submit": "登录",
+    "error": "用户名或密码错误",
+    "request_error": "登录请求失败，请重试"
+  },
+  "actions": {
+    "add_subscription": "添加订阅",
+    "add_node": "添加节点",
+    "node_list": "节点列表",
+    "batch": "批量操作",
+    "enable": "启用",
+    "disable": "禁用",
+    "remove": "删除",
+    "select_all": "全选",
+    "unselect": "取消",
+    "cancel": "取消"
+  },
+  "subscription": {
+    "add_title": "添加新订阅",
+    "name_label": "订阅名称",
+    "path_label": "订阅路径",
+    "path_help": "路径只能包含小写字母、数字和连字符，长度在5-50个字符之间",
+    "name_required": "请输入订阅名称",
+    "path_invalid": "路径格式不正确",
+    "created": "订阅创建成功",
+    "updated": "订阅信息已更新",
+    "deleted": "订阅已删除",
+    "delete_confirm": "确定要删除这个订阅吗？",
+    "path_used": "该路径已被使用",
+    "address_n": "订阅地址{n}："
+  },
+  "nodes": {
+    "title": "节点",
+    "content_label": "节点内容",
+    "placeholder": "请输入节点内容，支持以下格式：\n1. ss://... \n2. vless://...（除Surge） \n3. vmess://... \n4. trojan://... \n5. socks://... \n6. hysteria2://... \n7. tuic://... \n8. snell格式（仅Surge）\n9. Base64编码格式",
+    "list": "节点列表",
+    "loading": "加载中...",
+    "none": "暂无节点",
+    "name": "节点名称",
+    "link": "节点链接",
+    "edit": "编辑节点",
+    "edited": "节点更新成功",
+    "added": "节点添加成功",
+    "add_result": "添加完成：成功 {success} 个，失败 {failed} 个",
+    "deleted": "节点已删除",
+    "delete_confirm": "确定要删除这个节点吗？",
+    "batch_select_tip": "请选择要操作的节点，然后选择对应的操作",
+    "batch_delete_none": "请选择要删除的节点",
+    "batch_delete_confirm": "确定要删除选中的 {count} 个节点吗？",
+    "batch_deleting": "正在删除节点...",
+    "batch_delete_done": "删除完成：成功 {success} 个，失败 {failed} 个",
+    "batch_toggle_none": "请先选择要操作的节点",
+    "batch_toggle_confirm": "确定要{action}选中的 {count} 个节点吗？",
+    "batch_toggling": "正在{action}节点...",
+    "batch_toggle_done": "{action}完成：成功 {success} 个，失败 {failed} 个",
+    "sort_updated": "节点排序已更新",
+    "sort_failed": "更新节点排序失败"
+  },
+  "modal": {
+    "add_node_title": "添加节点",
+    "edit_sub_title": "编辑订阅信息",
+    "edit_node_title": "编辑节点"
+  },
+  "lang": {
+    "label": "语言",
+    "en": "English",
+    "zh": "简体中文"
+  }
+}
+
+

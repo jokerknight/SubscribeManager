@@ -208,7 +208,6 @@
     .btn-group {
       display: flex;
       gap: 0.5rem;
-      margin-top: 1rem;
     }
 
     .toast-container {
@@ -718,12 +717,16 @@
     <div class="container">
       <a class="navbar-brand" href="#">
         <i class="fas fa-cube"></i>
-        Subscribe-Manager
+        <span data-i18n="navbar.brand">Subscribe-Manager</span>
       </a>
-      <div class="navbar-user ms-auto">
+      <div class="navbar-user ms-auto d-flex align-items-center">
+        <div class="btn-group me-3">
+          <button class="btn btn-sm btn-outline-secondary" data-set-lang="zh-CN">中文</button>
+          <button class="btn btn-sm btn-outline-secondary" data-set-lang="en">EN</button>
+        </div>
         <a href="/admin/logout" class="logout-btn">
           <i class="fas fa-sign-out-alt me-1"></i>
-          退出
+          <span data-i18n="navbar.logout">退出</span>
         </a>
       </div>
     </div>
@@ -735,7 +738,7 @@
       <div class="d-flex justify-content-end">
         <button class="btn btn-primary action-btn" data-bs-toggle="modal" data-bs-target="#addSubscriptionModal">
           <i class="fas fa-plus"></i>
-          <span>添加订阅</span>
+          <span data-i18n="actions.add_subscription">添加订阅</span>
         </button>
       </div>
     </div>
@@ -751,28 +754,28 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">添加新订阅</h5>
+          <h5 class="modal-title" data-i18n="subscription.add_title">添加新订阅</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
           <form id="addSubscriptionForm" onsubmit="return false;">
             <div class="mb-3">
-              <label class="form-label">订阅名称 <span class="text-danger">*</span></label>
+              <label class="form-label"><span data-i18n="subscription.name_label">订阅名称</span> <span class="text-danger">*</span></label>
               <input type="text" class="form-control" name="name" required>
-              <div class="invalid-feedback">请输入订阅名称</div>
+              <div class="invalid-feedback" data-i18n="subscription.name_required">请输入订阅名称</div>
             </div>
             <div class="mb-3">
-              <label class="form-label">订阅路径 <span class="text-danger">*</span></label>
+              <label class="form-label"><span data-i18n="subscription.path_label">订阅路径</span> <span class="text-danger">*</span></label>
               <input type="text" class="form-control" name="path" required pattern="^[a-z0-9-]+$" minlength="5"
                 maxlength="50">
-              <div class="form-text">路径只能包含小写字母、数字和连字符，长度在5-50个字符之间</div>
+              <div class="form-text" data-i18n="subscription.path_help">路径只能包含小写字母、数字和连字符，长度在5-50个字符之间</div>
               <div class="path-error text-danger"></div>
             </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-          <button type="button" class="btn btn-primary" onclick="createSubscription()">创建</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
+          <button type="button" class="btn btn-primary" onclick="createSubscription()" data-i18n="common.create">创建</button>
         </div>
       </div>
     </div>
@@ -783,23 +786,22 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">添加节点</h5>
+          <h5 class="modal-title" data-i18n="modal.add_node_title">添加节点</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
           <form id="addNodeForm" onsubmit="return false;">
             <input type="hidden" name="subscriptionPath" value="">
             <div class="mb-3">
-              <label class="form-label">节点内容 <span class="text-danger">*</span></label>
-              <textarea class="form-control" name="content" rows="6" required
-                placeholder="请输入节点内容，支持以下格式：&#10;1. ss://... &#10;2. vless://...（除Surge） &#10;3. vmess://... &#10;4. trojan://... &#10;5. socks://... &#10;6. hysteria2://... &#10;7. tuic://... &#10;8. snell格式（仅Surge）&#10;9. Base64编码格式"></textarea>
+              <label class="form-label"><span data-i18n="nodes.content_label">节点内容</span> <span class="text-danger">*</span></label>
+              <textarea class="form-control" name="content" rows="6" required data-i18n-placeholder="nodes.placeholder"></textarea>
             </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
           <button type="button" class="btn btn-primary" onclick="createNode()">
-            <i class="fas fa-plus me-1"></i>添加
+            <i class="fas fa-plus me-1"></i><span data-i18n="actions.add_node">添加</span>
           </button>
         </div>
       </div>
@@ -811,32 +813,32 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">编辑订阅信息</h5>
+          <h5 class="modal-title" data-i18n="modal.edit_sub_title">编辑订阅信息</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
           <form id="editNameForm" onsubmit="return false;">
             <input type="hidden" name="originalPath">
             <div class="mb-3">
-              <label class="form-label">订阅名称 <span class="text-danger">*</span></label>
+              <label class="form-label"><span data-i18n="subscription.name_label">订阅名称</span> <span class="text-danger">*</span></label>
               <input type="text" class="form-control" name="name" required>
-              <div class="invalid-feedback">请输入订阅名称</div>
+              <div class="invalid-feedback" data-i18n="subscription.name_required">请输入订阅名称</div>
             </div>
             <div class="mb-3">
-              <label class="form-label">订阅路径 <span class="text-danger">*</span></label>
+              <label class="form-label"><span data-i18n="subscription.path_label">订阅路径</span> <span class="text-danger">*</span></label>
               <input type="text" class="form-control" name="path" required>
-              <div class="form-text">路径只能包含小写字母、数字和连字符，长度在5-50个字符之间</div>
+              <div class="form-text" data-i18n="subscription.path_help">路径只能包含小写字母、数字和连字符，长度在5-50个字符之间</div>
               <div class="path-error text-danger"></div>
             </div>
           </form>
         </div>
         <div class="modal-footer justify-content-between">
           <button type="button" class="btn btn-danger" onclick="confirmDelete()">
-            <i class="fas fa-trash"></i> 删除订阅
+            <i class="fas fa-trash"></i> <span data-i18n="common.delete">删除</span>
           </button>
           <div>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-            <button type="button" class="btn btn-primary" onclick="updateSubscriptionInfo()">保存</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
+            <button type="button" class="btn btn-primary" onclick="updateSubscriptionInfo()" data-i18n="common.save">保存</button>
           </div>
         </div>
       </div>
@@ -848,7 +850,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">编辑节点</h5>
+          <h5 class="modal-title" data-i18n="modal.edit_node_title">编辑节点</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
@@ -856,15 +858,14 @@
             <input type="hidden" name="subscriptionPath" value="">
             <input type="hidden" name="nodeId" value="">
             <div class="mb-3">
-              <label class="form-label">节点内容 <span class="text-danger">*</span></label>
-              <textarea class="form-control" name="content" rows="6" required
-                placeholder="请输入节点内容，支持以下格式：&#10;1. ss://... &#10;2. vless://...（除Surge） &#10;3. vmess://... &#10;4. trojan://... &#10;5. socks://... &#10;6. hysteria2://... &#10;7. tuic://... &#10;8. snell格式（仅Surge）&#10;9. Base64编码格式"></textarea>
+              <label class="form-label"><span data-i18n="nodes.content_label">节点内容</span> <span class="text-danger">*</span></label>
+              <textarea class="form-control" name="content" rows="6" required data-i18n-placeholder="nodes.placeholder"></textarea>
             </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-          <button type="button" class="btn btn-primary" onclick="updateNode()">保存</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
+          <button type="button" class="btn btn-primary" onclick="updateNode()" data-i18n="common.save">保存</button>
         </div>
       </div>
     </div>
@@ -875,9 +876,7 @@
     <div id="toast" class="toast align-items-center text-white bg-success" role="alert" aria-live="assertive"
       aria-atomic="true">
       <div class="d-flex">
-        <div class="toast-body" id="toastMessage">
-          操作成功!
-        </div>
+        <div class="toast-body" id="toastMessage"><span data-i18n="common.success">操作成功!</span></div>
         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
           aria-label="Close"></button>
       </div>
@@ -885,18 +884,21 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/i18n.js"></script>
   <script>
     // 定义 adminPath 变量
     const adminPath = 'admin';
+    const _t = (k, params) => (window.i18n && window.i18n.t(k, params)) || k;
+    window.i18n && window.i18n.init && window.i18n.init();
     // 优化的loadSubscriptions函数
     async function loadSubscriptions() {
       try {
         const response = await fetch('/' + adminPath + '/api/subscriptions');
-        if (!response.ok) throw new Error('加载失败');
+        if (!response.ok) throw new Error(_t('common.loading'));
         const result = await response.json();
 
         if (!result.success) {
-          throw new Error(result.message || '加载失败');
+          throw new Error(result.message || _t('common.loading'));
         }
 
         const subscriptions = result.data || [];
@@ -921,16 +923,16 @@
                 <div class="link-label">
                   <small>
                     <span>
-                      <span class="address-label">订阅地址1：</span> <a href="${sub.path}" target="_blank">${sub.path}</a>
+                      <span class="address-label" data-i18n="subscription.address_n" data-i18n-args='{"n":1}'>订阅地址1：</span> <a href="${sub.path}" target="_blank">${sub.path}</a>
                     </span>
                     <span>
-                      <span class="address-label">订阅地址2：</span> <a href="${sub.path}/v2ray" target="_blank">${sub.path}/v2ray</a>
+                      <span class="address-label" data-i18n="subscription.address_n" data-i18n-args='{"n":2}'>订阅地址2：</span> <a href="${sub.path}/v2ray" target="_blank">${sub.path}/v2ray</a>
                     </span>
                     <span>
-                      <span class="address-label">订阅地址3：</span> <a href="${sub.path}/surge" target="_blank">${sub.path}/surge</a>
+                      <span class="address-label" data-i18n="subscription.address_n" data-i18n-args='{"n":3}'>订阅地址3：</span> <a href="${sub.path}/surge" target="_blank">${sub.path}/surge</a>
                     </span>
                     <span>
-                      <span class="address-label">订阅地址4：</span> <a href="${sub.path}/clash" target="_blank">${sub.path}/clash</a>
+                      <span class="address-label" data-i18n="subscription.address_n" data-i18n-args='{"n":4}'>订阅地址4：</span> <a href="${sub.path}/clash" target="_blank">${sub.path}/clash</a>
                     </span>
                   </small>
                 </div>
@@ -938,11 +940,11 @@
               <div class="subscription-actions">
                 <button class="btn btn-success action-btn" onclick="showAddNodeModal('${sub.path}')">
                   <i class="fas fa-plus"></i>
-                  <span>添加节点</span>
+                  <span data-i18n="actions.add_node">添加节点</span>
                 </button>
                 <button class="btn btn-primary action-btn" onclick="showNodeList('${sub.path}')">
                   <i class="fas fa-list"></i>
-                  <span>节点列表</span>
+                  <span data-i18n="actions.node_list">节点列表</span>
                 </button>
               </div>
             </div>
@@ -951,8 +953,8 @@
                 <table class="table">
                   <thead>
                     <tr>
-                      <th style="min-width: 300px; width: 35%; padding-left: 0.75rem;">节点名称</th>
-                      <th style="padding-left: 4.5rem;">节点链接</th>
+                      <th style="min-width: 300px; width: 35%; padding-left: 0.75rem;"><span data-i18n="nodes.name">节点名称</span></th>
+                      <th style="padding-left: 4.5rem;"><span data-i18n="nodes.link">节点链接</span></th>
                     </tr>
                   </thead>
                   <tbody></tbody>
@@ -960,24 +962,24 @@
                 <div class="d-flex justify-content-between align-items-center mt-3 px-2 pb-2">
                   <div class="batch-operation-buttons" id="batch-operation-buttons-${sub.path}">
                     <button class="btn btn-primary btn-sm rounded-3" onclick="enterBatchMode('${sub.path}')" id="batch-mode-btn-${sub.path}" style="padding: 0.5rem 1rem;">
-                      <i class="fas fa-tasks me-1"></i>批量操作
+                      <i class="fas fa-tasks me-1"></i><span data-i18n="actions.batch">批量操作</span>
                     </button>
                   </div>
                   <div class="batch-action-buttons" id="batch-action-buttons-${sub.path}" style="display: none;">
                     <button class="btn btn-success btn-sm rounded-3 me-2" onclick="executeBatchStatusChange('${sub.path}', true)" style="padding: 0.5rem 1rem;">
-                      <i class="fas fa-toggle-on me-1"></i>启用
+                      <i class="fas fa-toggle-on me-1"></i><span data-i18n="actions.enable">启用</span>
                     </button>
                     <button class="btn btn-warning btn-sm rounded-3 me-2" onclick="executeBatchStatusChange('${sub.path}', false)" style="padding: 0.5rem 1rem;">
-                      <i class="fas fa-toggle-off me-1"></i>禁用
+                      <i class="fas fa-toggle-off me-1"></i><span data-i18n="actions.disable">禁用</span>
                     </button>
                     <button class="btn btn-danger btn-sm rounded-3 me-2" onclick="executeBatchDelete('${sub.path}')" style="padding: 0.5rem 1rem;">
-                      <i class="fas fa-trash-alt me-1"></i>删除
+                      <i class="fas fa-trash-alt me-1"></i><span data-i18n="actions.remove">删除</span>
                     </button>
                     <button class="btn btn-outline-secondary btn-sm rounded-3 me-2" onclick="toggleSelectAll('${sub.path}')" id="select-all-btn-${sub.path}" style="padding: 0.5rem 1rem;">
-                      <i class="fas fa-check-square me-1"></i>全选
+                      <i class="fas fa-check-square me-1"></i><span data-i18n="actions.select_all">全选</span>
                     </button>
                     <button class="btn btn-secondary btn-sm rounded-3" onclick="exitBatchMode('${sub.path}')" style="padding: 0.5rem 1rem;">
-                      <i class="fas fa-times me-1"></i>取消
+                      <i class="fas fa-times me-1"></i><span data-i18n="actions.cancel">取消</span>
                     </button>
                   </div>
                 </div>
@@ -989,7 +991,7 @@
 
         listElement.appendChild(fragment);
       } catch (error) {
-        showToast('加载订阅列表失败: ' + error.message, 'danger');
+        showToast('' + (error.message || _t('common.loading')), 'danger');
       }
     }
 
@@ -1023,7 +1025,7 @@
       // 重置全选按钮状态
       resetSelectAllButton(subscriptionPath);
 
-      showToast('请选择要操作的节点，然后选择对应的操作', 'info');
+      showToast(_t('nodes.batch_select_tip'), 'info');
     }
 
     // 退出批量操作模式
@@ -1050,7 +1052,7 @@
     function resetSelectAllButton(subscriptionPath) {
       const selectAllBtn = document.getElementById('select-all-btn-' + subscriptionPath);
       if (selectAllBtn) {
-        selectAllBtn.innerHTML = '<i class="fas fa-check-square me-1"></i>全选';
+        selectAllBtn.innerHTML = '<i class="fas fa-check-square me-1"></i>' + _t('actions.select_all');
       }
     }
 
@@ -1071,9 +1073,9 @@
 
       // 更新按钮状态
       if (isAllSelected) {
-        selectAllBtn.innerHTML = '<i class="fas fa-check-square me-1"></i>全选';
+        selectAllBtn.innerHTML = '<i class="fas fa-check-square me-1"></i>' + _t('actions.select_all');
       } else {
-        selectAllBtn.innerHTML = '<i class="fas fa-minus-square me-1"></i>取消';
+        selectAllBtn.innerHTML = '<i class="fas fa-minus-square me-1"></i>' + _t('actions.unselect');
       }
     }
 
@@ -1083,11 +1085,11 @@
       const checkedNodes = nodeListArea.querySelectorAll('.node-checkbox:checked');
 
       if (checkedNodes.length === 0) {
-        showToast('请选择要删除的节点', 'warning');
+        showToast(_t('nodes.batch_delete_none'), 'warning');
         return;
       }
 
-      if (!confirm(`确定要删除选中的 ${checkedNodes.length} 个节点吗？`)) {
+      if (!confirm(_t('nodes.batch_delete_confirm', { count: checkedNodes.length }))) {
         return;
       }
 
@@ -1096,7 +1098,7 @@
         let failCount = 0;
 
         // 显示进度提示
-        showToast('正在删除节点...', 'info');
+        showToast(_t('nodes.batch_deleting'), 'info');
 
         // 批量删除所选节点
         for (const checkbox of checkedNodes) {
@@ -1123,9 +1125,9 @@
 
         // 显示删除结果
         if (failCount === 0) {
-          showToast(`成功删除 ${successCount} 个节点`, 'success');
+          showToast(_t('nodes.deleted'), 'success');
         } else {
-          showToast(`删除完成：成功 ${successCount} 个，失败 ${failCount} 个`, 'warning');
+          showToast(_t('nodes.batch_delete_done', { success: successCount, failed: failCount }), 'warning');
         }
 
         // 退出批量操作模式
@@ -1137,7 +1139,7 @@
 
       } catch (error) {
         console.error('批量删除失败:', error);
-        showToast('批量删除失败: ' + error.message, 'danger');
+        showToast('' + error.message, 'danger');
       }
     };
 
@@ -1147,12 +1149,12 @@
       const checkedNodes = nodeListArea.querySelectorAll('.node-checkbox:checked');
 
       if (checkedNodes.length === 0) {
-        showToast('请先选择要操作的节点', 'warning');
+        showToast(_t('nodes.batch_toggle_none'), 'warning');
         return;
       }
 
-      const action = enabled ? '启用' : '禁用';
-      if (!confirm('确定要' + action + '选中的 ' + checkedNodes.length + ' 个节点吗？')) {
+      const action = enabled ? _t('actions.enable') : _t('actions.disable');
+      if (!confirm(_t('nodes.batch_toggle_confirm', { action, count: checkedNodes.length }))) {
         return;
       }
 
@@ -1161,7 +1163,7 @@
         let failCount = 0;
 
         // 显示进度提示
-        showToast('正在' + action + '节点...', 'info');
+        showToast(_t('nodes.batch_toggling', { action }), 'info');
 
         // 批量操作所选节点
         for (const checkbox of checkedNodes) {
@@ -1189,9 +1191,9 @@
 
         // 显示操作结果
         if (failCount === 0) {
-          showToast('成功' + action + ' ' + successCount + ' 个节点', 'success');
+          showToast(_t('common.success'), 'success');
         } else {
-          showToast(action + '完成：成功 ' + successCount + ' 个，失败 ' + failCount + ' 个', 'warning');
+          showToast(_t('nodes.batch_toggle_done', { action, success: successCount, failed: failCount }), 'warning');
         }
 
         // 退出批量操作模式
@@ -1203,7 +1205,7 @@
 
       } catch (error) {
         console.error('批量操作失败:', error);
-        showToast('批量' + action + '失败: ' + error.message, 'danger');
+        showToast('' + error.message, 'danger');
       }
     }
 
@@ -1231,7 +1233,7 @@
       try {
         const form = document.getElementById('addNodeForm');
         if (!form) {
-          throw new Error('找不到表单元素');
+          throw new Error('Form not found');
         }
 
         const formData = new FormData(form);
@@ -1240,11 +1242,11 @@
         let content = formData.get('content')?.trim();
 
         if (!subscriptionPath) {
-          throw new Error('缺少订阅路径');
+          throw new Error('Missing subscription path');
         }
 
         if (!content) {
-          throw new Error('请填写节点内容');
+          throw new Error('Please fill node content');
         }
         console.log('Original content:', content);
         // 分割成行
@@ -1282,7 +1284,7 @@
         }
 
         if (validNodes.length === 0) {
-          throw new Error('未找到有效的节点链接');
+          throw new Error('No valid node links found');
         }
 
         // 批量创建节点，按顺序添加
@@ -1323,9 +1325,9 @@
 
         // 显示结果
         if (validNodes.length === 1) {
-          showToast(successful > 0 ? '节点添加成功' : '节点添加失败', successful > 0 ? 'success' : 'danger');
+          showToast(successful > 0 ? _t('nodes.added') : 'Node add failed', successful > 0 ? 'success' : 'danger');
         } else {
-          showToast(`添加完成：成功 ${successful} 个，失败 ${failed} 个`, successful > 0 ? 'success' : 'warning');
+          showToast(_t('nodes.add_result', { success: successful, failed: failed }), successful > 0 ? 'success' : 'warning');
         }
 
         // 关闭模态框
@@ -1348,18 +1350,18 @@
 
       } catch (error) {
         console.error('添加节点失败:', error);
-        showToast('添加节点失败: ' + error.message, 'danger');
+        showToast('' + error.message, 'danger');
       }
     }
 
     // 提取节点名称（前端版本）
     function extractNodeNameFrontend(nodeLink) {
-      if (!nodeLink) return '未命名节点';
+      if (!nodeLink) return 'Unnamed Node';
 
       // 处理snell节点
       if (nodeLink.includes('snell,')) {
         const name = nodeLink.split('=')[0].trim();
-        return name || '未命名节点';
+        return name || 'Unnamed Node';
       }
 
       // 处理 VMess 链接
@@ -1370,7 +1372,7 @@
             return config.ps;
           }
         } catch { }
-        return '未命名节点';
+        return 'Unnamed Node';
       }
 
       // 处理其他使用哈希标记名称的链接类型
@@ -1379,10 +1381,10 @@
         try {
           return decodeURIComponent(nodeLink.substring(hashIndex + 1));
         } catch {
-          return nodeLink.substring(hashIndex + 1) || '未命名节点';
+          return nodeLink.substring(hashIndex + 1) || 'Unnamed Node';
         }
       }
-      return '未命名节点';
+      return 'Unnamed Node';
     }
 
     // 节点类型常量定义
@@ -1442,7 +1444,7 @@
     async function showNodeList(subscriptionPath) {
       const nodeListArea = document.getElementById('node-list-' + subscriptionPath);
       if (!nodeListArea) {
-        console.error('找不到节点列表区域');
+        console.error('Node list area not found');
         return;
       }
 
@@ -1461,8 +1463,8 @@
 
         // 同时开始加载数据
         loadNodeList(subscriptionPath).catch(error => {
-          console.error('加载节点列表失败:', error);
-          showToast('加载节点列表失败: ' + error.message, 'danger');
+          console.error('Load node list failed:', error);
+          showToast('' + error.message, 'danger');
         });
       } else {
         nodeListArea.classList.remove('expanded');
@@ -1475,21 +1477,21 @@
     async function loadNodeList(subscriptionPath) {
       const nodeListArea = document.getElementById('node-list-' + subscriptionPath);
       if (!nodeListArea) {
-        throw new Error('找不到节点列表区域');
+        throw new Error('Node list area not found');
       }
 
       const tbody = nodeListArea.querySelector('tbody');
 
       // 先显示加载中的提示
-      tbody.innerHTML = '<tr><td colspan="2" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>加载中...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="2" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>' + _t('common.loading') + '</td></tr>';
 
       try {
         const response = await fetch('/' + adminPath + '/api/subscriptions/' + subscriptionPath + '/nodes');
-        if (!response.ok) throw new Error('加载失败');
+        if (!response.ok) throw new Error(_t('common.loading'));
 
         const result = await response.json();
         if (!result.success) {
-          throw new Error(result.message || '加载失败');
+          throw new Error(result.message || _t('common.loading'));
         }
 
         const nodes = result.data || [];
@@ -1520,13 +1522,13 @@
             ${nodeLink}
           </div>
                     <div class="node-actions d-flex" style="flex-shrink: 0; gap: 4px;">
-                      <button class="btn btn-sm btn-edit" onclick="showEditNodeModal('${subscriptionPath}', '${node.id}', '${escapedNodeLink}')" title="编辑节点">
+                      <button class="btn btn-sm btn-edit" onclick="showEditNodeModal('${subscriptionPath}', '${node.id}', '${escapedNodeLink}')" title="${_t('nodes.edit')}">
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button class="btn btn-sm btn-primary" onclick="copyToClipboard('${escapedNodeLink}')" title="复制链接">
+                      <button class="btn btn-sm btn-primary" onclick="copyToClipboard('${escapedNodeLink}')" title="${_t('common.copied')}">
                         <i class="fas fa-copy"></i>
                       </button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteNode('${subscriptionPath}', ${node.id})" title="删除节点">
+                      <button class="btn btn-sm btn-danger" onclick="deleteNode('${subscriptionPath}', ${node.id})" title="${_t('common.delete')}">
                         <i class="fas fa-trash"></i>
                       </button>
                     </div>
@@ -1537,7 +1539,7 @@
         }).join('');
 
         // 更新节点列表内容
-        tbody.innerHTML = nodesHtml || '<tr><td colspan="2" class="text-center py-4">暂无节点</td></tr>';
+        tbody.innerHTML = nodesHtml || '<tr><td colspan="2" class="text-center py-4">' + _t('nodes.none') + '</td></tr>';
 
         // 初始化拖拽排序
         if (nodes.length > 0) {
@@ -1573,10 +1575,10 @@
             }));
 
             await updateNodeOrder(subscriptionPath, newOrders);
-            showToast('节点排序已更新');
+            showToast(_t('nodes.sort_updated'));
           } catch (error) {
             console.error('更新节点排序失败:', error);
-            showToast('更新节点排序失败: ' + error.message, 'danger');
+            showToast(_t('nodes.sort_failed') + ': ' + error.message, 'danger');
             // 重新加载列表以恢复原始顺序
             await loadNodeList(subscriptionPath);
           }
@@ -1586,7 +1588,7 @@
 
     // 删除节点
     async function deleteNode(subscriptionPath, nodeId) {
-      if (!confirm('确定要删除这个节点吗？')) return;
+      if (!confirm(_t('nodes.delete_confirm'))) return;
 
       try {
         const response = await fetch('/' + adminPath + '/api/subscriptions/' + subscriptionPath + '/nodes/' + nodeId, {
@@ -1600,14 +1602,14 @@
         const result = await response.json();
 
         if (!response.ok) {
-          throw new Error(result.message || '删除失败');
+          throw new Error(result.message || '');
         }
 
-        showToast('节点已删除');
+        showToast(_t('nodes.deleted'));
         await loadNodeList(subscriptionPath);
         await loadSubscriptions();
       } catch (error) {
-        showToast('删除节点失败: ' + error.message, 'danger');
+        showToast('' + error.message, 'danger');
       }
     }
 
@@ -1619,7 +1621,7 @@
       const path = formData.get('path').trim();
 
       if (!name) {
-        showToast('请输入订阅名称', 'danger');
+        showToast(_t('subscription.name_required'), 'danger');
         form.querySelector('[name="name"]').focus();
         return;
       }
@@ -1628,7 +1630,7 @@
         const pathInput = form.querySelector('[name="path"]');
         pathInput.classList.add('is-invalid');
         pathInput.classList.remove('is-valid');
-        form.querySelector('.path-error').textContent = '路径格式不正确';
+        form.querySelector('.path-error').textContent = _t('subscription.path_invalid');
         form.querySelector('.path-error').style.display = 'block';
         pathInput.focus();
         return;
@@ -1646,14 +1648,14 @@
 
         const result = await response.json();
 
-        if (!response.ok) throw new Error(result.message || '创建失败');
+        if (!response.ok) throw new Error(result.message || '');
 
-        showToast('订阅创建成功');
+        showToast(_t('subscription.created'));
         bootstrap.Modal.getInstance(document.getElementById('addSubscriptionModal')).hide();
         form.reset();
         await loadSubscriptions();
       } catch (error) {
-        showToast('创建失败: ' + error.message, 'danger');
+        showToast('' + error.message, 'danger');
       }
     }
 
@@ -1696,7 +1698,7 @@
       try {
         // 验证输入
         if (!nameInput.value.trim()) {
-          showToast('请输入订阅名称', 'danger');
+          showToast(_t('subscription.name_required'), 'danger');
           nameInput.focus();
           return;
         }
@@ -1706,7 +1708,7 @@
         if (!validateSubscriptionPathFrontend(path)) {
           pathInput.classList.add('is-invalid');
           pathInput.classList.remove('is-valid');
-          pathError.textContent = '路径格式不正确';
+          pathError.textContent = _t('subscription.path_invalid');
           pathError.style.display = 'block';
           pathInput.focus();
           return;
@@ -1718,7 +1720,7 @@
           if (checkResponse.ok) {
             pathInput.classList.add('is-invalid');
             pathInput.classList.remove('is-valid');
-            pathError.textContent = '该路径已被使用';
+            pathError.textContent = _t('subscription.path_used');
             pathError.style.display = 'block';
             pathInput.focus();
             return;
@@ -1741,15 +1743,15 @@
         const result = await response.json();
 
         if (!response.ok) {
-          throw new Error(result.message || '更新失败');
+          throw new Error(result.message || '');
         }
 
-        showToast('订阅信息已更新');
+        showToast(_t('subscription.updated'));
         bootstrap.Modal.getInstance(document.getElementById('editNameModal')).hide();
         await loadSubscriptions();
       } catch (error) {
         console.error('更新订阅信息失败:', error);
-        showToast('更新失败: ' + error.message, 'danger');
+        showToast('' + error.message, 'danger');
       }
     }
 
@@ -1760,11 +1762,11 @@
         const path = form.querySelector('input[name="originalPath"]').value;
 
         if (!path) {
-          showToast('无效的订阅路径', 'danger');
+          showToast('' + _t('subscription.path_invalid'), 'danger');
           return;
         }
 
-        if (!confirm('确定要删除这个订阅吗？')) {
+        if (!confirm(_t('subscription.delete_confirm'))) {
           return;
         }
 
@@ -1778,7 +1780,7 @@
 
         if (!response.ok) {
           const result = await response.json();
-          throw new Error(result.message || '删除失败');
+          throw new Error(result.message || '');
         }
 
         // 关闭编辑模态框
@@ -1787,11 +1789,11 @@
           editModal.hide();
         }
 
-        showToast('订阅已删除');
+        showToast(_t('subscription.deleted'));
         await loadSubscriptions();
       } catch (error) {
         console.error('删除失败:', error);
-        showToast('删除失败: ' + error.message, 'danger');
+        showToast('' + error.message, 'danger');
       }
     }
 
@@ -1803,9 +1805,9 @@
     // 复制到剪贴板
     function copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(() => {
-        showToast('已复制到剪贴板');
+        showToast(_t('common.copied'));
       }).catch(() => {
-        showToast('复制失败', 'danger');
+        showToast(_t('common.copy_failed'), 'danger');
       });
     }
 
@@ -1815,7 +1817,7 @@
       const form = document.getElementById('editNodeForm');
 
       if (!modal || !form) {
-        showToast('显示编辑模态框失败：找不到必要的页面元素', 'danger');
+        showToast('' + 'Failed to open modal', 'danger');
         return;
       }
 
@@ -1839,13 +1841,13 @@
       const originalContent = form.getAttribute('data-original-content');
 
       if (!subscriptionPath || !nodeId || !content) {
-        showToast('请填写完整的节点信息', 'danger');
+        showToast('' + 'Please complete node info', 'danger');
         return;
       }
 
       // 检查内容是否被修改
       if (content === originalContent) {
-        showToast('节点内容未修改');
+        showToast('' + _t('common.success'));
         bootstrap.Modal.getInstance(document.getElementById('editNodeModal'))?.hide();
         return;
       }
@@ -1861,9 +1863,9 @@
         });
 
         const result = await response.json();
-        if (!response.ok) throw new Error(result.message || '更新失败');
+        if (!response.ok) throw new Error(result.message || '');
 
-        showToast('节点更新成功');
+        showToast(_t('nodes.edited'));
         bootstrap.Modal.getInstance(document.getElementById('editNodeModal'))?.hide();
         form.reset();
 
@@ -1874,7 +1876,7 @@
         ]);
 
       } catch (error) {
-        showToast('更新节点失败: ' + error.message, 'danger');
+        showToast('' + error.message, 'danger');
       }
     }
 
@@ -1893,7 +1895,7 @@
         const result = await response.json();
 
         if (!result.success) {
-          throw new Error(result.message || '保存排序失败');
+          throw new Error(result.message || '');
         }
 
         return result;
