@@ -4,6 +4,17 @@ PLATFORMS = linux/amd64,linux/arm64
 
 .PHONY: build push release
 
+up:
+	docker compose up -d
+
+buildup:
+	docker compose up -d --build
+
+down:
+	docker compose down
+
+logs:
+	docker compose logs -f
 # 本地构建(只构建当前架构，不推送)
 build:
 	docker build -t $(IMAGE_NAME):$(TAG) .

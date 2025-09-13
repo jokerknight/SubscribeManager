@@ -1,47 +1,78 @@
 
 [中文](https://github.com/jokerknight/SubscribeManager/blob/main/REAME_ZH.md)|English
 ### Overview
-SubscribeManager is a Node.js version of [Sub-Hub](https://github.com/shiyi11yi/Sub-Hub), a lightweight proxy subscription manager. It can now be deployed locally using Docker Compose, no Cloudflare Workers needed. It provides an intuitive web interface to manage multiple subscriptions and nodes, supporting various proxy protocols and subscription formats.
+SubscribeManager is the Node.js version of [Sub-Hub](https://github.com/shiyi11yi/Sub-Hub), a lightweight and simple proxy node subscription management system. It can now be deployed locally via Docker Compose, without Cloudflare Workers. Provides an intuitive web interface and supports multiple proxy protocols and subscription formats.
 
-### Features
-- **Supported Proxy Protocols**: SS, SS2022, VMess, Trojan, VLESS, SOCKS5, Snell, Hysteria2, Tuic
-- **Subscription Management**: Create multiple subscriptions, custom paths, bulk import, drag-and-drop ordering
-- **Multiple Subscription Formats**: Original, Base64(/v2ray), Surge(/surge), Clash(/clash)
-- **Security**: Admin login, session management, secure cookies
-- **Modern UI**: Responsive, mobile-friendly
+## Features
 
-### Deployment
+- Supports multiple proxy protocols: SS, SS2022, VMess, Trojan, VLESS, SOCKS5, Snell, Hysteria2, Tuic
+- Subscription management:
+  - Create multiple subscriptions
+  - Custom paths
+  - Bulk import
+  - Drag-and-drop sorting
+- Multiple subscription formats:
+  - Raw
+  - Base64 (/v2ray)
+  - Surge (/surge)
+  - Clash (/clash)
+- Security features:
+  - Admin login authentication
+  - Session management
+  - Secure cookies
+- Interface design:
+  - Responsive
+  - Mobile-friendly
+
+## Deployment Guide
+
 1. Make sure Docker and Docker Compose are installed
-2. Clone the project
-3. Create a `.env` file in the project root or renmame .env.example to .env and configure environment variables:
-```env
+2. Clone the project locally
+3. Create a .env file in the project root or copy .env.example and modify
+
+Example .env:
 SESSION_SECRET=your_session_secret
 ADMIN_PATH=admin
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=your_password
 DB_PATH=./data/subscriptions.db
-```
-4. Start the service:
-```bash
-docker-compose up -d --build
-```
-5. Access admin panel: `http://localhost:3000/${ADMIN_PATH}`
 
-### Database
-- Data stored in `./data/subscriptions.db`
-- Database tables will be initialized automatically on first run
+4. Start the service
 
-### Usage
-- **Create Subscription**: Login → Add Subscription → Enter name & path → Create
-- **Manage Nodes**: Select subscription → Add Node → Supports single/multi-line/Base64
-- **Node Ordering**: Node List → Drag & Drop → Auto-save
-- **Bulk Operations**: Bulk Delete → Select → Confirm
+- Use pre-built Docker Hub image:
+docker compose up -d
 
-### Notes
+- Build from source and start:
+docker compose up -d --build
+
+- Makefile commands:
+make up          # Use existing image
+make build       # Build from source and start
+make down        # Stop and remove containers
+make logs        # View logs
+
+5. Access the admin panel: http://localhost:3000/${ADMIN_PATH}
+
+## Database
+
+- Data is stored in ./data/subscriptions.db
+- Tables will be initialized automatically on first run
+
+## Usage
+
+- Create Subscription: Login → Add Subscription → Enter name and path → Create
+- Manage Nodes: Select a subscription → Add nodes (supports single line, multiple lines, Base64)
+- Sort Nodes: Node list → Drag-and-drop → Auto-save
+- Bulk Actions: Bulk delete → Select → Confirm
+
+## Notes
+
 - Change default admin password after first deployment
-- Backup database regularly
-- Keep admin panel info safe
+- Regularly backup your database
+- Keep your admin panel info safe
 - Use strong passwords
 
-### Tech Stack
-Node.js, Express, SQLite, Docker, Docker Compose, HTML5, CSS3, JS(ES6+), Bootstrap 5, Font Awesome, SortableJS
+## Tech Stack
+
+Node.js, Express, SQLite, Docker, Docker Compose, HTML5, CSS3, JavaScript (ES6+), Bootstrap 5, Font Awesome, SortableJS
+
