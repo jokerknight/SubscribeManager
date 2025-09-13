@@ -39,19 +39,19 @@ DB_PATH=./data/subscriptions.db
 
 4. Start the service
 
-- Use pre-built Docker Hub image:
-docker compose up -d
+Use pre-built Docker Hub image:
+> docker compose up -d
 
-- Build from source and start:
-docker compose up -d --build
+Build from source and start:
+> docker compose up -d --build
 
-- Makefile commands:
-make up          # Use existing image
-make build       # Build from source and start
-make down        # Stop and remove containers
-make logs        # View logs
+Makefile commands:
+- make up          # Use existing image
+- make build       # Build from source and start
+- make down        # Stop and remove containers
+- make logs        # View logs
 
-5. Access the admin panel: http://localhost:3000/${ADMIN_PATH}
+1. Access the admin panel: http://localhost:3000/${ADMIN_PATH}
 
 ## Database
 

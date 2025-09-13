@@ -29,28 +29,30 @@ SubscribeManager 是 [Sub-Hub](https://github.com/shiyi11yi/Sub-Hub) 的 Node.js
 2. 克隆项目到本地
 3. 在项目根目录创建 .env 文件或复制 .env.example 文件并修改
 
+```
 示例 .env:
 SESSION_SECRET=你的会话密钥
 ADMIN_PATH=admin
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=你的密码
 DB_PATH=./data/subscriptions.db
+```
 
 4. 启动服务
 
-- 使用已构建的 Docker Hub 镜像:
-docker compose up -d
+使用已构建的 Docker Hub 镜像:
+> docker compose up -d
 
-- 从源码构建镜像并启动:
-docker compose up -d --build
+从源码构建镜像并启动:
+> docker compose up -d --build
 
-- Makefile 方式:
-make up          # 使用已构建镜像
-make build       # 从源码构建并启动
-make down        # 停止并删除容器
-make logs        # 查看日志
+> Makefile 方式:
+- make up          # 使用已构建镜像
+- make build       # 从源码构建并启动
+- make down        # 停止并删除容器
+- make logs        # 查看日志
 
-5. 访问管理面板: http://localhost:3000/${ADMIN_PATH}
+1. 访问管理面板: http://localhost:3000/${ADMIN_PATH}
 
 ## 数据库
 
