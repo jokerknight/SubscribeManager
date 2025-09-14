@@ -1,6 +1,6 @@
 # SubscribeManager
 
-[中文](https://github.com/jokerknight/SubscribeManager/blob/main/README_ZH.md) | EN
+[中文](https://github.com/jokerknight/SubscribeManager/blob/main/REAME_ZH.md) | EN
 
 ### Overview
 
