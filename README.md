@@ -1,84 +1,109 @@
+# SubscribeManager
 
-[中文](https://github.com/jokerknight/SubscribeManager/blob/main/REAME_ZH.md)|English
+[中文](https://github.com/jokerknight/SubscribeManager/blob/main/README_ZH.md) | EN
+
 ### Overview
-SubscribeManager is the Node.js version of [Sub-Hub](https://github.com/shiyi11yi/Sub-Hub), a lightweight and simple proxy node subscription management system. It can now be deployed locally via Docker Compose, without Cloudflare Workers. Provides an intuitive web interface and supports multiple proxy protocols and subscription formats.
 
-## TestEnv
-[SubscribeManager On Render](https://subscribemanager.onrender.com/admin)
-username: admin
-password: admin
-path: admin
+SubscribeManager is the Node.js version of [Sub-Hub](https://github.com/shiyi11yi/Sub-Hub),  
+a lightweight and simple proxy node subscription management system.  
+It can now be deployed locally via Docker Compose, without Cloudflare Workers.  
+It provides an intuitive web interface and supports multiple proxy protocols and subscription formats.
 
-## Features
+## 🌐 Live Demo
 
-- Supports multiple proxy protocols: SS, SS2022, VMess, Trojan, VLESS, SOCKS5, Snell, Hysteria2, Tuic
-- Subscription management:
-  - Create multiple subscriptions
-  - Custom paths
-  - Bulk import
-  - Drag-and-drop sorting
-- Multiple subscription formats:
-  - Raw
-  - Base64 (/v2ray)
-  - Surge (/surge)
-  - Clash (/clash)
-- Security features:
-  - Admin login authentication
-  - Session management
-  - Secure cookies
-- Interface design:
-  - Responsive
-  - Mobile-friendly
+[SubscribeManager On Render](https://subscribemanager.onrender.com/admin)  
+**username:** `admin`  
+**password:** `admin`  
+**path:** `admin`
 
-## Deployment Guide
+## ✨ Features
 
-1. Make sure Docker and Docker Compose are installed
-2. Clone the project locally
-3. Create a .env file in the project root or copy .env.example and modify
+-   **Multiple Protocols Supported**: SS, SS2022, VMess, Trojan, VLESS, SOCKS5, Snell, Hysteria2, Tuic
+-   **Subscription Management**:
+    -   Create multiple subscriptions
+    -   Custom paths
+    -   Bulk import
+    -   Drag-and-drop sorting
+-   **Multiple Subscription Formats**:
+    -   Raw
+    -   Base64 (`/v2ray`)
+    -   Surge (`/surge`)
+    -   Clash (`/clash`)
+-   **Security Features**:
+    -   Admin login authentication
+    -   Session management
+    -   Secure cookies
+-   **Interface Design**:
+    -   Responsive design
+    -   Mobile-friendly
 
-Example .env:
-SESSION_SECRET=your_session_secret
-ADMIN_PATH=admin
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=your_password
-DB_PATH=./data/subscriptions.db
+## 🚀 Deployment Guide
 
-4. Start the service
+1.  Ensure **Docker** and **Docker Compose** are installed
+2.  Clone the project locally\
+3.  Create a `.env` file in the project root or copy `.env.example` and modify
 
-Use pre-built Docker Hub image:
-> docker compose up -d
+```
+    Example .env:
+    SESSION_SECRET=your_session_secret
+    ADMIN_PATH=admin
+    ADMIN_USERNAME=admin
+    ADMIN_PASSWORD=your_password
+    DB_PATH=./data/subscriptions.db
+```
 
-Build from source and start:
-> docker compose up -d --build
+4.  Start the service
 
-Makefile commands:
-- make up          # Use existing image
-- make buildup       # Build from source and start
-- make down        # Stop and remove containers
-- make logs        # View logs
+-   Using pre-built Docker Hub image:
 
-5. Access the admin panel: http://localhost:3000/${ADMIN_PATH}
+    ```bash
+    docker compose up -d
+    ```
 
-## Database
+-   Build from source and start:
 
-- Data is stored in ./data/subscriptions.db
-- Tables will be initialized automatically on first run
+    ```bash
+    docker compose up -d --build
+    ```
 
-## Usage
+-   Makefile commands:
 
-- Create Subscription: Login → Add Subscription → Enter name and path → Create
-- Manage Nodes: Select a subscription → Add nodes (supports single line, multiple lines, Base64)
-- Sort Nodes: Node list → Drag-and-drop → Auto-save
-- Bulk Actions: Bulk delete → Select → Confirm
+    ```bash
+    make up       # Use pre-built image
+    make buildup  # Build from source and start
+    make down     # Stop and remove containers
+    make logs     # View logs
+    ```
 
-## Notes
+5.  Access the admin panel: `http://localhost:3000/${ADMIN_PATH}`
 
-- Change default admin password after first deployment
-- Regularly backup your database
-- Keep your admin panel info safe
-- Use strong passwords
+## 💾 Database
 
-## Tech Stack
+-   Data is stored in `./data/subscriptions.db`
+-   Tables will be automatically initialized on first run
 
-Node.js, Express, SQLite, Docker, Docker Compose, HTML5, CSS3, JavaScript (ES6+), Bootstrap 5, Font Awesome, SortableJS
+## 📖 Usage Instructions
+
+-   **Create Subscription**: Login → Add Subscription → Enter name and path → Create
+-   **Manage Nodes**: Select subscription → Add nodes → Supports single line, multiple lines, Base64
+-   **Node Sorting**: Node list → Drag-and-drop → Auto-save
+-   **Bulk Actions**: Bulk delete → Select → Confirm
+
+## ⚠️ Notes
+
+-   Change the default admin password after first deployment
+-   Regularly back up the database
+-   Keep admin panel credentials safe
+-   Use strong passwords
+
+## 🛠️ Tech Stack
+
+-   Node.js
+-   Express
+-   SQLite
+-   Docker & Docker Compose
+-   HTML5 / CSS3 / JavaScript (ES6+)
+-   Bootstrap 5
+-   Font Awesome
+-   SortableJS
 
