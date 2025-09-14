@@ -6,8 +6,8 @@ const fs = require('fs');
 const app = express();
 const routes = require('./routes');
 const { initializeDatabase } = require('./database');
-
 const PORT = process.env.PORT || 3000;
+
 app.set('trust proxy', 1);
 // 中间件配置
 app.use(express.urlencoded({ extended: true }));
@@ -23,6 +23,12 @@ app.use(session({
     maxAge: 24 * 60 * 60 * 1000 // 24小时
   }
 }));
+app.get('/config', (req, res) => {
+  res.json({
+    ADMIN_PATH: process.env.ADMIN_PATH || 'admin'
+  });
+});
+
 
 // 确保数据目录存在
 function ensureDataDirectory() {

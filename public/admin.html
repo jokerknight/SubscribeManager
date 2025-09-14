@@ -7,6 +7,7 @@
   <title>Subscribe-Manager</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <style>
     :root {
@@ -724,7 +725,7 @@
           <button class="btn btn-sm btn-outline-secondary" data-set-lang="zh-CN">中文</button>
           <button class="btn btn-sm btn-outline-secondary" data-set-lang="en">EN</button>
         </div>
-        <a href="/admin/logout" class="logout-btn">
+        <a class="logout-btn" onclick="logout()" href="#">
           <i class="fas fa-sign-out-alt me-1"></i>
           <span data-i18n="navbar.logout">退出</span>
         </a>
@@ -760,12 +761,14 @@
         <div class="modal-body">
           <form id="addSubscriptionForm" onsubmit="return false;">
             <div class="mb-3">
-              <label class="form-label"><span data-i18n="subscription.name_label">订阅名称</span> <span class="text-danger">*</span></label>
+              <label class="form-label"><span data-i18n="subscription.name_label">订阅名称</span> <span
+                  class="text-danger">*</span></label>
               <input type="text" class="form-control" name="name" required>
               <div class="invalid-feedback" data-i18n="subscription.name_required">请输入订阅名称</div>
             </div>
             <div class="mb-3">
-              <label class="form-label"><span data-i18n="subscription.path_label">订阅路径</span> <span class="text-danger">*</span></label>
+              <label class="form-label"><span data-i18n="subscription.path_label">订阅路径</span> <span
+                  class="text-danger">*</span></label>
               <input type="text" class="form-control" name="path" required pattern="^[a-z0-9-]+$" minlength="5"
                 maxlength="50">
               <div class="form-text" data-i18n="subscription.path_help">路径只能包含小写字母、数字和连字符，长度在5-50个字符之间</div>
@@ -775,7 +778,8 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
-          <button type="button" class="btn btn-primary" onclick="createSubscription()" data-i18n="common.create">创建</button>
+          <button type="button" class="btn btn-primary" onclick="createSubscription()"
+            data-i18n="common.create">创建</button>
         </div>
       </div>
     </div>
@@ -793,8 +797,10 @@
           <form id="addNodeForm" onsubmit="return false;">
             <input type="hidden" name="subscriptionPath" value="">
             <div class="mb-3">
-              <label class="form-label"><span data-i18n="nodes.content_label">节点内容</span> <span class="text-danger">*</span></label>
-              <textarea class="form-control" name="content" rows="6" required data-i18n-placeholder="nodes.placeholder"></textarea>
+              <label class="form-label"><span data-i18n="nodes.content_label">节点内容</span> <span
+                  class="text-danger">*</span></label>
+              <textarea class="form-control" name="content" rows="6" required
+                data-i18n-placeholder="nodes.placeholder"></textarea>
             </div>
           </form>
         </div>
@@ -820,12 +826,14 @@
           <form id="editNameForm" onsubmit="return false;">
             <input type="hidden" name="originalPath">
             <div class="mb-3">
-              <label class="form-label"><span data-i18n="subscription.name_label">订阅名称</span> <span class="text-danger">*</span></label>
+              <label class="form-label"><span data-i18n="subscription.name_label">订阅名称</span> <span
+                  class="text-danger">*</span></label>
               <input type="text" class="form-control" name="name" required>
               <div class="invalid-feedback" data-i18n="subscription.name_required">请输入订阅名称</div>
             </div>
             <div class="mb-3">
-              <label class="form-label"><span data-i18n="subscription.path_label">订阅路径</span> <span class="text-danger">*</span></label>
+              <label class="form-label"><span data-i18n="subscription.path_label">订阅路径</span> <span
+                  class="text-danger">*</span></label>
               <input type="text" class="form-control" name="path" required>
               <div class="form-text" data-i18n="subscription.path_help">路径只能包含小写字母、数字和连字符，长度在5-50个字符之间</div>
               <div class="path-error text-danger"></div>
@@ -837,8 +845,10 @@
             <i class="fas fa-trash"></i> <span data-i18n="common.delete">删除</span>
           </button>
           <div>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
-            <button type="button" class="btn btn-primary" onclick="updateSubscriptionInfo()" data-i18n="common.save">保存</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+              data-i18n="common.cancel">取消</button>
+            <button type="button" class="btn btn-primary" onclick="updateSubscriptionInfo()"
+              data-i18n="common.save">保存</button>
           </div>
         </div>
       </div>
@@ -858,8 +868,10 @@
             <input type="hidden" name="subscriptionPath" value="">
             <input type="hidden" name="nodeId" value="">
             <div class="mb-3">
-              <label class="form-label"><span data-i18n="nodes.content_label">节点内容</span> <span class="text-danger">*</span></label>
-              <textarea class="form-control" name="content" rows="6" required data-i18n-placeholder="nodes.placeholder"></textarea>
+              <label class="form-label"><span data-i18n="nodes.content_label">节点内容</span> <span
+                  class="text-danger">*</span></label>
+              <textarea class="form-control" name="content" rows="6" required
+                data-i18n-placeholder="nodes.placeholder"></textarea>
             </div>
           </form>
         </div>
@@ -887,12 +899,15 @@
   <script src="/js/i18n.js"></script>
   <script>
     // 定义 adminPath 变量
-    const adminPath = 'admin';
+    let adminPath = 'admin';
     const _t = (k, params) => (window.i18n && window.i18n.t(k, params)) || k;
-    window.i18n && window.i18n.init && window.i18n.init();
+    async function logout() {
+      window.location.href = '/' + adminPath + '/logout';
+    }
     // 优化的loadSubscriptions函数
     async function loadSubscriptions() {
       try {
+
         const response = await fetch('/' + adminPath + '/api/subscriptions');
         if (!response.ok) throw new Error(_t('common.loading'));
         const result = await response.json();
@@ -994,9 +1009,33 @@
         showToast('' + (error.message || _t('common.loading')), 'danger');
       }
     }
+    async function initializeApp() {
+      // 初始化多语言支持
+      window.i18n && window.i18n.init && window.i18n.init();
+
+      try {
+        // 2. 使用 await 等待 fetch 请求完成
+        const response = await fetch('/config');
+        if (!response.ok) {
+          // 如果请求失败，可以抛出错误或使用默认值
+          console.error('Failed to load config, using default admin path.');
+        } else {
+          const config = await response.json();
+          // 3. 成功获取配置后，更新 adminPath
+          adminPath = config.ADMIN_PATH || 'admin';
+          console.log('Admin path loaded:', adminPath);
+        }
+      } catch (error) {
+        console.error('Error fetching config:', error);
+        // 出错时，依然可以使用默认的 adminPath
+      }
+
+      // 4. 确保在 adminPath 设置完成后，再加载订阅列表
+      await loadSubscriptions();
+    }
 
     // 页面加载完成后，加载订阅列表
-    window.addEventListener('load', loadSubscriptions);
+    window.addEventListener('load', initializeApp);
 
     // 进入批量操作模式
     function enterBatchMode(subscriptionPath) {

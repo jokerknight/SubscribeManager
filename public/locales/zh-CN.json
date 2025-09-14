@@ -13,7 +13,8 @@
     "close": "关闭",
     "confirm": "确认",
     "copied": "已复制到剪贴板",
-    "copy_failed": "复制失败"
+    "copy_failed": "复制失败",
+    "network_error": "网络错误，请重试"
   },
   "navbar": {
     "brand": "Subscribe-Manager",
@@ -29,6 +30,8 @@
     "error": "用户名或密码错误",
     "request_error": "登录请求失败，请重试"
   },
+  "logout_sucess": "退出登录成功",
+  "logout_failed": "退出登录失败，请重试",
   "actions": {
     "add_subscription": "添加订阅",
     "add_node": "添加节点",

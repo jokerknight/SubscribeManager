@@ -13,7 +13,8 @@
     "close": "Close",
     "confirm": "Confirm",
     "copied": "Copied to clipboard",
-    "copy_failed": "Copy failed"
+    "copy_failed": "Copy failed",
+    "network_error": "Network error, please try again"
   },
   "navbar": {
     "brand": "Subscribe-Manager",
@@ -29,6 +30,8 @@
     "error": "Incorrect username or password",
     "request_error": "Login request failed, please try again"
   },
+  "logout_sucess": "Logged out successfully",
+  "logout_failed": "Logout failed, please try again",
   "actions": {
     "add_subscription": "Add Subscription",
     "add_node": "Add Node",
