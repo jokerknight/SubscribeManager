@@ -8,6 +8,13 @@ const routes = require('./routes');
 const { initializeDatabase } = require('./database');
 const PORT = process.env.PORT || 3000;
 
+// ******** 开始诊断代码 ********
+// 把它放在所有 app.use(...) 的最前面
+app.use((req, res, next) => {
+  console.log('Request Headers:', JSON.stringify(req.headers, null, 2));
+  next();
+});
+// ******** 结束诊断代码 ********
 app.set('trust proxy', 1);
 // 中间件配置
 app.use(express.urlencoded({ extended: true }));
