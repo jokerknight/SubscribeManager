@@ -47,7 +47,7 @@ Build from source and start:
 
 Makefile commands:
 - make up          # Use existing image
-- make build       # Build from source and start
+- make buildup       # Build from source and start
 - make down        # Stop and remove containers
 - make logs        # View logs
 

@@ -8,7 +8,7 @@ const routes = require('./routes');
 const { initializeDatabase } = require('./database');
 
 const PORT = process.env.PORT || 3000;
-
+app.set('trust proxy', 1);
 // 中间件配置
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

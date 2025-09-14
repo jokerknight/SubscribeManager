@@ -48,7 +48,7 @@ DB_PATH=./data/subscriptions.db
 
 Makefile 方式:
 - make up          # 使用已构建镜像
-- make build       # 从源码构建并启动
+- make buildup       # 从源码构建并启动
 - make down        # 停止并删除容器
 - make logs        # 查看日志
 
