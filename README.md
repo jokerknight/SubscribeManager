@@ -3,6 +3,12 @@
 ### Overview
 SubscribeManager is the Node.js version of [Sub-Hub](https://github.com/shiyi11yi/Sub-Hub), a lightweight and simple proxy node subscription management system. It can now be deployed locally via Docker Compose, without Cloudflare Workers. Provides an intuitive web interface and supports multiple proxy protocols and subscription formats.
 
+## TestEnv
+[SubscribeManager On Render](https://subscribemanager.onrender.com/admin)
+username: admin
+password: admin
+path: admin
+
 ## Features
 
 - Supports multiple proxy protocols: SS, SS2022, VMess, Trojan, VLESS, SOCKS5, Snell, Hysteria2, Tuic

@@ -2,6 +2,12 @@
 ### 简介
 SubscribeManager 是 [Sub-Hub](https://github.com/shiyi11yi/Sub-Hub) 的 Node.js 版本，是一个轻量级、简单的代理节点订阅管理系统。现在可以通过 Docker Compose 本地部署，无需 Cloudflare Workers。提供直观的 Web 界面，支持多种代理协议和订阅格式。
 
+## 线上体验
+[SubscribeManager On Render](https://subscribemanager.onrender.com/admin)
+username: admin
+password: admin
+path: admin
+
 ## 功能特点
 
 - 支持多种代理协议: SS, SS2022, VMess, Trojan, VLESS, SOCKS5, Snell, Hysteria2, Tuic
