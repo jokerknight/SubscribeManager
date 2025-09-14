@@ -40,7 +40,7 @@ It provides an intuitive web interface and supports multiple proxy protocols and
 ## 🚀 Deployment Guide
 
 1.  Ensure **Docker** and **Docker Compose** are installed
-2.  Clone the project locally\
+2.  Clone the project locally
 3.  Create a `.env` file in the project root or copy `.env.example` and modify
 
 ```
