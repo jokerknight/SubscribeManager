@@ -682,7 +682,7 @@ function parseSocksLink(socksLink) {
 
 // 解析 Hysteria2 链接为 Surge 格式
 function parseHysteria2ToSurge(hysteria2Link) {
-  if (!hysteria2Link.startsWith(NODE_TYPES.HYSTERIA2)) return null;
+  if (!hysteria2Link.startsWith(NODE_TYPES.HYSTERIA2) || !hysteria2Link.startsWith(NODE_TYPES.HY2) ) return null;
 
   try {
     const url = new URL(hysteria2Link);
@@ -822,6 +822,7 @@ function convertToSurge(content) {
     [NODE_TYPES.TROJAN, parseTrojanLink],
     [NODE_TYPES.SOCKS, parseSocksLink],
     [NODE_TYPES.HYSTERIA2, parseHysteria2ToSurge],
+    [NODE_TYPES.HY2, parseHysteria2ToSurge],
     [NODE_TYPES.TUIC, parseTuicToSurge]
   ]);
   return content
@@ -1174,7 +1175,7 @@ function parseNodeToClash(nodeLink) {
   }
 
   // 解析 Hysteria2 节点
-  if (lowerLink.startsWith(NODE_TYPES.HYSTERIA2)) {
+  if (lowerLink.startsWith(NODE_TYPES.HYSTERIA2) || lowerLink.startsWith(NODE_TYPES.HY2)) {
     return parseHysteria2ToClash(nodeLink);
   }
 
@@ -1256,7 +1257,7 @@ function parseTuicToClash(tuicLink) {
 
 // 解析 Hysteria2 节点为 Clash 格式
 function parseHysteria2ToClash(hysteria2Link) {
-  if (!hysteria2Link.startsWith(NODE_TYPES.HYSTERIA2)) return null;
+  if (!hysteria2Link.startsWith(NODE_TYPES.HYSTERIA2)||!hysteria2Link.startsWith(NODE_TYPES.HY2)) return null;
 
   try {
     const url = new URL(hysteria2Link);
@@ -1319,6 +1320,7 @@ const NODE_TYPES = {
   VLESS: 'vless://',
   SOCKS: 'socks://',
   HYSTERIA2: 'hysteria2://',
+  HY2: 'hy2://',
   TUIC: 'tuic://',
   SNELL: 'snell,'
 };
