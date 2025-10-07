@@ -14,7 +14,8 @@
     "confirm": "确认",
     "copied": "已复制到剪贴板",
     "copy_failed": "复制失败",
-    "network_error": "网络错误，请重试"
+    "network_error": "网络错误，请重试",
+    "error_prefix": "错误: "
   },
   "navbar": {
     "brand": "Subscribe-Manager",
@@ -56,11 +57,16 @@
     "deleted": "订阅已删除",
     "delete_confirm": "确定要删除这个订阅吗？",
     "path_used": "该路径已被使用",
-    "address_n": "订阅地址{n}："
+    "address_n": "订阅地址{n}：",
+    "not_found": "订阅不存在"
   },
   "nodes": {
     "title": "节点",
     "content_label": "节点内容",
+    "content_required": "缺少节点内容",
+    "unsupported_format": "不支持的节点格式",
+    "invalid_enabled": "无效的 enabled 值",
+    "invalid_orders": "无效的 orders 数据",
     "placeholder": "请输入节点内容，支持以下格式：\n1. ss://... \n2. vless://...（除Surge） \n3. vmess://... \n4. trojan://... \n5. socks://... \n6. hysteria2://... \n7. tuic://... \n8. snell格式（仅Surge）\n9. Base64编码格式",
     "list": "节点列表",
     "loading": "加载中...",
@@ -83,7 +89,9 @@
     "batch_toggling": "正在{action}节点...",
     "batch_toggle_done": "{action}完成：成功 {success} 个，失败 {failed} 个",
     "sort_updated": "节点排序已更新",
-    "sort_failed": "更新节点排序失败"
+    "sort_failed": "更新节点排序失败",
+    "enabled": "节点已启用",
+    "disabled": "节点已禁用"
   },
   "modal": {
     "add_node_title": "添加节点",

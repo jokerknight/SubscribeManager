@@ -14,7 +14,8 @@
     "confirm": "Confirm",
     "copied": "Copied to clipboard",
     "copy_failed": "Copy failed",
-    "network_error": "Network error, please try again"
+    "network_error": "Network error, please try again",
+    "error_prefix": "Error: "
   },
   "navbar": {
     "brand": "Subscribe-Manager",
@@ -56,11 +57,16 @@
     "deleted": "Subscription deleted",
     "delete_confirm": "Are you sure you want to delete this subscription?",
     "path_used": "This path is already in use",
-    "address_n": "Sub URL {n}:"
+    "address_n": "Sub URL {n}:",
+    "not_found": "Subscription not found"
   },
   "nodes": {
     "title": "Nodes",
     "content_label": "Node Content",
+    "content_required": "Missing node content",
+    "unsupported_format": "Unsupported node format",
+    "invalid_enabled": "Invalid enabled value",
+    "invalid_orders": "Invalid orders data",
     "placeholder": "Enter node content. Supported formats: ss://, vless:// (except Surge), vmess://, trojan://, socks://, hysteria2://, tuic://, snell (Surge only), Base64",
     "list": "Node List",
     "loading": "Loading...",
@@ -83,7 +89,9 @@
     "batch_toggling": "{action} nodes...",
     "batch_toggle_done": "{action} completed: success {success}, failed {failed}",
     "sort_updated": "Node order updated",
-    "sort_failed": "Failed to update node order"
+    "sort_failed": "Failed to update node order",
+    "enabled": "Node enabled",
+    "disabled": "Node disabled"
   },
   "modal": {
     "add_node_title": "Add Node",

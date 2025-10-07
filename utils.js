@@ -682,7 +682,7 @@ function parseSocksLink(socksLink) {
 
 // 解析 Hysteria2 链接为 Surge 格式
 function parseHysteria2ToSurge(hysteria2Link) {
-  if (!hysteria2Link.startsWith(NODE_TYPES.HYSTERIA2) || !hysteria2Link.startsWith(NODE_TYPES.HY2) ) return null;
+  if (!hysteria2Link.startsWith(NODE_TYPES.HYSTERIA2) && !hysteria2Link.startsWith(NODE_TYPES.HY2)) return null;
 
   try {
     const url = new URL(hysteria2Link);
@@ -815,7 +815,6 @@ function parseTuicToSurge(tuicLink) {
 function convertToSurge(content) {
   if (!content?.trim()) return '';
 
-  // 使用Map来映射节点类型和处理函数，提高性能
   const nodeParserMap = new Map([
     [NODE_TYPES.SS, parseSIP002Format],
     [NODE_TYPES.VMESS, parseVmessLink],
@@ -825,30 +824,27 @@ function convertToSurge(content) {
     [NODE_TYPES.HY2, parseHysteria2ToSurge],
     [NODE_TYPES.TUIC, parseTuicToSurge]
   ]);
+
   return content
     .split(/\r?\n/)
     .map(line => {
-
       const trimmedLine = line.trim();
       if (!trimmedLine) return null;
 
-      // 如果已经是snell格式,格式化并返回
       if (trimmedLine.includes(NODE_TYPES.SNELL)) {
         return formatSnellConfig(trimmedLine);
       }
 
-      // 跳过 VLESS 节点
       if (trimmedLine.toLowerCase().startsWith(NODE_TYPES.VLESS)) {
         return null;
       }
 
-      // 检查是否有匹配的解析器
       for (const [prefix, parser] of nodeParserMap.entries()) {
         if (trimmedLine.startsWith(prefix)) {
           return parser(trimmedLine);
         }
       }
-
+      
       return null;
     })
     .filter(Boolean)
@@ -1319,6 +1315,7 @@ const NODE_TYPES = {
   TROJAN: 'trojan://',
   VLESS: 'vless://',
   SOCKS: 'socks://',
+  SOCKS5: 'socks5://',
   HYSTERIA2: 'hysteria2://',
   HY2: 'hy2://',
   TUIC: 'tuic://',
@@ -1370,7 +1367,21 @@ async function dbRun(sql, params) {
   return db.run(sql, params);
 }
 
+// 事务处理
+async function withTransaction(callback) {
+  const db = getDB();
+  await db.run('BEGIN TRANSACTION');
+  try {
+    await callback(db);
+    await db.run('COMMIT');
+  } catch (error) {
+    await db.run('ROLLBACK');
+    throw error;
+  }
+}
+
 module.exports = {
+  withTransaction,
   safeBase64Decode,
   safeBase64Encode,
   validateSubscriptionPath,

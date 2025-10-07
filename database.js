@@ -1,14 +1,21 @@
 const sqlite3 = require('sqlite3').verbose();
 const { open } = require('sqlite');
+const { dbPath } = require('./config');
+const fs = require('fs');
 const path = require('path');
-
-const DB_PATH = process.env.DB_PATH || path.resolve(__dirname, 'subscriptions.db');
 
 let db;
 
 async function initializeDatabase() {
+  // Ensure the database directory exists
+  const dbDir = path.dirname(dbPath);
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+    console.log(`创建数据目录: ${dbDir}`);
+  }
+
   db = await open({
-    filename: DB_PATH,
+    filename: dbPath,
     driver: sqlite3.Database
   });
 
@@ -35,7 +42,7 @@ async function createTables() {
       enabled BOOLEAN DEFAULT 1,
       FOREIGN KEY (subscription_id) REFERENCES subscriptions(id) ON DELETE CASCADE
     );
-    
+
     CREATE TABLE IF NOT EXISTS sessions (
       session_id TEXT PRIMARY KEY,
       username TEXT NOT NULL,

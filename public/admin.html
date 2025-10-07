@@ -722,8 +722,8 @@
       </a>
       <div class="navbar-user ms-auto d-flex align-items-center">
         <div class="btn-group me-3">
-          <button class="btn btn-sm btn-outline-secondary" data-set-lang="zh-CN">中文</button>
-          <button class="btn btn-sm btn-outline-secondary" data-set-lang="en">EN</button>
+          <button class="btn btn-sm btn-outline-secondary lang-select-btn" data-set-lang="zh-CN">中文</button>
+          <button class="btn btn-sm btn-outline-secondary lang-select-btn" data-set-lang="en">EN</button>
         </div>
         <a class="logout-btn" onclick="logout()" href="#">
           <i class="fas fa-sign-out-alt me-1"></i>
@@ -732,6 +732,13 @@
       </div>
     </div>
   </nav>
+  <style>
+    .lang-select-btn.active {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+  </style>
 
   <div class="container">
     <div class="subscription-item"
@@ -1005,6 +1012,7 @@
         }
 
         listElement.appendChild(fragment);
+        window.i18n.translateDOM(listElement); // 翻译新添加的订阅项
       } catch (error) {
         showToast('' + (error.message || _t('common.loading')), 'danger');
       }
@@ -1034,8 +1042,8 @@
       await loadSubscriptions();
     }
 
-    // 页面加载完成后，加载订阅列表
-    window.addEventListener('load', initializeApp);
+    // DOM 内容加载完成后，加载订阅列表
+    window.addEventListener('DOMContentLoaded', initializeApp);
 
     // 进入批量操作模式
     function enterBatchMode(subscriptionPath) {
@@ -1364,7 +1372,7 @@
 
         // 显示结果
         if (validNodes.length === 1) {
-          showToast(successful > 0 ? _t('nodes.added') : 'Node add failed', successful > 0 ? 'success' : 'danger');
+          showToast(successful > 0 ? _t('nodes.added') : _t('nodes.add_failed'), successful > 0 ? 'success' : 'danger');
         } else {
           showToast(_t('nodes.add_result', { success: successful, failed: failed }), successful > 0 ? 'success' : 'warning');
         }
@@ -1433,6 +1441,7 @@
       TROJAN: 'trojan://',
       VLESS: 'vless://',
       SOCKS: 'socks://',
+      SOCKS5: 'socks5://',
       HYSTERIA2: 'hysteria2://',
       HY2: 'hy2://',
       TUIC: 'tuic://',
@@ -1523,7 +1532,7 @@
       const tbody = nodeListArea.querySelector('tbody');
 
       // 先显示加载中的提示
-      tbody.innerHTML = '<tr><td colspan="2" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>' + _t('common.loading') + '</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="2" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i><span data-i18n="common.loading"></span></td></tr>';
 
       try {
         const response = await fetch('/' + adminPath + '/api/subscriptions/' + subscriptionPath + '/nodes');
@@ -1562,13 +1571,13 @@
             ${nodeLink}
           </div>
                     <div class="node-actions d-flex" style="flex-shrink: 0; gap: 4px;">
-                      <button class="btn btn-sm btn-edit" onclick="showEditNodeModal('${subscriptionPath}', '${node.id}', '${escapedNodeLink}')" title="${_t('nodes.edit')}">
+                      <button class="btn btn-sm btn-edit" onclick="showEditNodeModal('${subscriptionPath}', '${node.id}', '${escapedNodeLink}')" data-i18n-title="nodes.edit">
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button class="btn btn-sm btn-primary" onclick="copyToClipboard('${escapedNodeLink}')" title="${_t('common.copied')}">
+                      <button class="btn btn-sm btn-primary" onclick="copyToClipboard('${escapedNodeLink}')" data-i18n-title="common.copied">
                         <i class="fas fa-copy"></i>
                       </button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteNode('${subscriptionPath}', ${node.id})" title="${_t('common.delete')}">
+                      <button class="btn btn-sm btn-danger" onclick="deleteNode('${subscriptionPath}', ${node.id})" data-i18n-title="common.delete">
                         <i class="fas fa-trash"></i>
                       </button>
                     </div>
@@ -1579,7 +1588,8 @@
         }).join('');
 
         // 更新节点列表内容
-        tbody.innerHTML = nodesHtml || '<tr><td colspan="2" class="text-center py-4">' + _t('nodes.none') + '</td></tr>';
+        tbody.innerHTML = nodesHtml || '<tr><td colspan="2" class="text-center py-4"><span data-i18n="nodes.none"></span></td></tr>';
+        window.i18n.translateDOM(tbody); // 翻译新添加的节点元素
 
         // 初始化拖拽排序
         if (nodes.length > 0) {
@@ -1593,8 +1603,9 @@
         }
       } catch (error) {
         tbody.innerHTML = `<tr><td colspan="2" class="text-center py-4 text-danger">
-          <i class="fas fa-exclamation-circle me-2"></i>${error.message}
+          <i class="fas fa-exclamation-circle me-2"></i><span data-i18n="common.error_prefix"></span>${error.message}
         </td></tr>`;
+        window.i18n.translateDOM(tbody); // 翻译错误信息中的 data-i18n 元素
         throw error;
       }
     }

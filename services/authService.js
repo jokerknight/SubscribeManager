@@ -1,16 +1,15 @@
 const sessionService = require('./sessionService');
 const { generateSessionToken } = require('../utils');
-
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'password';
+const { adminUsername, adminPassword } = require('../config');
+const ApiError = require('../utils/ApiError');
 
 async function login(username, password) {
-  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+  if (username === adminUsername && password === adminPassword) {
     const sessionId = generateSessionToken();
     await sessionService.createSession(sessionId, username);
     return { sessionId };
   }
-  return null;
+  throw new ApiError(401, 'login.error');
 }
 
 async function logout(sessionId) {

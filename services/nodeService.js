@@ -1,4 +1,5 @@
-const { dbQuery, dbRun, extractNodeName, NODE_TYPES, safeBase64Decode } = require('../utils');
+const { dbQuery, dbRun, extractNodeName, NODE_TYPES, safeBase64Decode, withTransaction } = require('../utils');
+const ApiError = require('../utils/ApiError');
 
 async function getNodes(subscriptionPath) {
   return dbQuery(`
@@ -17,7 +18,7 @@ async function getNodes(subscriptionPath) {
 
 async function createNode(subscriptionPath, name, content, order) {
   if (!content) {
-    throw new Error('Missing node content');
+    throw new ApiError(400, 'nodes.content_required');
   }
   
   // 获取订阅ID
@@ -27,7 +28,7 @@ async function createNode(subscriptionPath, name, content, order) {
   );
   
   if (!subscription.length) {
-    throw new Error('Subscription not found');
+    throw new ApiError(404, 'subscription.not_found');
   }
   
   const subscriptionId = subscription[0].id;
@@ -36,17 +37,17 @@ async function createNode(subscriptionPath, name, content, order) {
   // 尝试Base64解码
   try {
     const decodedContent = safeBase64Decode(originalLink);
-    if (Object.values(NODE_TYPES).some(prefix => 
+    if (Object.values(NODE_TYPES).some(prefix =>
       decodedContent.startsWith(prefix) && prefix !== NODE_TYPES.SNELL)) {
       originalLink = decodedContent.trim();
     }
-  } catch (e) {}
-  
+  } catch (e) { }
+
   // 验证节点类型
   const lowerContent = originalLink.toLowerCase();
   const isSnell = lowerContent.includes('=') && lowerContent.includes('snell,');
   if (!Object.values(NODE_TYPES).some(type => lowerContent.startsWith(type.toLowerCase())) && !isSnell) {
-    throw new Error('Unsupported node format');
+    throw new ApiError(400, 'nodes.unsupported_format');
   }
   
   // 提取节点名称
@@ -61,7 +62,7 @@ async function createNode(subscriptionPath, name, content, order) {
 
 async function updateNode(subscriptionPath, nodeId, content) {
   if (!content) {
-    throw new Error('Missing node content');
+    throw new ApiError(400, 'nodes.content_required');
   }
   
   // 获取订阅ID
@@ -71,7 +72,7 @@ async function updateNode(subscriptionPath, nodeId, content) {
   );
   
   if (!subscription.length) {
-    throw new Error('Subscription not found');
+    throw new ApiError(404, 'subscription.not_found');
   }
   
   const subscriptionId = subscription[0].id;
@@ -80,12 +81,12 @@ async function updateNode(subscriptionPath, nodeId, content) {
   // 尝试base64解码
   try {
     const decodedContent = safeBase64Decode(originalLink);
-    if (Object.values(NODE_TYPES).some(prefix => 
+    if (Object.values(NODE_TYPES).some(prefix =>
       decodedContent.startsWith(prefix) && prefix !== NODE_TYPES.SNELL)) {
       originalLink = decodedContent.replace(/[\r\n\s]+$/, '');
     }
-  } catch (e) {}
-  
+  } catch (e) { }
+
   // 提取节点名称
   const nodeName = extractNodeName(originalLink);
   
@@ -104,7 +105,7 @@ async function deleteNode(subscriptionPath, nodeId) {
   );
   
   if (!subscription.length) {
-    throw new Error('Subscription not found');
+    throw new ApiError(404, 'subscription.not_found');
   }
   
   const subscriptionId = subscription[0].id;
@@ -118,7 +119,7 @@ async function deleteNode(subscriptionPath, nodeId) {
 
 async function toggleNode(subscriptionPath, nodeId, enabled) {
   if (typeof enabled !== 'boolean') {
-    throw new Error('Invalid enabled value');
+    throw new ApiError(400, 'nodes.invalid_enabled');
   }
   
   // 获取订阅ID
@@ -128,7 +129,7 @@ async function toggleNode(subscriptionPath, nodeId, enabled) {
   );
   
   if (!subscription.length) {
-    throw new Error('Subscription not found');
+    throw new ApiError(404, 'subscription.not_found');
   }
   
   const subscriptionId = subscription[0].id;
@@ -142,7 +143,7 @@ async function toggleNode(subscriptionPath, nodeId, enabled) {
 
 async function reorderNodes(subscriptionPath, orders) {
   if (!Array.isArray(orders) || orders.length === 0) {
-    throw new Error('Invalid orders');
+    throw new ApiError(400, 'nodes.invalid_orders');
   }
   
   // 获取订阅ID
@@ -152,22 +153,19 @@ async function reorderNodes(subscriptionPath, orders) {
   );
   
   if (!subscription.length) {
-    throw new Error('Subscription not found');
+    throw new ApiError(404, 'subscription.not_found');
   }
   
   const subscriptionId = subscription[0].id;
-  const db = require('../database').getDB(); // 需要事务处理
   
-  await db.run('BEGIN TRANSACTION');
-  
-  for (const { id, order } of orders) {
-    await db.run(
-      'UPDATE nodes SET node_order = ? WHERE id = ? AND subscription_id = ?',
-      [order, id, subscriptionId]
-    );
-  }
-  
-  await db.run('COMMIT');
+  await withTransaction(async (db) => {
+    for (const { id, order } of orders) {
+      await db.run(
+        'UPDATE nodes SET node_order = ? WHERE id = ? AND subscription_id = ?',
+        [order, id, subscriptionId]
+      );
+    }
+  });
 }
 
 module.exports = {
