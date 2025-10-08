@@ -440,13 +440,27 @@
         padding: 0 15px;
       }
 
-      .navbar {
-        margin-bottom: 2rem;
-        padding: 0.8rem 1rem;
+      .navbar .container {
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .navbar-brand {
+        font-size: 1.2rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+      }
+
+      .navbar-user {
+        flex-shrink: 0;
+        margin-left: 1rem;
       }
 
       .btn-group {
-        flex-direction: column;
+        flex-direction: row;
       }
 
       .subscription-item {
@@ -504,88 +518,88 @@
       .table {
         table-layout: fixed;
         width: 100%;
-        margin-bottom: 0 !important;
+        margin-bottom: 0;
       }
 
       .table thead th:first-child {
-        padding-left: 1rem !important;
-        width: 100% !important;
+        padding-left: 1rem;
+        width: 100%;
       }
 
       .table thead th:last-child {
-        display: none !important;
+        display: none;
       }
 
       .node-row td {
-        padding: 0.5rem !important;
+        padding: 0.5rem;
       }
 
       .node-row td:first-child {
         font-size: 0.85rem;
-        padding-right: 0 !important;
-        width: calc(100% - 90px) !important;
+        padding-right: 0;
+        width: calc(100% - 90px);
       }
 
       .node-row td:first-child .text-truncate {
-        max-width: 100% !important;
-        width: 100% !important;
-        padding-right: 8px !important;
+        max-width: 100%;
+        width: 100%;
+        padding-right: 8px;
       }
 
       .node-row td:last-child {
-        padding-left: 0 !important;
-        width: 90px !important;
-        position: relative !important;
+        padding-left: 0;
+        width: 90px;
+        position: relative;
       }
 
       .node-row td:last-child .text-truncate {
-        display: none !important;
+        display: none;
       }
 
       .node-actions {
-        margin: 0 !important;
-        gap: 2px !important;
-        justify-content: flex-end !important;
-        width: 90px !important;
-        position: absolute !important;
-        right: 4px !important;
-        flex-wrap: nowrap !important;
-        align-items: center !important;
+        margin: 0;
+        gap: 2px;
+        justify-content: flex-end;
+        width: 90px;
+        position: absolute;
+        right: 4px;
+        flex-wrap: nowrap;
+        align-items: center;
       }
 
       .node-actions .btn {
-        padding: 2px 4px !important;
-        min-width: 28px !important;
-        height: 28px !important;
-        margin: 0 !important;
+        padding: 2px 4px;
+        min-width: 28px;
+        height: 28px;
+        margin: 0;
       }
 
       .node-actions .btn i {
         font-size: 12px;
         line-height: 1;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .batch-action-buttons {
-        flex-wrap: wrap !important;
-        gap: 0.25rem !important;
-        width: 100% !important;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        width: 100%;
       }
 
       .batch-action-buttons .btn {
-        font-size: 0.75rem !important;
-        padding: 0.25rem 0.5rem !important;
-        margin: 0 !important;
-        flex: 1 !important;
-        min-width: 0 !important;
-        white-space: nowrap !important;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        margin: 0;
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
       }
 
       .batch-action-button .btn i {
-        font-size: 0.75rem !important;
-        margin-right: 0.25rem !important;
+        font-size: 0.75rem;
+        margin-right: 0.25rem;
       }
     }
 
