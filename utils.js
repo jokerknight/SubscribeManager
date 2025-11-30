@@ -862,7 +862,7 @@ function convertToClash(content) {
     .filter(Boolean)
     .map(parseNodeToClash)
     .filter(Boolean);
-
+  
   return generateClashConfig(nodes);
 }
 // 解析 SS 节点为 Clash 格式
@@ -1253,7 +1253,13 @@ function parseTuicToClash(tuicLink) {
 
 // 解析 Hysteria2 节点为 Clash 格式
 function parseHysteria2ToClash(hysteria2Link) {
-  if (!hysteria2Link.startsWith(NODE_TYPES.HYSTERIA2)||!hysteria2Link.startsWith(NODE_TYPES.HY2)) return null;
+ if (
+  !hysteria2Link.startsWith(NODE_TYPES.HYSTERIA2) &&
+  !hysteria2Link.startsWith(NODE_TYPES.HY2)
+) {
+  console.log("not hysteria2 nor hy2 link");
+  return null;
+}
 
   try {
     const url = new URL(hysteria2Link);
@@ -1302,9 +1308,10 @@ function parseHysteria2ToClash(hysteria2Link) {
     if (cc) {
       node.cc = cc;
     }
-
+    console.log(node);
     return node;
   } catch {
+    console.log('error parsing hysteria2 link');
     return null;
   }
 }
