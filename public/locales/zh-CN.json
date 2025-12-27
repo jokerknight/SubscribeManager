@@ -19,6 +19,7 @@
   },
   "navbar": {
     "brand": "Subscribe-Manager",
+    "config_manager": "协议说明",
     "logout": "退出"
   },
   "login": {

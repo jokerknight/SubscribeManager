@@ -4,6 +4,8 @@ PLATFORMS = linux/amd64,linux/arm64
 
 .PHONY: build push release
 
+dev:
+	npm start
 up:
 	docker compose up -d
 

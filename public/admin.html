@@ -11,18 +11,28 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <style>
     :root {
-      --primary-color: #4e73df;
-      --success-color: #1cc88a;
-      --danger-color: #e74a3b;
-      --transition-timing: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      --box-shadow-light: 0 2px 10px rgba(0, 0, 0, 0.05);
-      --box-shadow-medium: 0 4px 15px rgba(0, 0, 0, 0.08);
-      --font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-      --text-color: #2d3748;
-      --text-color-secondary: #444;
-      --border-radius-sm: 8px;
-      --border-radius-md: 12px;
+      --primary-color: #667eea;
+      --primary-dark: #5a67d8;
+      --success-color: #48bb78;
+      --danger-color: #f56565;
+      --warning-color: #ed8936;
+      --info-color: #4299e1;
+      --light-bg: #f7fafc;
+      --card-bg: #ffffff;
+      --text-primary: #1a202c;
+      --text-secondary: #4a5568;
+      --text-muted: #718096;
+      --border-color: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+      --transition-timing: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      --border-radius: 12px;
       --border-radius-lg: 16px;
+      --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --gradient-success: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+      --gradient-danger: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
     }
 
     * {
@@ -35,10 +45,31 @@
     }
 
     body {
-      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-      background-color: #f8f9fc;
-      padding: 20px 0;
-      overflow-y: scroll;
+      font-family: var(--font-family);
+      background: linear-gradient(135deg, #f6f9fc 0%, #e9f3ff 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      line-height: 1.6;
+      font-smoothing: antialiased;
+    }
+
+    /* 自定义滚动条 */
+    /* 注意：标准scrollbar属性目前支持有限，保留webkit前缀以确保兼容性 */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--light-bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
     }
 
     /* 防止模态框打开时页面偏移 */
@@ -58,6 +89,36 @@
       padding-right: 0 !important;
     }
 
+    .modal-content {
+      border: none;
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-lg);
+      background: var(--card-bg);
+    }
+
+    .modal-header {
+      border-bottom: 1px solid var(--border-color);
+      padding: 1.5rem 2rem;
+      background: var(--light-bg);
+      border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    }
+
+    .modal-title {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      padding: 2rem;
+    }
+
+    .modal-footer {
+      border-top: 1px solid var(--border-color);
+      padding: 1.5rem 2rem;
+      background: var(--light-bg);
+      border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+    }
+
     /* 标题和重要文字样式 */
     .navbar-brand,
     .subscription-name,
@@ -68,9 +129,61 @@
     }
 
     /* 按钮统一样式 */
-    .btn,
+    .btn {
+      font-weight: 600;
+      border-radius: var(--border-radius);
+      border: none;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.875rem;
+      transition: all var(--transition-timing);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-success {
+      background: var(--gradient-success);
+      color: white;
+    }
+
+    .btn-danger {
+      background: var(--gradient-danger);
+      color: white;
+    }
+
+    .btn-outline-secondary {
+      background: transparent;
+      border: 2px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+
+    .btn-outline-secondary:hover {
+      background: var(--border-color);
+      transform: translateY(-1px);
+    }
+
     .logout-btn {
-      font-weight: 500;
+      color: var(--text-secondary);
+      background: none;
+      border: 2px solid var(--border-color);
+      margin-left: 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all var(--transition-timing);
     }
 
     /* 次要文字样式 */
@@ -86,32 +199,41 @@
     }
 
     .navbar {
-      background-color: white;
-      box-shadow: var(--box-shadow-light);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
       padding: 1rem 1.5rem;
-      margin-bottom: 0.5rem;
-      height: 80px;
+      margin-bottom: 2rem;
+      height: 70px;
       display: flex;
       align-items: center;
-      transform: translateY(0);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      transition: all var(--transition-timing);
     }
 
     .navbar:hover {
-      box-shadow: var(--box-shadow-medium);
+      box-shadow: var(--shadow-md);
     }
 
     .navbar-brand {
-      font-weight: bold;
-      color: #000;
+      font-weight: 700;
+      color: var(--text-primary);
       display: flex;
       align-items: center;
-      font-size: 1.8rem;
+      font-size: 1.6rem;
+      text-decoration: none;
     }
 
     .navbar-brand i {
-      font-size: 2.2rem;
+      font-size: 1.8rem;
       margin-right: 0.8rem;
-      color: #000;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .navbar-user {
@@ -135,9 +257,11 @@
     }
 
     .logout-btn:hover {
-      background-color: #f8f9fa;
-      color: var(--danger-color);
+      background-color: var(--danger-color);
+      color: white;
       text-decoration: none;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
     }
 
     .logout-btn:focus {
@@ -145,70 +269,364 @@
       outline: none;
     }
 
+    .nav-link {
+      color: var(--text-secondary);
+      background: none;
+      border: none;
+      margin-left: 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius);
+      text-decoration: none;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      transition: all var(--transition-timing);
+    }
+
+    .nav-link:hover {
+      background: var(--gradient-primary);
+      color: white;
+      text-decoration: none;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .nav-link:focus {
+      text-decoration: none;
+      outline: none;
+    }
+
     .container {
-      max-width: 1100px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* 订阅卡片样式 */
+    /* 新的订阅卡片布局 */
+    .subscription-item {
+      background: linear-gradient(145deg, #ffffff 0%, #fafbff 100%);
+      border-radius: 16px;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .subscription-row:hover,
+    .subscription-item:hover {
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      transform: translateY(-2px);
+      border-color: rgba(99, 102, 241, 0.3);
+      will-change: transform, box-shadow;
+      /* 优化性能 */
+      backface-visibility: hidden;
+      /* 防止抖动 */
+    }
+
+    .subscription-item:hover::before {
+      height: 4px;
+    }
+
+    /* 卡片头部 */
+    .card-header {
+      padding: 1.5rem 1.5rem 1rem;
+      background: rgba(248, 250, 252, 0.5);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+    }
+
+    .subscription-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .subscription-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .title-text {
+      flex: 1;
+    }
+
+    .edit-trigger {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      color: var(--primary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 12px;
+    }
+
+    .edit-trigger:hover {
+      background: var(--primary-color);
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .subscription-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .node-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.75rem;
+      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+      border: 1px solid #bae6fd;
+      border-radius: 12px;
+      color: #0369a1;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .node-badge i {
+      font-size: 10px;
+    }
+
+    .node-badge .count {
+      font-weight: 700;
+      margin: 0 0.25rem;
+    }
+
+    .node-badge .label {
+      font-weight: 400;
+    }
+
+    /* 卡片主体 */
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    .links-section {
+      margin: 0;
+    }
+
+    /* 卡片底部 */
+    .card-footer {
+      padding: 1rem 1.5rem 1.5rem;
+      background: rgba(248, 250, 252, 0.3);
+      border-top: 1px solid rgba(226, 232, 240, 0.3);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+
+
+    .action-btn {
+      margin: 0;
+      border-radius: 12px;
+      font-weight: 600;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 140px;
+      justify-content: center;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .action-btn:active {
+      transform: translateY(0);
     }
 
     textarea {
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
+      border: 2px solid var(--border-color);
+      border-radius: var(--border-radius);
       resize: vertical;
       min-height: 300px;
       max-height: 800px;
       height: 300px;
-      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      padding: 12px;
+      font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      padding: 1rem;
+      background: var(--card-bg);
+      transition: all var(--transition-timing);
     }
 
-    .link-label {
-      display: flex;
-      flex-direction: column;
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-control {
+      border: 2px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+      transition: all var(--transition-timing);
+      background: var(--card-bg);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .node-list {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      overflow: hidden;
       margin-top: 1rem;
-      color: #444;
-      font-size: 0.9rem;
     }
 
-    .link-label small {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .link-label small>span {
+    .node-item {
       display: flex;
       align-items: center;
-      gap: 0.25rem;
-      font-size: 0.9rem;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      transition: all var(--transition-timing);
     }
 
-    .link-label small>span>span {
-      display: inline-block;
-      width: 90px;
-      color: var(--text-color);
+    .node-item:hover {
+      background: var(--light-bg);
+    }
+
+    .node-item:last-child {
+      border-bottom: none;
+    }
+
+    /* 订阅链接按钮布局 */
+    .subscription-links {
+      margin-top: 1rem;
+    }
+
+    .links-horizontal {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .link-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.8rem;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      position: relative;
+      min-width: 80px;
+      justify-content: center;
+    }
+
+    .link-btn:hover {
+      background: #f1f5f9;
+      border-color: var(--primary-color);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-icon {
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 8px;
+      color: white;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    /* 不同类型的图标颜色 */
+    .common-icon {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    }
+
+    .v2ray-icon {
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    }
+
+    .surge-icon {
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    }
+
+    .clash-icon {
+      background: linear-gradient(135deg, #10b981, #34d399);
+    }
+
+    .ss-icon {
+      background: linear-gradient(135deg, #ef4444, #f87171);
+    }
+
+    .btn-label {
+      font-size: 0.75rem;
       font-weight: 600;
-      text-align: justify;
-      text-align-last: justify;
-      font-size: 0.9rem;
+      color: var(--text-color);
+      white-space: nowrap;
     }
 
-    .link-label a {
-      margin-left: 0;
+    .btn-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: transparent;
+      color: #64748b;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .btn-link:hover {
+      background: rgba(99, 102, 241, 0.1);
       color: var(--primary-color);
       text-decoration: none;
-      word-break: break-all;
-      font-weight: 700;
-      font-size: 0.9rem;
+      transform: scale(1.1);
     }
 
-    .link-label .link:hover {
-      text-decoration: underline;
+    .btn-link .copy-icon {
+      font-size: 9px;
+      opacity: 1;
     }
+
+
 
     .btn-group {
       display: flex;
-      gap: 0.5rem;
     }
 
     .toast-container {
@@ -228,6 +646,23 @@
       margin-bottom: 2rem;
     }
 
+    /* 新的订阅布局样式 */
+    .subscription-row {
+      background: #fff;
+      border-radius: var(--border-radius-md);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--box-shadow-light);
+      border: 1px solid #eaeaea;
+      overflow: hidden;
+      transition: margin-bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
+      position: relative;
+      backface-visibility: hidden;
+      will-change: margin-bottom, box-shadow, transform;
+    }
+
     .subscription-item {
       background: #fff;
       border-radius: var(--border-radius-md);
@@ -236,8 +671,59 @@
       box-shadow: var(--box-shadow-light);
       border: 1px solid #eaeaea;
       overflow: hidden;
-      transition: margin-bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: margin-bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
       position: relative;
+      backface-visibility: hidden;
+      will-change: margin-bottom, box-shadow, transform;
+    }
+
+    .subscription-header {
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 1rem;
+    }
+
+    .subscription-actions-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 2rem;
+      padding-top: 1rem;
+    }
+
+    .client-types {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .clickable-client {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.8rem;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      position: relative;
+      min-width: 80px;
+      justify-content: center;
+    }
+
+    .clickable-client:hover {
+      background: #f1f5f9;
+      border-color: var(--primary-color);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      text-decoration: none;
+      color: inherit;
     }
 
     .edit-button {
@@ -254,6 +740,9 @@
 
     .subscription-item:hover {
       box-shadow: var(--box-shadow-medium);
+      transform: translateY(-1px);
+      will-change: transform;
+      /* 优化性能 */
     }
 
     .subscription-edit-area {
@@ -437,170 +926,510 @@
     /* 移动端适配样式 */
     @media (max-width: 767px) {
       .container {
-        padding: 0 15px;
+        padding: 0 10px;
+      }
+
+      .navbar {
+        height: auto;
+        min-height: 50px;
+        padding: 0.25rem 0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       }
 
       .navbar .container {
-        flex-wrap: nowrap;
+        flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0;
       }
 
       .navbar-brand {
-        font-size: 1.2rem;
+        font-size: 0.95rem;
         white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        min-width: 0;
+        order: 1;
+        flex-basis: auto;
+        flex-shrink: 1;
+      }
+
+      .navbar-brand i {
+        margin-right: 0.25rem;
+      }
+
+      .navbar-nav {
+        flex-direction: row;
+        gap: 0.2rem;
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        margin: 0.25rem 0;
+        flex-wrap: wrap;
+      }
+
+      .navbar-nav .nav-link {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.7rem;
+        white-space: nowrap;
+        border-radius: 4px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
       }
 
       .navbar-user {
+        gap: 0.2rem;
+        order: 2;
         flex-shrink: 0;
-        margin-left: 1rem;
+        margin-left: auto;
       }
 
       .btn-group {
         flex-direction: row;
+        gap: 0.15rem;
       }
 
-      .subscription-item {
-        padding: 1rem;
+      .btn-group .btn {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.3rem;
+        min-width: auto;
+        border-radius: 3px;
       }
 
-      .subscription-item>div {
+      .logout-btn {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.4rem;
+        border-radius: 4px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+      }
+
+      .main-content {
+        padding: 1.5rem 0 3rem;
+        min-height: calc(100vh - 70px);
+      }
+
+      .page-header {
+        margin-bottom: 2rem;
+      }
+
+      .page-title {
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .actions-toolbar {
         flex-direction: column;
-        align-items: flex-start !important;
+        align-items: stretch;
+        gap: 1rem;
       }
 
-      .subscription-item .link-label {
-        margin: 1rem 0 0;
+      .add-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+      }
+
+      .btn-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 10px;
+      }
+
+      /* 订阅卡片响应式 */
+      .subscription-card {
+        border-radius: 1rem;
+        margin-bottom: 1rem;
+        overflow: hidden;
+      }
+
+      .card-header {
+        padding: 1rem 1.25rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+
+      .subscription-title {
+        font-size: 1.125rem;
         width: 100%;
       }
 
-      .subscription-actions {
-        margin-top: 1rem;
-        width: 100%;
-        flex-direction: row !important;
-        gap: 0.5rem;
+      .subscription-path {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        align-self: flex-start;
       }
 
-      .subscription-actions .btn {
+      .card-stats {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .stat-item {
         flex: 1;
-        font-size: 0.875rem;
+        text-align: center;
         padding: 0.5rem;
       }
 
-      .subscription-actions .btn i {
-        margin-right: 0.25rem;
+      .stat-number {
+        font-size: 1rem;
+      }
+
+      .stat-label {
+        font-size: 0.7rem;
+      }
+
+      .card-body {
+        padding: 1.25rem;
+      }
+
+      .links-section {
+        margin-bottom: 1rem;
+      }
+
+      .section-title {
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .links-horizontal {
+        gap: 0.4rem;
+        justify-content: flex-start;
+      }
+
+      .link-btn {
+        min-width: 70px;
+        padding: 0.35rem 0.65rem;
+        font-size: 0.7rem;
+      }
+
+      .btn-icon {
+        width: 14px;
+        height: 14px;
+        font-size: 7px;
+      }
+
+      .btn-label {
+        font-size: 0.7rem;
+      }
+
+      .btn-link {
+        width: 16px;
+        height: 16px;
+      }
+
+      .client-list {
+        gap: 0.5rem;
+      }
+
+      .client-item {
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+      }
+
+      .client-info {
+        gap: 0.5rem;
+      }
+
+      .client-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 0.7rem;
+      }
+
+      .client-name {
+        font-size: 0.8rem;
+      }
+
+      .client-nodes {
+        font-size: 0.7rem;
+      }
+
+      .node-badges {
+        gap: 0.25rem;
+      }
+
+      .node-badge {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.65rem;
+      }
+
+      .card-footer {
+        padding: 1rem 1.25rem;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .action-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        min-width: auto;
+      }
+
+      .subscription-list {
+        margin-bottom: 1.5rem;
+      }
+
+      .subscription-row,
+      .subscription-item {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 0.75rem;
+        transition: box-shadow 0.15s ease, transform 0.15s ease;
+        backface-visibility: hidden;
+        /* 防止抖动 */
+      }
+
+      .subscription-header {
+        padding-bottom: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .subscription-actions-row {
+        flex-direction: column;
+        gap: 1rem;
+        padding-top: 0.75rem;
+      }
+
+      .client-types {
+        justify-content: center;
+      }
+
+      .clickable-client {
+        min-width: 70px;
+        padding: 0.35rem 0.65rem;
+        font-size: 0.7rem;
+      }
+
+      .edit-button {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .edit-button .btn {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+      }
+
+      textarea {
+        min-height: 200px;
+        font-size: 0.8rem;
+        padding: 0.75rem;
+      }
+
+      .form-control {
+        padding: 0.625rem 0.875rem;
         font-size: 0.875rem;
+      }
+
+      .form-label {
+        font-size: 0.9rem;
+        margin-bottom: 0.4rem;
+      }
+
+      .node-item {
+        padding: 0.75rem 1rem;
+      }
+
+      .toast-container {
+        top: 0.5rem;
+        right: 0.5rem;
+        left: 0.5rem;
       }
 
       .modal-dialog {
         margin: 0.5rem;
+        max-width: calc(100% - 1rem);
       }
 
-      .modal-content {
-        border-radius: 1rem;
+      .modal-header {
+        padding: 1rem;
       }
 
-      .toast-container {
-        right: 0;
-        left: 0;
-        bottom: 1rem;
-        top: auto;
-        margin: 0 1rem;
+      .modal-body {
+        padding: 1rem;
       }
 
-      .toast {
+      .modal-footer {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .modal-footer .btn {
         width: 100%;
       }
 
-      .table {
-        table-layout: fixed;
-        width: 100%;
-        margin-bottom: 0;
+      .table-responsive {
+        font-size: 0.875rem;
       }
 
-      .table thead th:first-child {
-        padding-left: 1rem;
-        width: 100%;
-      }
-
-      .table thead th:last-child {
-        display: none;
-      }
-
-      .node-row td {
+      .table th,
+      .table td {
         padding: 0.5rem;
       }
 
-      .node-row td:first-child {
-        font-size: 0.85rem;
-        padding-right: 0;
-        width: calc(100% - 90px);
+      .alert {
+        padding: 0.75rem;
+        font-size: 0.875rem;
       }
+    }
 
-      .node-row td:first-child .text-truncate {
-        max-width: 100%;
-        width: 100%;
-        padding-right: 8px;
-      }
+    .navbar-user {
+      flex-shrink: 0;
+      margin-left: 1rem;
+    }
 
-      .node-row td:last-child {
-        padding-left: 0;
-        width: 90px;
-        position: relative;
-      }
+    .btn-group {
+      flex-direction: row;
+    }
 
-      .node-row td:last-child .text-truncate {
-        display: none;
-      }
+    .subscription-item {
+      padding: 1rem;
+    }
 
-      .node-actions {
-        margin: 0;
-        gap: 2px;
-        justify-content: flex-end;
-        width: 90px;
-        position: absolute;
-        right: 4px;
-        flex-wrap: nowrap;
-        align-items: center;
-      }
+    .subscription-item>div {
+      flex-direction: column;
+      align-items: flex-start !important;
+    }
 
-      .node-actions .btn {
-        padding: 2px 4px;
-        min-width: 28px;
-        height: 28px;
-        margin: 0;
-      }
+    .subscription-item .link-label {
+      margin: 1rem 0 0;
+      width: 100%;
+    }
 
-      .node-actions .btn i {
-        font-size: 12px;
-        line-height: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
+    .subscription-actions {
+      margin-top: 1rem;
+      width: 100%;
+      flex-direction: row !important;
+      gap: 0.5rem;
+    }
 
-      .batch-action-buttons {
-        flex-wrap: wrap;
-        gap: 0.25rem;
-        width: 100%;
-      }
+    .subscription-actions .btn {
+      flex: 1;
+      font-size: 0.875rem;
+      padding: 0.5rem;
+    }
 
-      .batch-action-buttons .btn {
-        font-size: 0.75rem;
-        padding: 0.25rem 0.5rem;
-        margin: 0;
-        flex: 1;
-        min-width: 0;
-        white-space: nowrap;
-      }
+    .subscription-actions .btn i {
+      margin-right: 0.25rem;
+      font-size: 0.875rem;
+    }
 
-      .batch-action-button .btn i {
-        font-size: 0.75rem;
-        margin-right: 0.25rem;
-      }
+    .modal-dialog {
+      margin: 0.5rem;
+    }
+
+    .modal-content {
+      border-radius: 1rem;
+    }
+
+    .toast-container {
+      right: 0;
+      left: 0;
+      bottom: 1rem;
+      top: auto;
+      margin: 0 1rem;
+    }
+
+    .toast {
+      width: 100%;
+    }
+
+    .table {
+      table-layout: fixed;
+      width: 100%;
+      margin-bottom: 0;
+    }
+
+    .table thead th:first-child {
+      padding-left: 1rem;
+      width: 100%;
+    }
+
+    .table thead th:last-child {
+      display: none;
+    }
+
+    .node-row td {
+      padding: 0.5rem;
+    }
+
+    .node-row td:first-child {
+      font-size: 0.85rem;
+      padding-right: 0;
+      width: calc(100% - 90px);
+    }
+
+    .node-row td:first-child .text-truncate {
+      max-width: 100%;
+      width: 100%;
+      padding-right: 8px;
+    }
+
+    .node-row td:last-child {
+      padding-left: 0;
+      width: 90px;
+      position: relative;
+    }
+
+    .node-row td:last-child .text-truncate {
+      display: none;
+    }
+
+    .node-actions {
+      margin: 0;
+      gap: 2px;
+      justify-content: flex-end;
+      width: 90px;
+      position: absolute;
+      right: 4px;
+      flex-wrap: nowrap;
+      align-items: center;
+    }
+
+    .node-actions .btn {
+      padding: 2px 4px;
+      min-width: 28px;
+      height: 28px;
+      margin: 0;
+    }
+
+    .node-actions .btn i {
+      font-size: 12px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .batch-action-buttons {
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      width: 100%;
+    }
+
+    .batch-action-buttons .btn {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      margin: 0;
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+    }
+
+    .batch-action-button .btn i {
+      font-size: 0.75rem;
+      margin-right: 0.25rem;
     }
 
     /* 模态框按钮样式 */
@@ -724,6 +1553,665 @@
     .node-list-area .link:hover {
       text-decoration: underline;
     }
+
+    /* 现代化动画效果 */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .subscription-item {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .action-btn {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .action-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .action-btn:active::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    /* 加载动画 */
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 50%;
+      border-top-color: var(--primary-color);
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* 节点状态指示器 */
+    .node-status {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success-color);
+      margin-right: 0.75rem;
+      animation: pulse 2s infinite;
+    }
+
+    .node-status.disabled {
+      background: var(--text-muted);
+      animation: none;
+    }
+
+    /* 响应式优化 */
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 1rem;
+        height: auto;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .navbar-brand {
+        font-size: 1.4rem;
+      }
+
+      .container {
+        padding: 0 1rem;
+      }
+
+      .card-header,
+      .card-body,
+      .card-footer {
+        padding: 1rem;
+      }
+
+      .subscription-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+
+      .edit-trigger {
+        align-self: flex-end;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .action-btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .modal-body {
+        padding: 1.5rem;
+      }
+
+      .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+
+      /* 移动端订阅链接按钮优化 */
+      .links-horizontal {
+        gap: 0.3rem;
+        justify-content: center;
+      }
+
+      .link-btn {
+        padding: 0.35rem 0.6rem;
+        min-width: 70px;
+      }
+
+      .btn-icon {
+        width: 14px;
+        height: 14px;
+        font-size: 7px;
+      }
+
+      .btn-label {
+        font-size: 0.7rem;
+      }
+
+      .btn-link {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    /* 平板设备优化 */
+    @media (max-width: 1024px) and (min-width: 769px) {
+      .container {
+        padding: 0 1rem;
+        max-width: 100%;
+      }
+
+      .navbar {
+        height: 60px;
+        padding: 0.5rem 0;
+      }
+
+      .navbar .container {
+        gap: 0.5rem;
+      }
+
+      .navbar-brand {
+        font-size: 1.1rem;
+      }
+
+      .navbar-nav .nav-link {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.8rem;
+      }
+
+      .btn-group .btn {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.5rem;
+      }
+
+      .logout-btn {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
+      }
+
+      .main-content {
+        padding: 2rem 0;
+      }
+
+      .page-title {
+        font-size: 1.8rem;
+      }
+
+      .actions-toolbar {
+        gap: 1.25rem;
+      }
+
+      .add-btn {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.9rem;
+      }
+
+      .subscription-card,
+      .subscription-row {
+        margin-bottom: 1.25rem;
+      }
+
+      .card-header {
+        padding: 1.25rem 1.5rem;
+      }
+
+      .subscription-header {
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .subscription-title {
+        font-size: 1.25rem;
+      }
+
+      .subscription-path {
+        font-size: 0.8rem;
+      }
+
+      .card-body {
+        padding: 1.5rem;
+      }
+
+      .card-stats {
+        gap: 1rem;
+      }
+
+      .stat-number {
+        font-size: 1.125rem;
+      }
+
+      .stat-label {
+        font-size: 0.75rem;
+      }
+
+      .links-horizontal {
+        gap: 0.5rem;
+        justify-content: flex-start;
+      }
+
+      .link-btn {
+        min-width: 75px;
+        padding: 0.45rem 0.75rem;
+        font-size: 0.75rem;
+      }
+
+      .clickable-client {
+        min-width: 75px;
+        padding: 0.45rem 0.75rem;
+        font-size: 0.75rem;
+      }
+
+      .btn-icon {
+        width: 16px;
+        height: 16px;
+        font-size: 8px;
+      }
+
+      .client-icon {
+        width: 36px;
+        height: 36px;
+      }
+
+      .client-name {
+        font-size: 0.9rem;
+      }
+
+      .client-nodes {
+        font-size: 0.8rem;
+      }
+
+      .action-buttons {
+        gap: 1rem;
+      }
+
+      .action-btn {
+        padding: 0.675rem 1.25rem;
+        font-size: 0.9rem;
+        min-width: 120px;
+      }
+
+      .subscription-actions-row {
+        gap: 1.5rem;
+      }
+
+      .client-types {
+        gap: 0.5rem;
+      }
+
+      .node-item {
+        padding: 1rem 1.25rem;
+      }
+    }
+
+    /* 大屏设备优化 */
+    @media (min-width: 1200px) {
+      .container {
+        max-width: 1140px;
+      }
+
+      .main-content {
+        padding: 3rem 0;
+      }
+
+      .page-header {
+        margin-bottom: 3rem;
+      }
+
+      .page-title {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .subscription-list {
+        margin-bottom: 2.5rem;
+      }
+
+      .subscription-card {
+        margin-bottom: 1.5rem;
+        border-radius: 1.25rem;
+      }
+
+      .card-header {
+        padding: 1.75rem 2rem;
+        gap: 1.25rem;
+      }
+
+      .subscription-title {
+        font-size: 1.375rem;
+      }
+
+      .subscription-path {
+        font-size: 0.875rem;
+        padding: 0.375rem 1rem;
+      }
+
+      .card-stats {
+        gap: 1.5rem;
+      }
+
+      .stat-number {
+        font-size: 1.25rem;
+      }
+
+      .stat-label {
+        font-size: 0.8rem;
+      }
+
+      .card-body {
+        padding: 2rem;
+      }
+
+      .links-section {
+        margin-bottom: 1.5rem;
+      }
+
+      .section-title {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .links-horizontal {
+        gap: 0.625rem;
+      }
+
+      .link-btn {
+        min-width: 90px;
+        padding: 0.5rem 0.875rem;
+        font-size: 0.8rem;
+      }
+
+      .btn-icon {
+        width: 18px;
+        height: 18px;
+        font-size: 9px;
+      }
+
+      .btn-label {
+        font-size: 0.8rem;
+      }
+
+      .btn-link {
+        width: 20px;
+        height: 20px;
+      }
+
+      .client-list {
+        gap: 1rem;
+      }
+
+      .client-item {
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+      }
+
+      .client-info {
+        gap: 0.75rem;
+      }
+
+      .client-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 0.8rem;
+      }
+
+      .client-name {
+        font-size: 0.95rem;
+      }
+
+      .client-nodes {
+        font-size: 0.85rem;
+      }
+
+      .node-badges {
+        gap: 0.375rem;
+      }
+
+      .node-badge {
+        padding: 0.25rem 0.625rem;
+        font-size: 0.7rem;
+      }
+
+      .card-footer {
+        padding: 1.5rem 2rem;
+      }
+
+      .action-buttons {
+        gap: 1.25rem;
+      }
+
+      .action-btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.925rem;
+        min-width: 150px;
+      }
+
+      .node-item {
+        padding: 1.25rem 1.5rem;
+      }
+
+      textarea {
+        min-height: 350px;
+        font-size: 0.9rem;
+        padding: 1.25rem;
+      }
+
+      .form-control {
+        padding: 0.875rem 1.125rem;
+        font-size: 0.9rem;
+      }
+
+      .form-label {
+        font-size: 0.95rem;
+        margin-bottom: 0.625rem;
+      }
+    }
+
+    /* 超大屏设备优化 */
+    @media (min-width: 1400px) {
+      .container {
+        max-width: 1320px;
+      }
+
+      .subscription-card {
+        margin-bottom: 1.75rem;
+      }
+
+      .card-header {
+        padding: 2rem 2.5rem;
+      }
+
+      .subscription-title {
+        font-size: 1.5rem;
+      }
+
+      .card-body {
+        padding: 2.25rem;
+      }
+
+      .card-footer {
+        padding: 1.75rem 2.25rem;
+      }
+
+      .link-btn {
+        min-width: 95px;
+        padding: 0.5rem 1rem;
+      }
+
+      .action-btn {
+        min-width: 160px;
+      }
+    }
+
+    /* 横屏手机适配 */
+    @media (max-height: 500px) and (orientation: landscape) {
+      .navbar {
+        height: 60px;
+      }
+
+      .navbar-brand {
+        font-size: 1.1rem;
+      }
+
+      .navbar-nav .nav-link {
+        padding: 0.375rem 0.625rem;
+        font-size: 0.8rem;
+      }
+
+      .btn-group .btn {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+      }
+
+      .main-content {
+        padding: 1.5rem 0;
+      }
+
+      .page-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .card-header,
+      .card-body,
+      .card-footer {
+        padding: 0.75rem 1rem;
+      }
+
+      .action-btn {
+        padding: 0.5rem 0.875rem;
+        font-size: 0.8rem;
+      }
+
+      textarea {
+        min-height: 150px;
+      }
+    }
+
+    /* 超小屏幕适配 */
+    @media (max-width: 480px) {
+      .navbar {
+        padding: 0.25rem 0;
+        min-height: 50px;
+      }
+
+      .navbar .container {
+        gap: 0.25rem;
+      }
+
+      .navbar-brand {
+        font-size: 1rem;
+      }
+
+      .navbar-nav {
+        margin: 0.25rem 0;
+      }
+
+      .navbar-nav .nav-link {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.7rem;
+      }
+
+      .navbar-user {
+        gap: 0.2rem;
+      }
+
+      .btn-group .btn {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.3rem;
+      }
+
+      .logout-btn {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.4rem;
+      }
+    }
+
+    /* 极小屏幕适配 */
+    @media (max-width: 380px) {
+      .navbar-brand {
+        font-size: 0.9rem;
+      }
+
+      .navbar-brand i {
+        display: none;
+      }
+
+      .navbar-nav .nav-link span {
+        display: none;
+      }
+
+      .navbar-nav .nav-link i {
+        font-size: 0.8rem;
+      }
+
+      .btn-group .btn span {
+        display: none;
+      }
+
+      .logout-btn span {
+        display: none;
+      }
+
+      .logout-btn i {
+        font-size: 0.8rem;
+      }
+    }
+
+    /* 触摸设备优化 */
+    @media (hover: none) and (pointer: coarse) {
+      .link-btn {
+        min-height: 44px;
+        min-width: 44px;
+      }
+
+      .action-btn {
+        min-height: 48px;
+      }
+
+      .btn-link {
+        min-width: 44px;
+        min-height: 44px;
+      }
+
+      .client-item {
+        min-height: 44px;
+      }
+    }
   </style>
 </head>
 
@@ -735,6 +2223,10 @@
         <span data-i18n="navbar.brand">Subscribe-Manager</span>
       </a>
       <div class="navbar-user ms-auto d-flex align-items-center">
+        <a class="nav-link me-3" href="/admin/config-manager" target="_blank">
+          <i class="fas fa-info-circle me-1"></i>
+          <span data-i18n="navbar.config_manager">协议说明</span>
+        </a>
         <div class="btn-group me-3">
           <button class="btn btn-sm btn-outline-secondary lang-select-btn" data-set-lang="zh-CN">中文</button>
           <button class="btn btn-sm btn-outline-secondary lang-select-btn" data-set-lang="en">EN</button>
@@ -755,14 +2247,11 @@
   </style>
 
   <div class="container">
-    <div class="subscription-item"
-      style="padding-bottom: 0; border: none; box-shadow: none; margin-bottom: 1rem; background: transparent;">
-      <div class="d-flex justify-content-end">
-        <button class="btn btn-primary action-btn" data-bs-toggle="modal" data-bs-target="#addSubscriptionModal">
-          <i class="fas fa-plus"></i>
-          <span data-i18n="actions.add_subscription">添加订阅</span>
-        </button>
-      </div>
+    <div class="d-flex justify-content-end" style="margin-bottom: 1rem;">
+      <button class="btn btn-primary action-btn" data-bs-toggle="modal" data-bs-target="#addSubscriptionModal">
+        <i class="fas fa-plus"></i>
+        <span data-i18n="actions.add_subscription">添加订阅</span>
+      </button>
     </div>
 
     <!-- 订阅列表 -->
@@ -923,13 +2412,13 @@
     let adminPath = 'admin';
     const _t = (k, params) => (window.i18n && window.i18n.t(k, params)) || k;
     async function logout() {
-      window.location.href = '/' + adminPath + '/logout';
+      window.location.href = '/' + adminPath + '/auth/logout';
     }
     // 优化的loadSubscriptions函数
     async function loadSubscriptions() {
       try {
 
-        const response = await fetch('/' + adminPath + '/api/subscriptions');
+        const response = await fetch('/api/subscriptions');
         if (!response.ok) throw new Error(_t('common.loading'));
         const result = await response.json();
 
@@ -945,35 +2434,70 @@
 
         for (const sub of subscriptions) {
           const item = document.createElement('div');
-          item.className = 'subscription-item';
+          item.className = 'subscription-row';
           item.innerHTML = `
-            <div class="d-flex justify-content-between align-items-start">
-              <button class="btn btn-sm btn-link text-primary edit-button" onclick="showEditNameModal('${sub.path}', '${sub.name}')">
-                <i class="fas fa-edit"></i>
-              </button>
-              <div class="subscription-content">
-                <div class="d-flex align-items-center">
-                  <h5 class="subscription-name mb-1">${sub.name}</h5>
-                  <span class="node-count ms-2"><i class="fas fa-server"></i>${sub.nodeCount}</span>
-                </div>
-                <div class="link-label">
-                  <small>
-                    <span>
-                      <span class="address-label" >Common:</span> <a href="${sub.path}" target="_blank">${sub.path}</a>
-                    </span>
-                    <span>
-                      <span class="address-label" >V2ray:</span> <a href="${sub.path}/v2ray" target="_blank">${sub.path}/v2ray</a>
-                    </span>
-                    <span>
-                      <span class="address-label" >Surge:</span> <a href="${sub.path}/surge" target="_blank">${sub.path}/surge</a>
-                    </span>
-                    <span>
-                      <span class="address-label" >Clash:</span> <a href="${sub.path}/clash" target="_blank">${sub.path}/clash</a>
-                    </span>
-                  </small>
+            <!-- 订阅信息行 - 不是卡片样式 -->
+            <div class="subscription-header">
+              <div class="subscription-info">
+                <h3 class="subscription-title">
+                  <span class="title-text">${sub.name}</span>
+                  <div class="edit-trigger" onclick="showEditNameModal('${sub.path}', '${sub.name}')" title="编辑订阅信息">
+                    <i class="fas fa-edit"></i>
+                  </div>
+                </h3>
+                <div class="subscription-meta">
+                  <span class="node-badge">
+                    <i class="fas fa-server"></i>
+                    <span class="count">${sub.nodeCount}</span>
+                    <span class="label">节点</span>
+                  </span>
                 </div>
               </div>
-              <div class="subscription-actions">
+            </div>
+            
+            <!-- 操作行：客户端类型 + 添加节点 + 节点列表 -->
+            <div class="subscription-actions-row">
+              <!-- 客户端类型 -->
+              <div class="client-types">
+                <div class="link-btn clickable-client" onclick="openClientPage(event, '${sub.path}')" title="点击打开通用链接页面">
+                  <i class="fas fa-link btn-icon common-icon"></i>
+                  <span class="btn-label">通用</span>
+                  <span class="btn-link" onclick="copySubscriptionLink('${sub.path}', event); event.stopPropagation();" title="点击复制">
+                    <i class="fas fa-copy copy-icon"></i>
+                  </span>
+                </div>
+                <div class="link-btn clickable-client" onclick="openClientPage(event, '${sub.path}/v2ray')" title="点击打开V2Ray链接页面">
+                  <i class="fas fa-rocket btn-icon v2ray-icon"></i>
+                  <span class="btn-label">V2Ray</span>
+                  <span class="btn-link" onclick="copySubscriptionLink('${sub.path}/v2ray', event); event.stopPropagation();" title="点击复制">
+                    <i class="fas fa-copy copy-icon"></i>
+                  </span>
+                </div>
+                <div class="link-btn clickable-client" onclick="openClientPage(event, '${sub.path}/surge')" title="点击打开Surge链接页面">
+                  <i class="fas fa-bolt btn-icon surge-icon"></i>
+                  <span class="btn-label">Surge</span>
+                  <span class="btn-link" onclick="copySubscriptionLink('${sub.path}/surge', event); event.stopPropagation();" title="点击复制">
+                    <i class="fas fa-copy copy-icon"></i>
+                  </span>
+                </div>
+                <div class="link-btn clickable-client" onclick="openClientPage(event, '${sub.path}/clash')" title="点击打开Clash链接页面">
+                  <i class="fas fa-shield-alt btn-icon clash-icon"></i>
+                  <span class="btn-label">Clash</span>
+                  <span class="btn-link" onclick="copySubscriptionLink('${sub.path}/clash', event); event.stopPropagation();" title="点击复制">
+                    <i class="fas fa-copy copy-icon"></i>
+                  </span>
+                </div>
+                <div class="link-btn clickable-client" onclick="openClientPage(event, '${sub.path}/shadowsocks')" title="点击打开Shadowsocks链接页面">
+                  <i class="fas fa-lock btn-icon ss-icon"></i>
+                  <span class="btn-label">SS</span>
+                  <span class="btn-link" onclick="copySubscriptionLink('${sub.path}/shadowsocks', event); event.stopPropagation();" title="点击复制">
+                    <i class="fas fa-copy copy-icon"></i>
+                  </span>
+                </div>
+              </div>
+              
+              <!-- 操作按钮 -->
+              <div class="action-buttons">
                 <button class="btn btn-success action-btn" onclick="showAddNodeModal('${sub.path}')">
                   <i class="fas fa-plus"></i>
                   <span data-i18n="actions.add_node">添加节点</span>
@@ -1045,7 +2569,7 @@
           const config = await response.json();
           // 3. 成功获取配置后，更新 adminPath
           adminPath = config.ADMIN_PATH || 'admin';
-          console.log('Admin path loaded:', adminPath);
+
         }
       } catch (error) {
         console.error('Error fetching config:', error);
@@ -1165,7 +2689,7 @@
         for (const checkbox of checkedNodes) {
           const nodeId = checkbox.value;
           try {
-            const response = await fetch('/' + adminPath + '/api/subscriptions/' + subscriptionPath + '/nodes/' + nodeId, {
+            const response = await fetch('/api/subscriptions/' + subscriptionPath + '/nodes/' + nodeId, {
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json',
@@ -1230,7 +2754,7 @@
         for (const checkbox of checkedNodes) {
           const nodeId = checkbox.value;
           try {
-            const response = await fetch('/' + adminPath + '/api/subscriptions/' + subscriptionPath + '/nodes/' + nodeId, {
+            const response = await fetch('/api/subscriptions/' + subscriptionPath + '/nodes/' + nodeId, {
               method: 'PATCH',
               headers: {
                 'Content-Type': 'application/json',
@@ -1309,11 +2833,9 @@
         if (!content) {
           throw new Error('Please fill node content');
         }
-        console.log('Original content:', content);
         // 分割成行
         const lines = content.split(/\r?\n/);
         const validNodes = [];
-        console.log('Processing lines:', lines);
 
         // 处理每一行
         for (const line of lines) {
@@ -1356,7 +2878,7 @@
           const node = validNodes[i];
           try {
             // 创建节点，使用时间戳+索引作为顺序值
-            const response = await fetch('/' + adminPath + '/api/subscriptions/' + subscriptionPath + '/nodes', {
+            const response = await fetch('/api/subscriptions/' + subscriptionPath + '/nodes', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -1484,23 +3006,9 @@
       )?.[0].toLowerCase() || '';
     }
 
-    // 安全的Base64解码函数（前端版本）
+    // Base64解码函数
     function safeBase64DecodeFrontend(str) {
-      try {
-        // 方法1：使用atob
-        return atob(str);
-      } catch (e) {
-        try {
-          // 方法2：使用Buffer（如果可用）
-          if (typeof Buffer !== 'undefined') {
-            return Buffer.from(str, 'base64').toString('utf-8');
-          }
-        } catch (e2) {
-          // 如果失败，返回原始字符串
-          return str;
-        }
-        return str;
-      }
+      return atob(str);
     }
 
     // 显示节点列表
@@ -1549,7 +3057,7 @@
       tbody.innerHTML = '<tr><td colspan="2" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i><span data-i18n="common.loading"></span></td></tr>';
 
       try {
-        const response = await fetch('/' + adminPath + '/api/subscriptions/' + subscriptionPath + '/nodes');
+        const response = await fetch('/api/subscriptions/' + subscriptionPath + '/nodes');
         if (!response.ok) throw new Error(_t('common.loading'));
 
         const result = await response.json();
@@ -1656,7 +3164,7 @@
       if (!confirm(_t('nodes.delete_confirm'))) return;
 
       try {
-        const response = await fetch('/' + adminPath + '/api/subscriptions/' + subscriptionPath + '/nodes/' + nodeId, {
+        const response = await fetch('/api/subscriptions/' + subscriptionPath + '/nodes/' + nodeId, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -1702,7 +3210,7 @@
       }
 
       try {
-        const response = await fetch('/' + adminPath + '/api/subscriptions', {
+        const response = await fetch('/api/subscriptions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1722,6 +3230,13 @@
       } catch (error) {
         showToast('' + error.message, 'danger');
       }
+    }
+
+    // 打开客户端页面
+    function openClientPage(event, url) {
+      event.preventDefault();
+      event.stopPropagation();
+      window.open(url, '_blank');
     }
 
     // 显示Toast提示
@@ -1781,7 +3296,7 @@
 
         // 如果路径被修改，检查新路径是否已存在
         if (path !== originalPath) {
-          const checkResponse = await fetch('/' + adminPath + '/api/subscriptions/' + path);
+          const checkResponse = await fetch('/api/subscriptions/' + path);
           if (checkResponse.ok) {
             pathInput.classList.add('is-invalid');
             pathInput.classList.remove('is-valid');
@@ -1792,7 +3307,7 @@
           }
         }
 
-        const response = await fetch('/' + adminPath + '/api/subscriptions/' + originalPath, {
+        const response = await fetch('/api/subscriptions/' + originalPath, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -1800,8 +3315,7 @@
           },
           body: JSON.stringify({
             name: nameInput.value.trim(),
-            path: path,
-            action: 'update_info'
+            path: path
           })
         });
 
@@ -1835,7 +3349,7 @@
           return;
         }
 
-        const response = await fetch('/' + adminPath + '/api/subscriptions/' + path, {
+        const response = await fetch('/api/subscriptions/' + path, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -1874,6 +3388,30 @@
       }).catch(() => {
         showToast(_t('common.copy_failed'), 'danger');
       });
+    }
+
+    // 复制订阅链接（用于链接点击）
+    async function copySubscriptionLink(url, event) {
+      event.preventDefault();
+
+      try {
+        // 构建完整的URL
+        const fullUrl = window.location.origin + '/' + url;
+
+        // 复制到剪贴板
+        await navigator.clipboard.writeText(fullUrl);
+
+        // 显示复制成功的提示
+        showToast('链接已复制到剪贴板');
+
+        // 可选：打开新窗口
+        if (event.ctrlKey || event.metaKey) {
+          window.open(fullUrl, '_blank');
+        }
+      } catch (error) {
+        console.error('复制失败:', error);
+        showToast('复制失败', 'danger');
+      }
     }
 
     // 显示编辑节点模态框
@@ -1918,7 +3456,7 @@
       }
 
       try {
-        const response = await fetch('/' + adminPath + '/api/subscriptions/' + subscriptionPath + '/nodes/' + nodeId, {
+        const response = await fetch('/api/subscriptions/' + subscriptionPath + '/nodes/' + nodeId, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -1948,7 +3486,7 @@
     // 更新节点顺序
     async function updateNodeOrder(subscriptionPath, orders) {
       try {
-        const response = await fetch('/' + adminPath + '/api/subscriptions/' + subscriptionPath + '/nodes/reorder', {
+        const response = await fetch('/api/subscriptions/' + subscriptionPath + '/nodes/reorder', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

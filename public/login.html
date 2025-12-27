@@ -139,7 +139,7 @@
           const username = document.getElementById('username').value;
           const password = document.getElementById('password').value;
           try {
-            const response = await fetch(`/${ADMIN_PATH}/login`, {
+            const response = await fetch(`/${ADMIN_PATH}/auth/login`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ username, password }),

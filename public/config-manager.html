@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>协议说明</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #1d1d1f;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #6e6e73;
+            font-size: 16px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #1d1d1f;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .client-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .client-card {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #e5e5e7;
+        }
+
+        .client-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .client-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .clash-icon { background: #7d4cdb; }
+        .surge-icon { background: #3478f6; }
+        .shadowsocks-icon { background: #4a5568; }
+        .universal-icon { background: #10b981; }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .info-label {
+            color: #6e6e73;
+        }
+
+        .info-value {
+            color: #1d1d1f;
+            font-weight: 500;
+        }
+
+        .protocol-list {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e5e5e7;
+        }
+
+        .protocol-item {
+            display: inline-block;
+            background: #e5e5e7;
+            color: #1d1d1f;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin: 2px 4px 2px 0;
+        }
+
+        .protocol-item.supported {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .matrix-table th,
+        .matrix-table td {
+            text-align: center;
+            padding: 12px;
+            border: 1px solid #e5e5e7;
+        }
+
+        .matrix-table th {
+            background: #f5f5f7;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .matrix-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .supported {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .not-supported {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .description {
+            color: #6e6e73;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .client-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .client-card {
+                padding: 1rem;
+                border-radius: 0.75rem;
+            }
+
+            .client-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 0.9rem;
+            }
+
+            .client-name {
+                font-size: 1rem;
+            }
+
+            .client-description {
+                font-size: 0.85rem;
+            }
+            
+            .matrix-table {
+                font-size: 11px;
+                border-radius: 0.5rem;
+                overflow: hidden;
+            }
+            
+            .matrix-table th,
+            .matrix-table td {
+                padding: 6px 4px;
+            }
+
+            .matrix-table th:first-child,
+            .matrix-table td:first-child {
+                padding-left: 8px;
+            }
+
+            .matrix-table th:last-child,
+            .matrix-table td:last-child {
+                padding-right: 8px;
+            }
+
+            .status-badge {
+                padding: 2px 6px;
+                font-size: 0.65rem;
+                min-width: 18px;
+                height: 18px;
+            }
+
+            .description {
+                font-size: 13px;
+                margin-bottom: 16px;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .section {
+                padding: 1.5rem 0;
+            }
+
+            .legend {
+                flex-wrap: wrap;
+                gap: 0.75rem;
+                justify-content: center;
+            }
+
+            .legend-item {
+                font-size: 0.8rem;
+            }
+
+            .legend-color {
+                width: 12px;
+                height: 12px;
+                margin-right: 6px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 0.75rem;
+            }
+
+            .client-card {
+                padding: 0.75rem;
+            }
+
+            .client-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 0.8rem;
+            }
+
+            .client-name {
+                font-size: 0.95rem;
+            }
+
+            .client-description {
+                font-size: 0.8rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .subtitle {
+                font-size: 0.85rem;
+            }
+
+            .matrix-table {
+                font-size: 10px;
+            }
+            
+            .matrix-table th,
+            .matrix-table td {
+                padding: 4px 2px;
+            }
+
+            .matrix-table th:first-child,
+            .matrix-table td:first-child {
+                padding-left: 6px;
+            }
+
+            .matrix-table th:last-child,
+            .matrix-table td:last-child {
+                padding-right: 6px;
+            }
+
+            .status-badge {
+                font-size: 0.6rem;
+                min-width: 16px;
+                height: 16px;
+            }
+
+            .legend-item {
+                font-size: 0.75rem;
+            }
+
+            .legend-color {
+                width: 10px;
+                height: 10px;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .client-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.25rem;
+            }
+
+            .client-card {
+                padding: 1.25rem;
+            }
+
+            .client-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 1rem;
+            }
+
+            .client-name {
+                font-size: 1.1rem;
+            }
+
+            .client-description {
+                font-size: 0.9rem;
+            }
+
+            .matrix-table {
+                font-size: 12px;
+            }
+            
+            .matrix-table th,
+            .matrix-table td {
+                padding: 10px 8px;
+            }
+
+            .status-badge {
+                padding: 3px 8px;
+                font-size: 0.7rem;
+                min-width: 20px;
+                height: 20px;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .client-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+            }
+
+            .client-card {
+                padding: 1.5rem;
+            }
+
+            .client-icon {
+                width: 52px;
+                height: 52px;
+                font-size: 1.1rem;
+            }
+
+            .client-name {
+                font-size: 1.2rem;
+            }
+
+            .client-description {
+                font-size: 0.95rem;
+            }
+
+            .matrix-table {
+                font-size: 14px;
+            }
+            
+            .matrix-table th,
+            .matrix-table td {
+                padding: 12px 10px;
+            }
+
+            .status-badge {
+                padding: 4px 10px;
+                font-size: 0.75rem;
+                min-width: 22px;
+                height: 22px;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 1200px;
+            }
+
+            .client-grid {
+                gap: 2rem;
+            }
+
+            .client-card {
+                padding: 2rem;
+            }
+
+            .client-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.25rem;
+            }
+
+            .client-name {
+                font-size: 1.3rem;
+            }
+
+            .client-description {
+                font-size: 1rem;
+            }
+
+            .matrix-table {
+                font-size: 15px;
+            }
+            
+            .matrix-table th,
+            .matrix-table td {
+                padding: 14px 12px;
+            }
+
+            .status-badge {
+                padding: 5px 12px;
+                font-size: 0.8rem;
+                min-width: 24px;
+                height: 24px;
+            }
+        }
+
+        /* 触摸设备优化 */
+        @media (hover: none) and (pointer: coarse) {
+            .client-card {
+                min-height: 44px;
+                padding: 1rem 1.25rem;
+            }
+
+            .status-badge {
+                min-width: 44px;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>协议说明</h1>
+            <div class="subtitle">
+                展示各客户端对不同代理协议的支持情况，帮助您选择合适的客户端配置
+            </div>
+        </header>
+
+        <!-- 协议支持概览 -->
+        <div class="card">
+            <h2>协议支持概览</h2>
+            <div class="description">
+                以下是目前各客户端支持的协议类型概览。不同的客户端因其设计目标和技术实现，对协议的支持程度各不相同。
+            </div>
+            <div class="client-grid" id="clientGrid">
+                <div class="loading"></div>
+            </div>
+        </div>
+
+        <!-- 协议支持矩阵 -->
+        <div class="card">
+            <h2>协议支持矩阵</h2>
+            <div class="description">
+                详细展示了每种协议在不同客户端中的支持情况。✓ 表示该客户端支持该协议，✗ 表示不支持。
+            </div>
+            <table class="matrix-table" id="matrixTable">
+                <thead>
+                    <tr>
+                        <th>协议</th>
+                        <th>Clash</th>
+                        <th>Surge</th>
+                        <th>Shadowsocks</th>
+                        <th>Universal</th>
+                    </tr>
+                </thead>
+                <tbody id="matrixBody">
+                    <tr><td colspan="5" style="text-align: center;"><div class="loading"></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 简化的客户端支持配置
+        const CLIENT_PROTOCOL_SUPPORT = {
+            clash: ['ss://', 'ssr://', 'vmess://', 'vless://', 'trojan://', 'socks://', 'hysteria2://', 'hy2://', 'tuic://'],
+            surge: ['ss://', 'vmess://', 'trojan://', 'socks://', 'hysteria2://', 'hy2://', 'tuic://', 'snell://'],
+            shadowsocks: ['ss://', 'ssr://'],
+            universal: ['ss://', 'ssr://', 'vmess://', 'vless://', 'trojan://', 'socks://', 'hysteria2://', 'hy2://', 'tuic://', 'snell://']
+        };
+
+        const CLIENT_INFO = {
+            clash: {
+                name: 'Clash',
+                description: '功能强大的代理工具，支持规则分流',
+                icon: 'C',
+                iconClass: 'clash-icon'
+            },
+            surge: {
+                name: 'Surge',
+                description: 'iOS/macOS 平台专业网络调试工具',
+                icon: 'S',
+                iconClass: 'surge-icon'
+            },
+            shadowsocks: {
+                name: 'Shadowsocks',
+                description: '轻量级代理协议专用客户端',
+                icon: 'SS',
+                iconClass: 'shadowsocks-icon'
+            },
+            universal: {
+                name: 'Universal',
+                description: '通用客户端，支持所有主流协议',
+                icon: 'U',
+                iconClass: 'universal-icon'
+            }
+        };
+
+        // 获取协议矩阵
+        function getProtocolMatrix() {
+            const matrix = {};
+            const allProtocols = new Set();
+            
+            Object.values(CLIENT_PROTOCOL_SUPPORT).forEach(protocols => {
+                protocols.forEach(protocol => allProtocols.add(protocol));
+            });
+
+            allProtocols.forEach(protocol => {
+                matrix[protocol] = {};
+                Object.keys(CLIENT_PROTOCOL_SUPPORT).forEach(client => {
+                    matrix[protocol][client] = CLIENT_PROTOCOL_SUPPORT[client].includes(protocol);
+                });
+            });
+
+            return matrix;
+        }
+
+        // 渲染客户端概览
+        function renderOverview() {
+            const grid = document.getElementById('clientGrid');
+            grid.innerHTML = '';
+
+            Object.entries(CLIENT_PROTOCOL_SUPPORT).forEach(([clientType, protocols]) => {
+                const info = CLIENT_INFO[clientType];
+                const card = document.createElement('div');
+                card.className = 'client-card';
+                
+                card.innerHTML = `
+                    <div class="client-name">
+                        <div class="client-icon ${info.iconClass}">${info.icon}</div>
+                        ${info.name}
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">描述:</span>
+                        <span class="info-value">${info.description}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">支持协议数:</span>
+                        <span class="info-value">${protocols.length} 种</span>
+                    </div>
+                    <div class="protocol-list">
+                        <strong>支持的协议:</strong><br>
+                        ${protocols.map(protocol => 
+                            `<span class="protocol-item supported">${protocol.replace('://', '')}</span>`
+                        ).join('')}
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // 渲染协议矩阵
+        function renderMatrix(matrix) {
+            const tbody = document.getElementById('matrixBody');
+            tbody.innerHTML = '';
+
+            Object.entries(matrix).forEach(([protocol, clients]) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${protocol.replace('://', '')}</strong></td>
+                    <td class="${getClassForSupport(clients.clash)}">${formatSupport(clients.clash)}</td>
+                    <td class="${getClassForSupport(clients.surge)}">${formatSupport(clients.surge)}</td>
+                    <td class="${getClassForSupport(clients.shadowsocks)}">${formatSupport(clients.shadowsocks)}</td>
+                    <td class="${getClassForSupport(clients.universal)}">${formatSupport(clients.universal)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // 获取支持状态的样式类
+        function getClassForSupport(isSupported) {
+            return isSupported ? 'supported' : 'not-supported';
+        }
+
+        // 格式化支持信息
+        function formatSupport(isSupported) {
+            return isSupported ? '✓ 支持' : '✗ 不支持';
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            renderOverview();
+            
+            const matrix = getProtocolMatrix();
+            renderMatrix(matrix);
+        });
+    </script>
+</body>
+</html>

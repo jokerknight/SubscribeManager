@@ -2,28 +2,55 @@ const express = require("express");
 const session = require("express-session");
 const path = require("path");
 const app = express();
-const routes = require("./routes/index");
 const { initializeDatabase } = require("./database");
 const config = require("./config");
 
-// 提取和模块化中间件
+// 使用原有的简单路由
+const apiRoutes = require("./routes/api");
+const authRoutes = require("./routes/auth");
+
+// 中间件
 const languageHandler = require("./middleware/languageHandler");
 const errorHandler = require("./middleware/errorHandler");
 
+// 认证中间件
+const sessionService = require("./services/sessionService");
 
-// ******** 开始诊断代码 ********
-// 把它放在所有 app.use(...) 的最前面
-// app.use((req, res, next) => {
-//   console.log('Request Headers:', JSON.stringify(req.headers, null, 2));
-//   next();
-// });
-// ******** 结束诊断代码 ********
+async function requireAuth(req, res, next) {
+  if (!req.session.sessionId) {
+    // 如果是API调用，返回401而不是重定向
+    if (req.path.startsWith('/api/')) {
+      return res.status(401).json({ error: { code: 401, message: 'Unauthorized' } });
+    }
+    return res.redirect(`/${config.adminPath}/auth/login`);
+  }
+  
+  try {
+    // 验证 session 是否有效
+    const isValid = await sessionService.verifyAndRenewSession(req.session.sessionId);
+    if (!isValid) {
+      delete req.session.sessionId;
+      // 如果是API调用，返回401而不是重定向
+      if (req.path.startsWith('/api/')) {
+        return res.status(401).json({ error: { code: 401, message: 'Unauthorized' } });
+      }
+      return res.redirect(`/${config.adminPath}/auth/login`);
+    }
+    next();
+  } catch (error) {
+    console.error('Session verification error:', error);
+    delete req.session.sessionId;
+    // 如果是API调用，返回401而不是重定向
+    if (req.path.startsWith('/api/')) {
+      return res.status(401).json({ error: { code: 401, message: 'Unauthorized' } });
+    }
+    return res.redirect(`/${config.adminPath}/auth/login`);
+  }
+}
+
+
+
 app.set("trust proxy", 1);
-
-// 重定向根路径到管理面板
-app.get("/", (req, res) => {
-  res.redirect(`/${config.adminPath}`);
-});
 
 // 中间件配置
 app.use(languageHandler);
@@ -54,8 +81,23 @@ async function startApp() {
     // 初始化数据库
     await initializeDatabase();
 
-    // 路由处理
-    app.use("/", routes);
+    // 注册认证路由
+    app.use(`/${config.adminPath}/auth`, authRoutes);
+
+    // 管理面板路由（必须在订阅路由之前）
+    app.get(`/${config.adminPath}`, requireAuth, (req, res) => {
+      res.sendFile(path.join(__dirname, "public", "admin.html"));
+    });
+
+    // 配置管理页面路由
+    app.get(`/${config.adminPath}/config-manager`, requireAuth, (req, res) => {
+      res.sendFile(path.join(__dirname, "public", "config-manager.html"));
+    });
+
+    // 注册路由
+    app.use("/api", requireAuth, apiRoutes);
+    const subscriptionRoutes = require("./routes/subscriptionRoutes");
+    app.use("/", subscriptionRoutes); // 订阅内容不需要认证
 
     // 全局错误处理
     app.use(errorHandler);

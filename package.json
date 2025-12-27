@@ -6,7 +6,23 @@
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7"
   },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3"
+  },
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "**/*.js",
+      "!**/node_modules/**",
+      "!**/coverage/**",
+      "!jest.config.js"
+    ]
   }
 }

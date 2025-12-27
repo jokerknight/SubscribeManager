@@ -19,7 +19,7 @@
     const parts = path.split('.');
     let cur = obj;
     for (const p of parts) {
-      if (cur && Object.prototype.hasOwnProperty.call(cur, p)) {
+      if (cur && p in cur) {
         cur = cur[p];
       } else {
         return undefined;
@@ -39,7 +39,7 @@
         console.warn(`Failed to load locale: ${lang}. Using default English locale.`);
       }
     } catch (e) {
-      console.error(`Error loading locale ${lang}:`, e);
+      // Error loading locale, using default English
     }
 
     state.dict = Object.assign({}, defaultDict, currentLangDict); // 合并字典，当前语言覆盖英文
@@ -97,19 +97,15 @@
   }
 
   async function setLang(lang) {
-    console.log(`setLang called with: ${lang}`);
     if (lang === state.lang && state.loaded) {
-      console.log(`Language ${lang} already loaded and active.`);
       translateDOM();
       return;
     }
     await loadLocale(lang); // loadLocale 内部会更新 state.lang 和调用 updateLanguageButtons
     localStorage.setItem('lang', lang);
-    console.log(`Language ${lang} saved to localStorage.`);
     translateDOM(); // 确保 DOM 重新翻译
     // Dispatch event to allow custom code to react
     document.dispatchEvent(new CustomEvent('i18n:changed', { detail: { lang } }));
-    console.log(`setLang finished for: ${lang}`);
   }
 
   // 新增：更新语言按钮的 active 状态
@@ -134,9 +130,9 @@
         } else {
           console.warn('Failed to preload default English locale.');
         }
-      } catch (e) {
-        console.error('Error preloading default English locale:', e);
-      }
+    } catch (e) {
+      // Error preloading default English locale
+    }
 
       const savedLang = localStorage.getItem('lang');
       let initialLang = savedLang;
@@ -156,7 +152,7 @@
         }
       });
     } catch (e) {
-      console.error(e);
+      // Error in click handler
     }
   }
 

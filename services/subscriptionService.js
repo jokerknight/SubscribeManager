@@ -43,6 +43,26 @@ async function getSubscription(path) {
   return results[0];
 }
 
+async function generateSubscriptionContent(path) {
+  // 获取订阅信息
+  const subscription = await getSubscription(path);
+  if (!subscription) {
+    return null;
+  }
+  
+  // 获取订阅下的所有启用节点
+  const nodes = await dbQuery(`
+    SELECT original_link 
+    FROM nodes 
+    WHERE subscription_id = ? 
+      AND (enabled IS NULL OR enabled = 1)
+    ORDER BY node_order ASC, id ASC
+  `, [subscription.id]);
+  
+  // 生成订阅内容
+  return nodes.map(node => node.original_link).join('\n');
+}
+
 async function updateSubscription(oldPath, newName, newPath) {
   if (!newName || !validateSubscriptionPath(newPath)) {
     throw new ApiError(400, 'subscription.path_invalid');
@@ -86,6 +106,7 @@ module.exports = {
   getSubscriptions,
   createSubscription,
   getSubscription,
+  generateSubscriptionContent,
   updateSubscription,
   deleteSubscription
 };

@@ -1,5 +1,5 @@
 const sessionService = require('./sessionService');
-const { generateSessionToken } = require('../utils');
+const { generateSessionToken } = require('../utils/helpers');
 const { adminUsername, adminPassword } = require('../config');
 const ApiError = require('../utils/ApiError');
 

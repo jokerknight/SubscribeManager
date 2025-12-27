@@ -1,0 +1,90 @@
+const BaseProtocol = require('./BaseProtocol');
+const { safeDecodeURIComponent } = require('../utils/helpers');
+
+class TUICProtocol extends BaseProtocol {
+  constructor() {
+    super({
+      prefix: 'tuic://',
+      defaults: {
+        name: '未命名节点',
+        version: '5'
+      },
+      transformers: {
+        name: (name) => name ? decodeURIComponent(name) : '未命名节点',
+        port: (port) => parseInt(port),
+        version: (version) => version || '5',
+        skipCertVerify: (allowInsecure) => allowInsecure === 'true' || allowInsecure === '1',
+        disableSni: (disable) => disable === 'true' || disable === '1',
+        reduceRtt: (reduce) => reduce === 'true' || reduce === '1'
+      }
+    });
+  }
+
+  extractElements(nodeLink) {
+    const url = new URL(nodeLink);
+    if (!url.hostname || !url.port) return null;
+
+    const params = new URLSearchParams(url.search);
+    
+    return {
+      name: url.hash ? url.hash.substring(1) : null,
+      server: url.hostname,
+      port: url.port,
+      uuid: url.username || params.get('uuid'),
+      password: url.password || params.get('password'),
+      version: params.get('version') || params.get('v'),
+      sni: params.get('sni') || url.hostname,
+      alpn: params.get('alpn'),
+      allowInsecure: params.get('allow_insecure') || params.get('allowInsecure'),
+      udpRelayMode: params.get('udp_relay_mode') || params.get('udp-relay-mode'),
+      congestionControl: params.get('congestion_control') || params.get('congestion-control') || params.get('cc'),
+      disableSni: params.get('disable_sni'),
+      reduceRtt: params.get('reduce_rtt')
+    };
+  }
+
+  toSurgeFormat(node) {
+    const parts = [
+      `${node.name} = tuic`,
+      node.server,
+      node.port,
+      `uuid=${node.uuid}`,
+      `password=${node.password}`,
+      `version=${node.version}`,
+      `sni=${safeDecodeURIComponent(node.sni)}`,
+      `skip-cert-verify=${node.skipCertVerify}`
+    ];
+
+    if (node.alpn) parts.push(`alpn=${node.alpn}`);
+    if (node.udpRelayMode) parts.push(`udp-relay-mode=${node.udpRelayMode}`);
+    if (node.congestionControl) parts.push(`congestion-control=${node.congestionControl}`);
+    if (node.disableSni) parts.push('disable-sni=true');
+    if (node.reduceRtt) parts.push('reduce-rtt=true');
+
+    return parts.join(', ');
+  }
+
+  toClashFormat(node) {
+    const clashNode = {
+      name: node.name,
+      type: 'tuic',
+      server: node.server,
+      port: node.port,
+      uuid: node.uuid,
+      password: node.password,
+      'skip-cert-verify': true
+    };
+
+    if (node.version) clashNode.version = parseInt(node.version);
+    if (node.sni) clashNode.sni = safeDecodeURIComponent(node.sni);
+    if (node.alpn) clashNode.alpn = node.alpn.split(',').map(s => s.trim());
+    if (node.udpRelayMode) clashNode['udp-relay-mode'] = node.udpRelayMode;
+    if (node.congestionControl) clashNode['congestion-control'] = node.congestionControl;
+    if (node.disableSni) clashNode['disable-sni'] = true;
+    if (node.reduceRtt) clashNode['reduce-rtt'] = true;
+
+    return clashNode;
+  }
+}
+
+module.exports = TUICProtocol;

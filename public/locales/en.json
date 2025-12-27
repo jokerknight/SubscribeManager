@@ -19,6 +19,7 @@
   },
   "navbar": {
     "brand": "Subscribe-Manager",
+    "config_manager": "Protocol Guide",
     "logout": "Logout"
   },
   "login": {

@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const { open } = require('sqlite');
-const { dbPath } = require('./config');
+const config = require('./config');
 const fs = require('fs');
 const path = require('path');
 
@@ -8,14 +8,14 @@ let db;
 
 async function initializeDatabase() {
   // Ensure the database directory exists
-  const dbDir = path.dirname(dbPath);
+  const dbDir = path.dirname(config.databasePath);
   if (!fs.existsSync(dbDir)) {
     fs.mkdirSync(dbDir, { recursive: true });
     console.log(`创建数据目录: ${dbDir}`);
   }
 
   db = await open({
-    filename: dbPath,
+    filename: config.databasePath,
     driver: sqlite3.Database
   });
 

@@ -6,7 +6,7 @@ const { adminPath } = require('../config');
 
 // 登录页面
 router.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public', 'login.html'));
+  res.sendFile(path.join(__dirname, '../public/login.html'));
 });
 
 // 登录处理

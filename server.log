@@ -1,0 +1,8 @@
+[dotenv@17.2.2] injecting env (7) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+(node:87125) Warning: Accessing non-existent property 'safeBase64Decode' of module exports inside circular dependency
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:87125) Warning: Accessing non-existent property 'safeUtf8Decode' of module exports inside circular dependency
+服务器运行在 http://localhost:3000
+管理面板路径: /admin
+
+收到终止信号，正在关闭应用...
