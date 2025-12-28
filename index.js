@@ -94,10 +94,23 @@ async function startApp() {
       res.sendFile(path.join(__dirname, "public", "config-manager.html"));
     });
 
+    // 重定向根路径到管理面板（必须在订阅路由之前）
+    app.get("/", (req, res) => {
+      res.redirect(`/${config.adminPath}`);
+    });
+
     // 注册路由
     app.use("/api", requireAuth, apiRoutes);
+    
+    // 订阅路由，排除管理路径
     const subscriptionRoutes = require("./routes/subscriptionRoutes");
-    app.use("/", subscriptionRoutes); // 订阅内容不需要认证
+    app.use("/", (req, res, next) => {
+      // 如果路径以adminPath开头，跳过订阅路由
+      if (req.path.startsWith(`/${config.adminPath}`)) {
+        return next();
+      }
+      subscriptionRoutes(req, res, next);
+    });
 
     // 全局错误处理
     app.use(errorHandler);

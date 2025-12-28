@@ -17,16 +17,17 @@ const {
 
 // 获取订阅内容 - 支持查询参数格式和路径参数格式
 router.get('/:path', async (req, res) => {
-  try {
-    const { path } = req.params;
-    let { format } = req.query;
-    
-    // 如果没有查询参数，检查路径参数格式 /path/format
-    const pathSegments = req.path.split('/').filter(Boolean);
-    if (pathSegments.length > 1 && !format) {
-      format = pathSegments[1]; // 取第二个路径段作为format
-    }
+  await handleSubscriptionRequest(req, res, req.params.path, req.query.format);
+});
 
+// 获取订阅内容 - 支持 /path/format 路径参数格式
+router.get('/:path/:format', async (req, res) => {
+  await handleSubscriptionRequest(req, res, req.params.path, req.params.format);
+});
+
+// 统一的订阅请求处理函数
+async function handleSubscriptionRequest(req, res, path, format) {
+  try {
     // 获取订阅内容
     const content = await generateSubscriptionContent(path);
     
@@ -75,6 +76,6 @@ router.get('/:path', async (req, res) => {
       error: { code: 500, message: 'Internal server error', details: error.message }
     });
   }
-});
+}
 
 module.exports = router;

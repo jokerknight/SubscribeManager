@@ -27,7 +27,7 @@ router.get('/logout', async (req, res) => {
     await authService.logout(req.session.sessionId);
     req.session.destroy();
   }
-  res.redirect(`/${adminPath}/login`);
+  res.redirect(`/${adminPath}/auth/login`);
 });
 
 module.exports = router;

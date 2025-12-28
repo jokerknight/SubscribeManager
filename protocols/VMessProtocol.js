@@ -1,5 +1,5 @@
 const BaseProtocol = require('./BaseProtocol');
-const { safeBase64Decode, safeUtf8Decode } = require('../utils');
+const { safeBase64Decode, safeUtf8Decode } = require('../utils/helpers');
 
 class VMessProtocol extends BaseProtocol {
   constructor() {
