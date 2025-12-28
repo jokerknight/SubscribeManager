@@ -267,6 +267,33 @@ function generateProxyConfig(proxy) {
       if (proxy.fingerprint) {
         config += `    fingerprint: ${proxy.fingerprint}\n`;
       }
+      // 处理网络选项
+      if (proxy['ws-opts']) {
+        config += `    ws-opts:\n`;
+        if (proxy['ws-opts'].path) {
+          config += `      path: "${proxy['ws-opts'].path}"\n`;
+        }
+        if (proxy['ws-opts'].headers) {
+          config += `      headers:\n`;
+          if (proxy['ws-opts'].headers.Host) {
+            config += `        Host: "${proxy['ws-opts'].headers.Host}"\n`;
+          }
+        }
+        if (proxy['ws-opts']['max-early-data']) {
+          config += `      max-early-data: ${proxy['ws-opts']['max-early-data']}\n`;
+        }
+        if (proxy['ws-opts']['early-data-header-name']) {
+          config += `      early-data-header-name: "${proxy['ws-opts']['early-data-header-name']}"\n`;
+        }
+      }
+      
+      if (proxy['grpc-opts']) {
+        config += `    grpc-opts:\n`;
+        if (proxy['grpc-opts']['grpc-service-name']) {
+          config += `      grpc-service-name: "${proxy['grpc-opts']['grpc-service-name']}"\n`;
+        }
+      }
+      
       // 处理 Reality 特殊配置
       if (proxy['reality-opts']) {
         config += `    reality-opts:\n`;
@@ -291,12 +318,42 @@ function generateProxyConfig(proxy) {
     case 'vmess':
       config += `    uuid: ${proxy.uuid}\n`;
       config += `    cipher: ${proxy.cipher}\n`;
-      config += `    network: ${proxy.network}\n`;
+      if (proxy.alterId !== undefined) {
+        config += `    alterId: ${proxy.alterId}\n`;
+      }
+      if (proxy.security) {
+        config += `    security: ${proxy.security}\n`;
+      }
+      if (proxy.network) {
+        config += `    network: ${proxy.network}\n`;
+      }
       if (proxy.tls) {
         config += `    tls: true\n`;
       }
       if (proxy.servername) {
         config += `    servername: ${proxy.servername}\n`;
+      }
+      if (proxy.fingerprint) {
+        config += `    fingerprint: ${proxy.fingerprint}\n`;
+      }
+      // VMess 网络选项
+      if (proxy['ws-opts']) {
+        config += `    ws-opts:\n`;
+        if (proxy['ws-opts'].path) {
+          config += `      path: "${proxy['ws-opts'].path}"\n`;
+        }
+        if (proxy['ws-opts'].headers) {
+          config += `      headers:\n`;
+          if (proxy['ws-opts'].headers.Host) {
+            config += `        Host: "${proxy['ws-opts'].headers.Host}"\n`;
+          }
+        }
+      }
+      if (proxy['grpc-opts']) {
+        config += `    grpc-opts:\n`;
+        if (proxy['grpc-opts']['grpc-service-name']) {
+          config += `      grpc-service-name: "${proxy['grpc-opts']['grpc-service-name']}"\n`;
+        }
       }
       break;
     case 'trojan':

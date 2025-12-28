@@ -45,6 +45,22 @@ class VLESSProtocol extends BaseProtocol {
         node.path = params.get('path');
       }
       
+      if (params.has('serviceName')) {
+        node.serviceName = params.get('serviceName');
+      }
+      
+      if (params.has('ed')) {
+        node.earlyData = params.get('ed');
+      }
+      
+      if (params.has('max-early-data')) {
+        node.maxEarlyData = params.get('max-early-data');
+      }
+      
+      if (params.has('early-data-header-name')) {
+        node.earlyDataHeaderName = params.get('early-data-header-name');
+      }
+      
       if (params.has('host')) {
         node.host = params.get('host');
       }
@@ -72,6 +88,11 @@ class VLESSProtocol extends BaseProtocol {
       
       if (params.has('sid')) {
         node.sid = params.get('sid');
+      }
+      
+      // 证书验证相关参数
+      if (params.has('allowInsecure') || params.has('allow_insecure')) {
+        node.allowInsecure = params.get('allowInsecure') || params.get('allow_insecure');
       }
 
       return node;
@@ -124,10 +145,23 @@ class VLESSProtocol extends BaseProtocol {
             Host: node.host
           };
         }
+        
+        // 早期数据配置
+        if (node.earlyData) {
+          clashNode['ws-opts']['max-early-data'] = parseInt(node.earlyData);
+        }
+        if (node.maxEarlyData) {
+          clashNode['ws-opts']['max-early-data'] = parseInt(node.maxEarlyData);
+        }
+        if (node.earlyDataHeaderName) {
+          clashNode['ws-opts']['early-data-header-name'] = node.earlyDataHeaderName;
+        }
       } else if (node.network === 'grpc') {
         clashNode['grpc-opts'] = {};
-        if (node.path) {
-          clashNode['grpc-opts']['grpc-service-name'] = node.path;
+        // 优先使用 serviceName，其次使用 path
+        const serviceName = node.serviceName || node.path;
+        if (serviceName) {
+          clashNode['grpc-opts']['grpc-service-name'] = serviceName;
         }
       }
     }
@@ -150,6 +184,11 @@ class VLESSProtocol extends BaseProtocol {
       }
       if (node.alpn) {
         clashNode.alpn = node.alpn.split(',');
+      }
+      
+      // 证书验证配置
+      if (node.allowInsecure === 'true' || node.allowInsecure === '1') {
+        clashNode['skip-cert-verify'] = true;
       }
       
       // Reality 特有配置
