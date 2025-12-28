@@ -267,6 +267,26 @@ function generateProxyConfig(proxy) {
       if (proxy.fingerprint) {
         config += `    fingerprint: ${proxy.fingerprint}\n`;
       }
+      // 处理 Reality 特殊配置
+      if (proxy['reality-opts']) {
+        config += `    reality-opts:\n`;
+        if (proxy['reality-opts'].sni) {
+          config += `      sni: ${proxy['reality-opts'].sni}\n`;
+        }
+        if (proxy['reality-opts'].fingerprint) {
+          config += `      fingerprint: ${proxy['reality-opts'].fingerprint}\n`;
+        }
+        if (proxy['reality-opts']['public-key']) {
+          config += `      public-key: ${proxy['reality-opts']['public-key']}\n`;
+        }
+        if (proxy['reality-opts']['short-id']) {
+          config += `      short-id: ${proxy['reality-opts']['short-id']}\n`;
+        }
+      }
+      // 处理 client-fingerprint
+      if (proxy['client-fingerprint']) {
+        config += `    client-fingerprint: ${proxy['client-fingerprint']}\n`;
+      }
       break;
     case 'vmess':
       config += `    uuid: ${proxy.uuid}\n`;

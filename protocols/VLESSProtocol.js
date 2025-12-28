@@ -132,39 +132,42 @@ class VLESSProtocol extends BaseProtocol {
       }
     }
 
-    // TLS 相关配置
-    if (node.security === 'tls' || node.sni) {
+    // 添加 flow 字段（如果存在）
+    if (node.flow) {
+      clashNode.flow = node.flow;
+    }
+
+    // TLS 配置
+    if (node.security === 'reality' || node.security === 'tls' || node.sni) {
       clashNode.tls = true;
+      
+      // 公共 TLS 配置
       if (node.sni) {
         clashNode.servername = node.sni;
+      }
+      if (node.fingerprint) {
+        clashNode.fingerprint = node.fingerprint;
       }
       if (node.alpn) {
         clashNode.alpn = node.alpn.split(',');
       }
-      if (node.fingerprint) {
-        clashNode.fingerprint = node.fingerprint;
+      
+      // Reality 特有配置
+      if (node.security === 'reality') {
+        clashNode['reality-opts'] = {};
+        
+        if (node.sni) {
+          clashNode['reality-opts'].sni = node.sni;
+        }
+        
+        if (node.pbk) {
+          clashNode['reality-opts']['public-key'] = node.pbk;
+        }
+        
+        if (node.sid) {
+          clashNode['reality-opts']['short-id'] = node.sid;
+        }
       }
-    }
-
-    // 添加 flow 字段（如果存在）
-    if (node.flow) {
-      clashNode.flow = node.flow;
-    }
-
-    // TLS 相关配置 - Reality 也需要 TLS 标志
-    if (node.security === 'tls' || node.security === 'reality' || node.sni) {
-      clashNode.tls = true;
-      if (node.sni) {
-        clashNode.servername = node.sni;
-      }
-      if (node.fingerprint) {
-        clashNode.fingerprint = node.fingerprint;
-      }
-    }
-
-    // 添加 flow 字段（如果存在）
-    if (node.flow) {
-      clashNode.flow = node.flow;
     }
 
     return clashNode;

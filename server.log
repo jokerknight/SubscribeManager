@@ -1,0 +1,9 @@
+
+> start
+> node index.js
+
+[dotenv@17.2.2] injecting env (7) from .env -- tip: ⚙️  override existing env vars with { override: true }
+服务器运行在 http://localhost:3000
+管理面板路径: /admin
+
+收到终止信号，正在关闭应用...
