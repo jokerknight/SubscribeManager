@@ -43,47 +43,60 @@ class TUICProtocol extends BaseProtocol {
     };
   }
 
-  toSurgeFormat(node) {
-    const parts = [
-      `${node.name} = tuic`,
-      node.server,
-      node.port,
-      `uuid=${node.uuid}`,
-      `password=${node.password}`,
-      `version=${node.version}`,
-      `sni=${safeDecodeURIComponent(node.sni)}`,
-      `skip-cert-verify=${node.skipCertVerify}`
-    ];
+  /**
+   * 将节点转换为指定目标格式
+   * @param {Object} node 节点对象
+   * @param {string} targetFormat 目标格式 ('surge', 'shadowsocks', 'clash')
+   * @returns {string|Object|null} 转换后的内容
+   */
+  convertToFormat(node, targetFormat) {
+    const format = targetFormat.toLowerCase();
 
-    if (node.alpn) parts.push(`alpn=${node.alpn}`);
-    if (node.udpRelayMode) parts.push(`udp-relay-mode=${node.udpRelayMode}`);
-    if (node.congestionControl) parts.push(`congestion-control=${node.congestionControl}`);
-    if (node.disableSni) parts.push('disable-sni=true');
-    if (node.reduceRtt) parts.push('reduce-rtt=true');
+    if (format === 'surge') {
+      const parts = [
+        `${node.name} = tuic`,
+        node.server,
+        node.port,
+        `uuid=${node.uuid}`,
+        `password=${node.password}`,
+        `version=${node.version}`,
+        `sni=${safeDecodeURIComponent(node.sni)}`,
+        `skip-cert-verify=${node.skipCertVerify}`
+      ];
 
-    return parts.join(', ');
-  }
+      if (node.alpn) parts.push(`alpn=${node.alpn}`);
+      if (node.udpRelayMode) parts.push(`udp-relay-mode=${node.udpRelayMode}`);
+      if (node.congestionControl) parts.push(`congestion-control=${node.congestionControl}`);
+      if (node.disableSni) parts.push('disable-sni=true');
+      if (node.reduceRtt) parts.push('reduce-rtt=true');
 
-  toClashFormat(node) {
-    const clashNode = {
-      name: node.name,
-      type: 'tuic',
-      server: node.server,
-      port: node.port,
-      uuid: node.uuid,
-      password: node.password,
-      'skip-cert-verify': true
-    };
+      return parts.join(', ');
+    }
 
-    if (node.version) clashNode.version = parseInt(node.version);
-    if (node.sni) clashNode.sni = safeDecodeURIComponent(node.sni);
-    if (node.alpn) clashNode.alpn = node.alpn.split(',').map(s => s.trim());
-    if (node.udpRelayMode) clashNode['udp-relay-mode'] = node.udpRelayMode;
-    if (node.congestionControl) clashNode['congestion-control'] = node.congestionControl;
-    if (node.disableSni) clashNode['disable-sni'] = true;
-    if (node.reduceRtt) clashNode['reduce-rtt'] = true;
+    if (format === 'clash') {
+      const clashNode = {
+        name: node.name,
+        type: 'tuic',
+        server: node.server,
+        port: node.port,
+        uuid: node.uuid,
+        password: node.password,
+        'skip-cert-verify': true
+      };
 
-    return clashNode;
+      if (node.version) clashNode.version = parseInt(node.version);
+      if (node.sni) clashNode.sni = safeDecodeURIComponent(node.sni);
+      if (node.alpn) clashNode.alpn = node.alpn.split(',').map(s => s.trim());
+      if (node.udpRelayMode) clashNode['udp-relay-mode'] = node.udpRelayMode;
+      if (node.congestionControl) clashNode['congestion-control'] = node.congestionControl;
+      if (node.disableSni) clashNode['disable-sni'] = true;
+      if (node.reduceRtt) clashNode['reduce-rtt'] = true;
+
+      return clashNode;
+    }
+
+    // TUIC 不支持 shadowsocks 格式
+    return null;
   }
 }
 

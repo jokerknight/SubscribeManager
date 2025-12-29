@@ -499,6 +499,16 @@
       margin-bottom: 0.5rem;
     }
 
+    .input-group {
+      display: flex;
+      align-items: stretch;
+      gap: 0.5rem;
+    }
+
+    .input-group .form-control {
+      flex: 1;
+    }
+
     .node-list {
       background: var(--card-bg);
       border-radius: var(--border-radius);
@@ -2348,6 +2358,13 @@
               <div class="form-text" data-i18n="subscription.path_help">路径只能包含小写字母、数字和连字符，长度在5-50个字符之间</div>
               <div class="path-error text-danger"></div>
             </div>
+            <hr>
+            <h6 class="mb-3" data-i18n="subscription.advanced_config">高级配置</h6>
+            <div class="mb-3">
+              <label class="form-label" data-i18n="subscription.subconvert_api">Subconvert API</label>
+              <input type="text" class="form-control" name="subconvert_api" placeholder="https://subconvert.example.com/sub?target=clash&config=https://example.com/template.ini&emoji=true">
+              <div class="form-text" data-i18n="subscription.subconvert_api_help">Subconvert API 地址，用于使用自定义模板规则。示例：https://subconvert.example.com/sub?target=clash&config=https://example.com/template.ini&emoji=true<br/>注意：系统会自动将当前订阅的地址拼接到请求中；如果需要转换外部订阅，可以在 url 参数中指定外部订阅地址。</div>
+            </div>
           </form>
         </div>
         <div class="modal-footer justify-content-between">
@@ -3257,11 +3274,30 @@
     }
 
     // 显示编辑名称模态框
-    function showEditNameModal(path, name) {
+    async function showEditNameModal(path, name) {
       const form = document.getElementById('editNameForm');
       form.querySelector('input[name="originalPath"]').value = path;
       form.querySelector('input[name="name"]').value = name;
       form.querySelector('input[name="path"]').value = path;
+
+      // 从数据库加载现有的配置
+      try {
+        const response = await fetch('/api/subscriptions/' + path);
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            const subscription = result.data;
+            // 设置 subconvert_api 的值
+            const subconvertApiInput = form.querySelector('input[name="subconvert_api"]');
+            if (subconvertApiInput) {
+              subconvertApiInput.value = subscription.subconvert_api || '';
+            }
+          }
+        }
+      } catch (error) {
+        console.error('加载订阅配置失败:', error);
+        // 即使加载失败也继续打开模态框
+      }
 
       const modal = new bootstrap.Modal(document.getElementById('editNameModal'));
       modal.show();
@@ -3273,6 +3309,7 @@
       const originalPath = form.querySelector('input[name="originalPath"]').value;
       const nameInput = form.querySelector('input[name="name"]');
       const pathInput = form.querySelector('input[name="path"]');
+      const subconvertApiInput = form.querySelector('input[name="subconvert_api"]');
       const pathError = form.querySelector('.path-error');
 
       try {
@@ -3315,7 +3352,8 @@
           },
           body: JSON.stringify({
             name: nameInput.value.trim(),
-            path: path
+            path: path,
+            subconvert_api: subconvertApiInput.value.trim() || null
           })
         });
 
@@ -3507,6 +3545,60 @@
       } finally {
         // 无论成功还是失败都重新加载节点列表
         await loadNodeList(subscriptionPath);
+      }
+    }
+
+    // 从 URL 加载模板
+    async function loadTemplateFromUrl() {
+      const urlInput = document.getElementById('templateUrlInput');
+      const templateTextarea = document.getElementById('customTemplateTextarea');
+      const url = urlInput.value.trim();
+
+      if (!url) {
+        showToast(_t('subscription.template_url_invalid'), 'danger');
+        return;
+      }
+
+      // 验证 URL 格式
+      try {
+        new URL(url);
+      } catch (e) {
+        showToast(_t('subscription.template_url_invalid'), 'danger');
+        return;
+      }
+
+      try {
+        showToast(_t('subscription.template_loading'), 'info');
+
+        const response = await fetch(url, {
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+            'Accept': 'text/plain, text/*'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const templateContent = await response.text();
+
+        if (!templateContent.trim()) {
+          throw new Error('Template content is empty');
+        }
+
+        // 将加载的内容填入 textarea
+        templateTextarea.value = templateContent;
+
+        showToast(_t('subscription.template_loaded'), 'success');
+
+        // 清空 URL 输入框
+        urlInput.value = '';
+
+      } catch (error) {
+        console.error('加载模板失败:', error);
+        showToast(_t('subscription.template_load_failed') + ': ' + error.message, 'danger');
       }
     }
   </script>

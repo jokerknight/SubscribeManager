@@ -61,19 +61,8 @@ class ProtocolFactory {
     const protocol = this.findProtocolByPrefix(node.type);
     if (!protocol) return null;
 
-    switch (formatType.toLowerCase()) {
-      case 'surge':
-      case 'shadowsocks':
-        // VLESS 不支持 Surge 格式，返回 null 会被过滤掉
-        if (node.type === 'vless://') {
-          return null;
-        }
-        return protocol.toSurgeFormat(node);
-      case 'clash':
-        return protocol.toClashFormat(node);
-      default:
-        return null;
-    }
+    // 协议自己决定是否支持该格式
+    return protocol.convertToFormat(node, formatType);
   }
 
   // 根据前缀查找协议

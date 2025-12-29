@@ -58,12 +58,15 @@ class BaseProtocol {
   }
 
   // 抽象方法：子类实现具体的格式转换
-  toSurgeFormat(node) {
-    throw new Error('toSurgeFormat must be implemented by subclass');
-  }
-
-  toClashFormat(node) {
-    throw new Error('toClashFormat must be implemented by subclass');
+  /**
+   * 将节点转换为指定目标格式
+   * 子类应该重写此方法来实现自己的转换逻辑
+   * @param {Object} node 节点对象
+   * @param {string} targetFormat 目标格式 ('surge', 'shadowsocks', 'clash')
+   * @returns {string|Object|null} 转换后的内容，不支持返回 null
+   */
+  convertToFormat(node, targetFormat) {
+    throw new Error(`Protocol ${this.getProtocolType()} does not support ${targetFormat} format`);
   }
 
   // 获取协议类型

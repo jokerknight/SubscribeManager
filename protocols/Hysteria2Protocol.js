@@ -37,53 +37,66 @@ class Hysteria2Protocol extends BaseProtocol {
     };
   }
 
-  toSurgeFormat(node) {
-    const parts = [
-      `${node.name} = hysteria2`,
-      node.server,
-      node.port,
-      `password=${node.password}`
-    ];
+  /**
+   * 将节点转换为指定目标格式
+   * @param {Object} node 节点对象
+   * @param {string} targetFormat 目标格式 ('surge', 'shadowsocks', 'clash')
+   * @returns {string|Object|null} 转换后的内容
+   */
+  convertToFormat(node, targetFormat) {
+    const format = targetFormat.toLowerCase();
 
-    if (node.up) parts.push(`up=${node.up}`);
-    if (node.down) parts.push(`down=${node.down}`);
-    if (node.sni) parts.push(`sni=${safeDecodeURIComponent(node.sni)}`);
-    if (node.alpn) parts.push(`alpn=${node.alpn}`);
-    if (node.obfs) {
-      parts.push(`obfs=${safeDecodeURIComponent(node.obfs)}`);
-      if (node.obfsPassword) {
-        parts.push(`obfs-password=${safeDecodeURIComponent(node.obfsPassword)}`);
+    if (format === 'surge') {
+      const parts = [
+        `${node.name} = hysteria2`,
+        node.server,
+        node.port,
+        `password=${node.password}`
+      ];
+
+      if (node.up) parts.push(`up=${node.up}`);
+      if (node.down) parts.push(`down=${node.down}`);
+      if (node.sni) parts.push(`sni=${safeDecodeURIComponent(node.sni)}`);
+      if (node.alpn) parts.push(`alpn=${node.alpn}`);
+      if (node.obfs) {
+        parts.push(`obfs=${safeDecodeURIComponent(node.obfs)}`);
+        if (node.obfsPassword) {
+          parts.push(`obfs-password=${safeDecodeURIComponent(node.obfsPassword)}`);
+        }
       }
+      if (node.cc) parts.push(`cc=${node.cc}`);
+
+      parts.push('skip-cert-verify=true');
+      return parts.join(', ');
     }
-    if (node.cc) parts.push(`cc=${node.cc}`);
 
-    parts.push('skip-cert-verify=true');
-    return parts.join(', ');
-  }
+    if (format === 'clash') {
+      const clashNode = {
+        name: node.name,
+        type: 'hysteria2',
+        server: node.server,
+        port: node.port,
+        password: node.password,
+        'skip-cert-verify': true
+      };
 
-  toClashFormat(node) {
-    const clashNode = {
-      name: node.name,
-      type: 'hysteria2',
-      server: node.server,
-      port: node.port,
-      password: node.password,
-      'skip-cert-verify': true
-    };
-
-    if (node.up) clashNode.up = node.up;
-    if (node.down) clashNode.down = node.down;
-    if (node.sni) clashNode.sni = safeDecodeURIComponent(node.sni);
-    if (node.alpn) clashNode.alpn = node.alpn.split(',').map(s => s.trim());
-    if (node.obfs) {
-      clashNode.obfs = safeDecodeURIComponent(node.obfs);
-      if (node.obfsPassword) {
-        clashNode['obfs-password'] = safeDecodeURIComponent(node.obfsPassword);
+      if (node.up) clashNode.up = node.up;
+      if (node.down) clashNode.down = node.down;
+      if (node.sni) clashNode.sni = safeDecodeURIComponent(node.sni);
+      if (node.alpn) clashNode.alpn = node.alpn.split(',').map(s => s.trim());
+      if (node.obfs) {
+        clashNode.obfs = safeDecodeURIComponent(node.obfs);
+        if (node.obfsPassword) {
+          clashNode['obfs-password'] = safeDecodeURIComponent(node.obfsPassword);
+        }
       }
-    }
-    if (node.cc) clashNode.cc = node.cc;
+      if (node.cc) clashNode.cc = node.cc;
 
-    return clashNode;
+      return clashNode;
+    }
+
+    // Hysteria2 不支持 shadowsocks 格式
+    return null;
   }
 }
 

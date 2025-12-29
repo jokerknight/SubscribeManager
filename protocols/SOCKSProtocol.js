@@ -46,31 +46,44 @@ class SOCKSProtocol extends BaseProtocol {
     return decodedUsername;
   }
 
-  toSurgeFormat(node) {
-    const parts = [
-      `${node.name} = socks5`,
-      node.server,
-      node.port
-    ];
+  /**
+   * 将节点转换为指定目标格式
+   * @param {Object} node 节点对象
+   * @param {string} targetFormat 目标格式 ('surge', 'shadowsocks', 'clash')
+   * @returns {string|Object|null} 转换后的内容
+   */
+  convertToFormat(node, targetFormat) {
+    const format = targetFormat.toLowerCase();
 
-    if (node.username) parts.push(node.username);
-    if (node.password) parts.push(node.password);
+    if (format === 'surge') {
+      const parts = [
+        `${node.name} = socks5`,
+        node.server,
+        node.port
+      ];
 
-    return parts.join(', ');
-  }
+      if (node.username) parts.push(node.username);
+      if (node.password) parts.push(node.password);
 
-  toClashFormat(node) {
-    const clashNode = {
-      name: node.name,
-      type: 'socks5',
-      server: node.server,
-      port: node.port
-    };
+      return parts.join(', ');
+    }
 
-    if (node.username) clashNode.username = node.username;
-    if (node.password) clashNode.password = node.password;
+    if (format === 'clash') {
+      const clashNode = {
+        name: node.name,
+        type: 'socks5',
+        server: node.server,
+        port: node.port
+      };
 
-    return clashNode;
+      if (node.username) clashNode.username = node.username;
+      if (node.password) clashNode.password = node.password;
+
+      return clashNode;
+    }
+
+    // SOCKS 不支持 shadowsocks 格式
+    return null;
   }
 }
 

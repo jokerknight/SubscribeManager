@@ -5,11 +5,27 @@
 /**
  * 生成 Clash 配置文件
  * @param {Array} proxies 代理节点数组
+ * @param {string} customTemplate 自定义模板内容（已废弃，请使用 Subconvert API）
+ * @returns {Promise<string>} Clash 配置文件内容
+ */
+async function generateConfig(proxies, customTemplate = null) {
+  // 自定义模板功能已废弃，请配置 Subconvert API 来使用自定义规则
+  if (customTemplate && customTemplate.trim()) {
+    console.warn('自定义模板功能已废弃，请配置 Subconvert API 来使用自定义规则');
+  }
+
+  // 直接使用默认模板
+  return generateDefaultConfig(proxies);
+}
+
+/**
+ * 生成默认的 Clash 配置
+ * @param {Array} proxies 代理节点数组
  * @returns {string} Clash 配置文件内容
  */
-function generateConfig(proxies) {
+function generateDefaultConfig(proxies) {
   const proxyNames = proxies.map(proxy => proxy.name);
-
+  
   return `# Clash 配置文件 - Subscribe-Manager 自动生成
 # 生成时间: ${new Date().toISOString()}
 
@@ -467,10 +483,11 @@ function generateProxyConfig(proxy) {
 
 /**
  * 生成空的 Clash 配置
- * @returns {string} 空的 Clash 配置文件
+ * @param {string} customTemplate 自定义模板内容（可选）
+ * @returns {Promise<string>} 空的 Clash 配置文件
  */
-function generateEmptyConfig() {
-  return generateConfig([]);
+function generateEmptyConfig(customTemplate = null) {
+  return generateConfig([], customTemplate);
 }
 
 module.exports = {

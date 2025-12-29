@@ -37,19 +37,32 @@ class SSProtocol extends BaseProtocol {
     return { name, server, port, method, password };
   }
 
-  toSurgeFormat(node) {
-    return `${node.name} = ss, ${node.server}, ${node.port}, encrypt-method=${node.method}, password=${node.password}`;
-  }
+  /**
+   * 将节点转换为指定目标格式
+   * @param {Object} node 节点对象
+   * @param {string} targetFormat 目标格式 ('surge', 'shadowsocks', 'clash')
+   * @returns {string|Object|null} 转换后的内容
+   */
+  convertToFormat(node, targetFormat) {
+    const format = targetFormat.toLowerCase();
 
-  toClashFormat(node) {
-    return {
-      name: node.name,
-      type: 'ss',
-      server: node.server,
-      port: node.port,
-      cipher: node.method,
-      password: node.password
-    };
+    // Shadowsocks 协议支持 surge、shadowsocks、clash 三种格式
+    if (format === 'surge' || format === 'shadowsocks') {
+      return `${node.name} = ss, ${node.server}, ${node.port}, encrypt-method=${node.method}, password=${node.password}`;
+    }
+
+    if (format === 'clash') {
+      return {
+        name: node.name,
+        type: 'ss',
+        server: node.server,
+        port: node.port,
+        cipher: node.method,
+        password: node.password
+      };
+    }
+
+    return null;
   }
 }
 

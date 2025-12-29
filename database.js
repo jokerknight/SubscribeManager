@@ -29,9 +29,11 @@ async function createTables() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
       path TEXT UNIQUE NOT NULL,
+      subconvert_api TEXT,
+      custom_template TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
-    
+
     CREATE TABLE IF NOT EXISTS nodes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       subscription_id INTEGER NOT NULL,
@@ -49,6 +51,18 @@ async function createTables() {
       expires_at INTEGER NOT NULL
     );
   `);
+
+  // Add new columns if they don't exist (for existing databases)
+  try {
+    await db.exec(`ALTER TABLE subscriptions ADD COLUMN subconvert_api TEXT`);
+  } catch (e) {
+    // Column already exists
+  }
+  try {
+    await db.exec(`ALTER TABLE subscriptions ADD COLUMN custom_template TEXT`);
+  } catch (e) {
+    // Column already exists
+  }
 }
 
 function getDB() {

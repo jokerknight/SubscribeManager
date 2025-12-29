@@ -59,7 +59,18 @@
     "delete_confirm": "确定要删除这个订阅吗？",
     "path_used": "该路径已被使用",
     "address_n": "订阅地址{n}：",
-    "not_found": "订阅不存在"
+    "not_found": "订阅不存在",
+    "advanced_config": "高级配置",
+    "subconvert_api": "Subconvert API",
+    "subconvert_api_help": "Subconvert API 地址，用于使用自定义模板规则。示例：https://subconvert.example.com/sub?target=clash&config=https://example.com/template.ini&emoji=true。注意：系统会自动将当前订阅的地址拼接到请求中；如果需要转换外部订阅，可以在 url 参数中指定外部订阅地址。",
+    "custom_template": "自定义模板",
+    "custom_template_help": "INI 格式的自定义模板配置",
+    "template_url_placeholder": "模板链接地址",
+    "load_template": "加载",
+    "template_loading": "正在加载模板...",
+    "template_loaded": "模板加载成功",
+    "template_load_failed": "模板加载失败",
+    "template_url_invalid": "请输入有效的模板链接地址"
   },
   "nodes": {
     "title": "节点",

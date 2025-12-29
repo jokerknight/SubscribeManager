@@ -3,9 +3,11 @@ const ApiError = require('../utils/ApiError');
 
 async function getSubscriptions() {
   return dbQuery(`
-    SELECT 
+    SELECT
       s.path,
       s.name,
+      s.subconvert_api,
+      s.custom_template,
       COUNT(n.id) as nodeCount
     FROM subscriptions s
     LEFT JOIN nodes n ON s.id = n.subscription_id
@@ -18,19 +20,19 @@ async function createSubscription(name, path) {
   if (!name || !validateSubscriptionPath(path)) {
     throw new ApiError(400, 'subscription.path_invalid');
   }
-  
+
   // 检查路径是否已存在
   const existing = await dbQuery(
     'SELECT COUNT(*) as count FROM subscriptions WHERE path = ?',
     [path]
   );
-  
+
   if (existing[0].count > 0) {
     throw new ApiError(400, 'subscription.path_used');
   }
-  
+
   await dbRun(
-    'INSERT INTO subscriptions (name, path) VALUES (?, ?)',
+    'INSERT INTO subscriptions (name, path, subconvert_api, custom_template) VALUES (?, ?, NULL, NULL)',
     [name, path]
   );
 }
@@ -49,40 +51,53 @@ async function generateSubscriptionContent(path) {
   if (!subscription) {
     return null;
   }
-  
+
   // 获取订阅下的所有启用节点
   const nodes = await dbQuery(`
-    SELECT original_link 
-    FROM nodes 
-    WHERE subscription_id = ? 
+    SELECT original_link
+    FROM nodes
+    WHERE subscription_id = ?
       AND (enabled IS NULL OR enabled = 1)
     ORDER BY node_order ASC, id ASC
   `, [subscription.id]);
-  
+
+  // 构建当前订阅的完整 URL（用于 Subconvert API）
+  const protocol = process.env.PROTOCOL || 'http';
+  const host = process.env.HOST || 'localhost';
+  const port = process.env.PORT || 3000;
+  const subscriptionUrl = `${protocol}://${host}:${port}/subscribe/${path}`;
+
   // 生成订阅内容
-  return nodes.map(node => node.original_link).join('\n');
+  return {
+    nodes: nodes.map(node => node.original_link).join('\n'),
+    subscriptionUrl: subscriptionUrl,
+    config: {
+      subconvertApi: subscription.subconvert_api,
+      customTemplate: subscription.custom_template
+    }
+  };
 }
 
-async function updateSubscription(oldPath, newName, newPath) {
+async function updateSubscription(oldPath, newName, newPath, subconvertApi = null, customTemplate = null) {
   if (!newName || !validateSubscriptionPath(newPath)) {
     throw new ApiError(400, 'subscription.path_invalid');
   }
-  
+
   // 如果路径被修改，检查新路径是否已存在
   if (newPath !== oldPath) {
     const existing = await dbQuery(
       'SELECT COUNT(*) as count FROM subscriptions WHERE path = ?',
       [newPath]
     );
-    
+
     if (existing[0].count > 0) {
       throw new ApiError(400, 'subscription.path_used');
     }
   }
-  
+
   await dbRun(
-    'UPDATE subscriptions SET name = ?, path = ? WHERE path = ?',
-    [newName, newPath, oldPath]
+    'UPDATE subscriptions SET name = ?, path = ?, subconvert_api = ?, custom_template = ? WHERE path = ?',
+    [newName, newPath, subconvertApi, customTemplate, oldPath]
   );
 }
 

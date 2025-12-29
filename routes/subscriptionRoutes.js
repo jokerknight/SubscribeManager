@@ -29,24 +29,33 @@ router.get('/:path/:format', async (req, res) => {
 async function handleSubscriptionRequest(req, res, path, format) {
   try {
     // 获取订阅内容
-    const content = await generateSubscriptionContent(path);
-    
-    if (!content) {
+    const subscriptionData = await generateSubscriptionContent(path);
+
+    if (!subscriptionData) {
       return res.status(404).json({
         error: { code: 404, message: 'Subscription not found' }
       });
     }
+
+    const { nodes: content, subscriptionUrl, config } = subscriptionData;
 
     // 根据格式返回内容
     let response;
     if (format) {
       switch (format) {
         case 'clash':
+          // 优先使用订阅配置中的 Subconvert API
+          const subconvertApi = config.subconvertApi;
+          response = {
+            content: await convertSubscription(content, format, null, subconvertApi, subscriptionUrl),
+            type: 'text/yaml; charset=utf-8'
+          };
+          break;
         case 'surge':
         case 'shadowsocks':
           response = {
-            content: convertSubscription(content, format),
-            type: format === 'clash' ? 'text/yaml; charset=utf-8' : 'text/plain; charset=utf-8'
+            content: await convertSubscription(content, format, null, config.subconvertApi, subscriptionUrl),
+            type: 'text/plain; charset=utf-8'
           };
           break;
         case 'v2ray':

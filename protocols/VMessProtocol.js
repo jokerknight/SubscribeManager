@@ -40,60 +40,73 @@ class VMessProtocol extends BaseProtocol {
     };
   }
 
-  toSurgeFormat(node) {
-    const parts = [
-      `${node.name} = vmess`,
-      node.server,
-      node.port,
-      `username=${node.uuid}`,
-      'vmess-aead=true',
-      `tls=${node.tls}`,
-      `sni=${node.server}`,
-      'skip-cert-verify=true',
-      'tfo=false'
-    ];
-    
-    if (node.tls && node.alpn) {
-      parts.push(`alpn=${node.alpn.replace(/,/g, ':')}`);
-    }
-    
-    if (node.net === 'ws') {
-      parts.push('ws=true');
-      if (node.path) parts.push(`ws-path=${node.path}`);
-      parts.push(`ws-headers=Host:${node.host}`);
-    }
-    
-    return parts.join(', ');
-  }
+  /**
+   * 将节点转换为指定目标格式
+   * @param {Object} node 节点对象
+   * @param {string} targetFormat 目标格式 ('surge', 'shadowsocks', 'clash')
+   * @returns {string|Object|null} 转换后的内容
+   */
+  convertToFormat(node, targetFormat) {
+    const format = targetFormat.toLowerCase();
 
-  toClashFormat(node) {
-    const clashNode = {
-      name: node.name,
-      type: 'vmess',
-      server: node.server,
-      port: node.port,
-      uuid: node.uuid,
-      alterId: node.alterId || 0,
-      cipher: 'auto',
-      tls: node.tls
-    };
+    if (format === 'surge') {
+      const parts = [
+        `${node.name} = vmess`,
+        node.server,
+        node.port,
+        `username=${node.uuid}`,
+        'vmess-aead=true',
+        `tls=${node.tls}`,
+        `sni=${node.server}`,
+        'skip-cert-verify=true',
+        'tfo=false'
+      ];
 
-    if (node.net === 'ws') {
-      clashNode.network = 'ws';
-      if (node.path) {
-        clashNode['ws-opts'] = {
-          path: node.path,
-          headers: { Host: node.host }
-        };
+      if (node.tls && node.alpn) {
+        parts.push(`alpn=${node.alpn.replace(/,/g, ':')}`);
       }
+
+      if (node.net === 'ws') {
+        parts.push('ws=true');
+        if (node.path) parts.push(`ws-path=${node.path}`);
+        parts.push(`ws-headers=Host:${node.host}`);
+      }
+
+      return parts.join(', ');
     }
 
-    if (node.tls) {
-      clashNode['skip-cert-verify'] = true;
-      if (node.sni) clashNode.servername = node.sni;
+    if (format === 'clash') {
+      const clashNode = {
+        name: node.name,
+        type: 'vmess',
+        server: node.server,
+        port: node.port,
+        uuid: node.uuid,
+        alterId: node.alterId || 0,
+        cipher: 'auto',
+        tls: node.tls
+      };
+
+      if (node.net === 'ws') {
+        clashNode.network = 'ws';
+        if (node.path) {
+          clashNode['ws-opts'] = {
+            path: node.path,
+            headers: { Host: node.host }
+          };
+        }
+      }
+
+      if (node.tls) {
+        clashNode['skip-cert-verify'] = true;
+        if (node.sni) clashNode.servername = node.sni;
+      }
+
+      return clashNode;
     }
 
-    return clashNode;
+    // VMess 不支持 shadowsocks 格式
+    return null;
   }
 }
 

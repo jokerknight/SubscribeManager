@@ -36,56 +36,69 @@ class TrojanProtocol extends BaseProtocol {
     };
   }
 
-  toSurgeFormat(node) {
-    const parts = [
-      `${node.name} = trojan`,
-      node.server,
-      node.port,
-      `password=${node.password}`,
-      'tls=true',
-      `sni=${node.sni}`,
-      'skip-cert-verify=true',
-      'tfo=false'
-    ];
+  /**
+   * 将节点转换为指定目标格式
+   * @param {Object} node 节点对象
+   * @param {string} targetFormat 目标格式 ('surge', 'shadowsocks', 'clash')
+   * @returns {string|Object|null} 转换后的内容
+   */
+  convertToFormat(node, targetFormat) {
+    const format = targetFormat.toLowerCase();
 
-    if (node.alpn) {
-      parts.push(`alpn=${node.alpn.replace(/,/g, ':')}`);
-    }
+    if (format === 'surge') {
+      const parts = [
+        `${node.name} = trojan`,
+        node.server,
+        node.port,
+        `password=${node.password}`,
+        'tls=true',
+        `sni=${node.sni}`,
+        'skip-cert-verify=true',
+        'tfo=false'
+      ];
 
-    if (node.type === 'ws') {
-      parts.push('ws=true');
-      if (node.path) {
-        parts.push(`ws-path=${safeDecodeURIComponent(node.path)}`);
+      if (node.alpn) {
+        parts.push(`alpn=${node.alpn.replace(/,/g, ':')}`);
       }
-      parts.push(`ws-headers=Host:${node.host || node.server}`);
+
+      if (node.type === 'ws') {
+        parts.push('ws=true');
+        if (node.path) {
+          parts.push(`ws-path=${safeDecodeURIComponent(node.path)}`);
+        }
+        parts.push(`ws-headers=Host:${node.host || node.server}`);
+      }
+
+      return parts.join(', ');
     }
 
-    return parts.join(', ');
-  }
+    if (format === 'clash') {
+      const clashNode = {
+        name: node.name,
+        type: 'trojan',
+        server: node.server,
+        port: node.port,
+        password: node.password,
+        'skip-cert-verify': true
+      };
 
-  toClashFormat(node) {
-    const clashNode = {
-      name: node.name,
-      type: 'trojan',
-      server: node.server,
-      port: node.port,
-      password: node.password,
-      'skip-cert-verify': true
-    };
-
-    if (node.type === 'ws') {
-      clashNode.network = 'ws';
-      if (node.path || node.host) {
-        clashNode['ws-opts'] = {};
-        if (node.path) clashNode['ws-opts'].path = safeDecodeURIComponent(node.path);
-        if (node.host) {
-          clashNode['ws-opts'].headers = { Host: safeDecodeURIComponent(node.host) };
+      if (node.type === 'ws') {
+        clashNode.network = 'ws';
+        if (node.path || node.host) {
+          clashNode['ws-opts'] = {};
+          if (node.path) clashNode['ws-opts'].path = safeDecodeURIComponent(node.path);
+          if (node.host) {
+            clashNode['ws-opts'].headers = { Host: safeDecodeURIComponent(node.host) };
+          }
         }
       }
+
+      if (node.sni) clashNode.sni = safeDecodeURIComponent(node.sni);
+      return clashNode;
     }
 
-    if (node.sni) clashNode.sni = safeDecodeURIComponent(node.sni);
-    return clashNode;
+    // Trojan 不支持 shadowsocks 格式
+    return null;
   }
 }
 

@@ -103,113 +103,111 @@ class VLESSProtocol extends BaseProtocol {
   }
 
   /**
-   * 转换为 Surge 格式
+   * 将节点转换为指定目标格式
    * @param {Object} node 节点信息
-   * @returns {string} Surge 配置
+   * @param {string} targetFormat 目标格式 ('surge', 'shadowsocks', 'clash')
+   * @returns {string|Object|null} 转换后的内容
    */
-  toSurgeFormat(node) {
-    // VLESS 在 Surge 中不支持，返回 null
-    return null;
-  }
+  convertToFormat(node, targetFormat) {
+    const format = targetFormat.toLowerCase();
 
-  /**
-   * 转换为 Clash 格式
-   * @param {Object} node 节点信息
-   * @returns {string} Clash 配置片段
-   */
-  toClashFormat(node) {
-    const clashNode = {
-      name: node.name,
-      type: 'vless',
-      server: node.server,
-      port: node.port,
-      uuid: node.uuid
-    };
+    if (format === 'clash') {
+      const clashNode = {
+        name: node.name,
+        type: 'vless',
+        server: node.server,
+        port: node.port,
+        uuid: node.uuid
+      };
 
-    // 添加可选参数
-    if (node.encryption) {
-      clashNode.cipher = node.encryption;
-    }
+      // 添加可选参数
+      if (node.encryption) {
+        clashNode.cipher = node.encryption;
+      }
 
-    if (node.network) {
-      clashNode.network = node.network;
-      
-      // 网络相关配置
-      if (node.network === 'ws') {
-        clashNode['ws-opts'] = {};
-        if (node.path) {
-          clashNode['ws-opts'].path = node.path;
-        }
-        if (node.host) {
-          clashNode['ws-opts'].headers = {
-            Host: node.host
-          };
-        }
-        
-        // 早期数据配置
-        if (node.earlyData) {
-          clashNode['ws-opts']['max-early-data'] = parseInt(node.earlyData);
-        }
-        if (node.maxEarlyData) {
-          clashNode['ws-opts']['max-early-data'] = parseInt(node.maxEarlyData);
-        }
-        if (node.earlyDataHeaderName) {
-          clashNode['ws-opts']['early-data-header-name'] = node.earlyDataHeaderName;
-        }
-      } else if (node.network === 'grpc') {
-        clashNode['grpc-opts'] = {};
-        // 优先使用 serviceName，其次使用 path
-        const serviceName = node.serviceName || node.path;
-        if (serviceName) {
-          clashNode['grpc-opts']['grpc-service-name'] = serviceName;
+      if (node.network) {
+        clashNode.network = node.network;
+
+        // 网络相关配置
+        if (node.network === 'ws') {
+          clashNode['ws-opts'] = {};
+          if (node.path) {
+            clashNode['ws-opts'].path = node.path;
+          }
+          if (node.host) {
+            clashNode['ws-opts'].headers = {
+              Host: node.host
+            };
+          }
+
+          // 早期数据配置
+          if (node.earlyData) {
+            clashNode['ws-opts']['max-early-data'] = parseInt(node.earlyData);
+          }
+          if (node.maxEarlyData) {
+            clashNode['ws-opts']['max-early-data'] = parseInt(node.maxEarlyData);
+          }
+          if (node.earlyDataHeaderName) {
+            clashNode['ws-opts']['early-data-header-name'] = node.earlyDataHeaderName;
+          }
+        } else if (node.network === 'grpc') {
+          clashNode['grpc-opts'] = {};
+          // 优先使用 serviceName，其次使用 path
+          const serviceName = node.serviceName || node.path;
+          if (serviceName) {
+            clashNode['grpc-opts']['grpc-service-name'] = serviceName;
+          }
         }
       }
-    }
 
-    // 添加 flow 字段（如果存在）
-    if (node.flow) {
-      clashNode.flow = node.flow;
-    }
+      // 添加 flow 字段（如果存在）
+      if (node.flow) {
+        clashNode.flow = node.flow;
+      }
 
-    // TLS 配置
-    if (node.security === 'reality' || node.security === 'tls' || node.sni) {
-      clashNode.tls = true;
-      
-      // 公共 TLS 配置
-      if (node.sni) {
-        clashNode.servername = node.sni;
-      }
-      if (node.fingerprint) {
-        clashNode.fingerprint = node.fingerprint;
-      }
-      if (node.alpn) {
-        clashNode.alpn = node.alpn.split(',');
-      }
-      
-      // 证书验证配置
-      if (node.allowInsecure === 'true' || node.allowInsecure === '1') {
-        clashNode['skip-cert-verify'] = true;
-      }
-      
-      // Reality 特有配置
-      if (node.security === 'reality') {
-        clashNode['reality-opts'] = {};
-        
+      // TLS 配置
+      if (node.security === 'reality' || node.security === 'tls' || node.sni) {
+        clashNode.tls = true;
+
+        // 公共 TLS 配置
         if (node.sni) {
-          clashNode['reality-opts'].sni = node.sni;
+          clashNode.servername = node.sni;
         }
-        
-        if (node.pbk) {
-          clashNode['reality-opts']['public-key'] = node.pbk;
+        if (node.fingerprint) {
+          clashNode.fingerprint = node.fingerprint;
         }
-        
-        if (node.sid) {
-          clashNode['reality-opts']['short-id'] = node.sid;
+        if (node.alpn) {
+          clashNode.alpn = node.alpn.split(',');
+        }
+
+        // 证书验证配置
+        if (node.allowInsecure === 'true' || node.allowInsecure === '1') {
+          clashNode['skip-cert-verify'] = true;
+        }
+
+        // Reality 特有配置
+        if (node.security === 'reality') {
+          clashNode['reality-opts'] = {};
+
+          if (node.sni) {
+            clashNode['reality-opts'].sni = node.sni;
+          }
+
+          if (node.pbk) {
+            clashNode['reality-opts']['public-key'] = node.pbk;
+          }
+
+          if (node.sid) {
+            clashNode['reality-opts']['short-id'] = node.sid;
+          }
         }
       }
+
+      return clashNode;
     }
 
-    return clashNode;
+    // VLESS 不支持 surge 和 shadowsocks 格式
+    return null;
   }
 
   /**

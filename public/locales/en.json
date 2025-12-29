@@ -59,7 +59,18 @@
     "delete_confirm": "Are you sure you want to delete this subscription?",
     "path_used": "This path is already in use",
     "address_n": "Sub URL {n}:",
-    "not_found": "Subscription not found"
+    "not_found": "Subscription not found",
+    "advanced_config": "Advanced Config",
+    "subconvert_api": "Subconvert API",
+    "subconvert_api_help": "Subconvert API URL for using custom template rules. Example: https://subconvert.example.com/sub?target=clash&config=https://example.com/template.ini&emoji=true. Note: The system will automatically append the current subscription URL to the request; if you need to convert an external subscription, you can specify the external subscription address in the url parameter.",
+    "custom_template": "Custom Template",
+    "custom_template_help": "INI format custom template configuration",
+    "template_url_placeholder": "Template URL",
+    "load_template": "Load",
+    "template_loading": "Loading template...",
+    "template_loaded": "Template loaded successfully",
+    "template_load_failed": "Failed to load template",
+    "template_url_invalid": "Please enter a valid template URL"
   },
   "nodes": {
     "title": "Nodes",

@@ -31,8 +31,8 @@ router.get('/subscriptions/:path', asyncHandler(async (req, res) => {
 // 更新订阅信息
 router.put('/subscriptions/:path', asyncHandler(async (req, res) => {
   const { path: oldPath } = req.params;
-  const { name, path: newPath } = req.body;
-  await subscriptionService.updateSubscription(oldPath, name, newPath);
+  const { name, path: newPath, subconvert_api } = req.body;
+  await subscriptionService.updateSubscription(oldPath, name, newPath, subconvert_api, null);
   res.json({ success: true, message: 'subscription.updated' });
 }));
 
