@@ -361,16 +361,104 @@ function generateProxyConfig(proxy) {
       if (proxy.network) {
         config += `    network: ${proxy.network}\n`;
       }
+      // Trojan TLS 配置
+      config += `    tls: true\n`;
+      if (proxy.sni) {
+        config += `    servername: ${proxy.sni}\n`;
+      }
+      if (proxy.fingerprint) {
+        config += `    fingerprint: ${proxy.fingerprint}\n`;
+      }
+      if (proxy.alpn) {
+        config += `    alpn: ${proxy.alpn}\n`;
+      }
+      if (proxy['skip-cert-verify']) {
+        config += `    skip-cert-verify: ${proxy['skip-cert-verify']}\n`;
+      }
+      // Trojan 网络选项
+      if (proxy['ws-opts']) {
+        config += `    ws-opts:\n`;
+        if (proxy['ws-opts'].path) {
+          config += `      path: "${proxy['ws-opts'].path}"\n`;
+        }
+        if (proxy['ws-opts'].headers) {
+          config += `      headers:\n`;
+          if (proxy['ws-opts'].headers.Host) {
+            config += `        Host: "${proxy['ws-opts'].headers.Host}"\n`;
+          }
+        }
+        if (proxy['ws-opts']['max-early-data']) {
+          config += `      max-early-data: ${proxy['ws-opts']['max-early-data']}\n`;
+        }
+        if (proxy['ws-opts']['early-data-header-name']) {
+          config += `      early-data-header-name: "${proxy['ws-opts']['early-data-header-name']}"\n`;
+        }
+      }
+      if (proxy['grpc-opts']) {
+        config += `    grpc-opts:\n`;
+        if (proxy['grpc-opts']['grpc-service-name']) {
+          config += `      grpc-service-name: "${proxy['grpc-opts']['grpc-service-name']}"\n`;
+        }
+      }
       break;
     case 'hysteria2':
       config += `    password: ${proxy.password}\n`;
       if (proxy.sni) {
         config += `    sni: ${proxy.sni}\n`;
       }
-      config += `    skip-cert-verify: true\n`;
+      if (proxy.obfs) {
+        config += `    obfs: ${proxy.obfs}\n`;
+      }
+      if (proxy['obfs-password']) {
+        config += `    obfs-password: "${proxy['obfs-password']}"\n`;
+      }
+      if (proxy['skip-cert-verify'] !== undefined) {
+        config += `    skip-cert-verify: ${proxy['skip-cert-verify']}\n`;
+      } else {
+        config += `    skip-cert-verify: true\n`;
+      }
       break;
     case 'socks':
       config += `    version: 5\n`;
+      if (proxy.username) {
+        config += `    username: ${proxy.username}\n`;
+      }
+      if (proxy.password) {
+        config += `    password: ${proxy.password}\n`;
+      }
+      if (proxy.tls) {
+        config += `    tls: true\n`;
+      }
+      if (proxy.skipCertVerify) {
+        config += `    skip-cert-verify: true\n`;
+      }
+      if (proxy.sni) {
+        config += `    servername: ${proxy.sni}\n`;
+      }
+      break;
+    case 'tuic':
+      config += `    uuid: ${proxy.uuid}\n`;
+      config += `    password: ${proxy.password}\n`;
+      if (proxy.congestionControl) {
+        config += `    congestion-controller: ${proxy.congestionControl}\n`;
+      }
+      if (proxy.udpRelay !== undefined) {
+        config += `    udp-relay: ${proxy.udpRelay}\n`;
+      }
+      if (proxy.alpn) {
+        config += `    alpn: ${proxy.alpn}\n`;
+      }
+      if (proxy.sni) {
+        config += `    sni: ${proxy.sni}\n`;
+      }
+      if (proxy['skip-cert-verify'] !== undefined) {
+        config += `    skip-cert-verify: ${proxy['skip-cert-verify']}\n`;
+      } else {
+        config += `    skip-cert-verify: true\n`;
+      }
+      if (proxy.reduceRtt) {
+        config += `    reduce-rtt: true\n`;
+      }
       break;
   }
 
