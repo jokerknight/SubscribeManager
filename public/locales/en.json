@@ -135,6 +135,8 @@
     "subconvert_url_hint": "API URL for generating Clash config",
     "custom_template": "Custom Template URL",
     "custom_template_hint": "Leave empty to use default template",
+    "use_default_template": "Use Default Template",
+    "use_default_template_hint": "Check to use built-in default template for Clash subscription (with 3900+ rules), uncheck to generate only nodes (no rules). This option has the highest priority.",
     "updated": "Subconverter configuration updated"
   },
   "import": {

@@ -73,12 +73,13 @@ async function generateSubscriptionContent(path) {
     subscriptionUrl: subscriptionUrl,
     config: {
       subconvertApi: subscription.subconvert_url,
-      customTemplate: subscription.custom_template
+      customTemplate: subscription.custom_template,
+      useDefaultTemplate: subscription.use_default_template
     }
   };
 }
 
-async function updateSubscription(oldPath, newName, newPath, subconvertUrl = null, customTemplate = null) {
+async function updateSubscription(oldPath, newName, newPath, subconvertUrl = null, customTemplate = null, useDefaultTemplate = null) {
   if (!newName || !validateSubscriptionPath(newPath)) {
     throw new ApiError(400, 'subscription.path_invalid');
   }
@@ -96,8 +97,8 @@ async function updateSubscription(oldPath, newName, newPath, subconvertUrl = nul
   }
 
   await dbRun(
-    'UPDATE subscriptions SET name = ?, path = ?, subconvert_url = ?, custom_template = ? WHERE path = ?',
-    [newName, newPath, subconvertUrl, customTemplate, oldPath]
+    'UPDATE subscriptions SET name = ?, path = ?, subconvert_url = ?, custom_template = ?, use_default_template = ? WHERE path = ?',
+    [newName, newPath, subconvertUrl, customTemplate, useDefaultTemplate !== null ? (useDefaultTemplate ? 1 : 0) : null, oldPath]
   );
 }
 

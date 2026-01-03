@@ -135,6 +135,8 @@
     "subconvert_url_hint": "用于生成 Clash 配置的 API 地址",
     "custom_template": "自定义模板 URL",
     "custom_template_hint": "留空使用默认模板",
+    "use_default_template": "使用默认模板",
+    "use_default_template_hint": "勾选后将使用内置默认模板生成 Clash 订阅（包含 3900+ 条规则），取消勾选则仅生成节点信息（不含规则）。此选项优先级最高。",
     "updated": "Subconverter 配置已更新"
   },
   "import": {

@@ -55,7 +55,8 @@ async function handleSubscriptionRequest(req, res, path, format) {
           const convertedContent = await conversionService.convert(content, format, {
             customTemplate: config.customTemplate,
             subconvertUrl: config.subconvertApi,
-            subscriptionUrl: subscriptionUrl
+            subscriptionUrl: subscriptionUrl,
+            useDefaultTemplate: config.useDefaultTemplate
           });
 
           response = {

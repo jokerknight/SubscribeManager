@@ -36,8 +36,8 @@ router.get('/subscriptions/:path', asyncHandler(async (req, res) => {
 // 更新订阅信息
 router.put('/subscriptions/:path', asyncHandler(async (req, res) => {
   const { path: oldPath } = req.params;
-  const { name, path: newPath, subconvert_url, custom_template } = req.body;
-  await subscriptionService.updateSubscription(oldPath, name, newPath, subconvert_url, custom_template);
+  const { name, path: newPath, subconvert_url, custom_template, use_default_template } = req.body;
+  await subscriptionService.updateSubscription(oldPath, name, newPath, subconvert_url, custom_template, use_default_template);
   res.json({ success: true, message: 'subscription.updated' });
 }));
 
@@ -321,14 +321,14 @@ router.post('/clash/load-template', asyncHandler(async (req, res) => {
 // 更新订阅的 Subconverter 配置
 router.put('/subscriptions/:path/subconverter', asyncHandler(async (req, res) => {
   const { path } = req.params;
-  const { subconvert_url, custom_template } = req.body;
+  const { subconvert_url, custom_template, use_default_template } = req.body;
 
   const subscription = await subscriptionService.getSubscription(path);
   if (!subscription) {
     throw new ApiError(404, 'subscription.not_found');
   }
 
-  await subscriptionService.updateSubscription(path, subscription.name, path, subconvert_url, custom_template);
+  await subscriptionService.updateSubscription(path, subscription.name, path, subconvert_url, custom_template, use_default_template);
   res.json({ success: true, message: 'subconverter.updated' });
 }));
 

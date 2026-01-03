@@ -2443,6 +2443,11 @@
               <input type="url" class="form-control" name="customTemplate" placeholder="https://example.com/template.yaml">
               <div class="form-text" data-i18n="subconverter.custom_template_hint">留空使用默认模板</div>
             </div>
+            <div class="mb-3 form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="useDefaultTemplate" id="useDefaultTemplate">
+              <label class="form-check-label" for="useDefaultTemplate" data-i18n="subconverter.use_default_template">使用默认模板</label>
+              <div class="form-text" data-i18n="subconverter.use_default_template_hint">勾选后将使用内置默认模板生成 Clash 订阅（包含 3900+ 条规则），取消勾选则仅生成节点信息（不含规则）。此选项优先级最高。</div>
+            </div>
           </form>
         </div>
         <div class="modal-footer">
@@ -3773,6 +3778,7 @@
             const sub = result.data;
             form.querySelector('[name="subconvertUrl"]').value = sub.subconvert_url || '';
             form.querySelector('[name="customTemplate"]').value = sub.custom_template || '';
+            form.querySelector('[name="useDefaultTemplate"]').checked = sub.use_default_template !== undefined ? sub.use_default_template : true;
           }
         })
         .catch(error => console.error('获取订阅配置失败:', error));
@@ -3788,6 +3794,7 @@
       const path = formData.get('subscriptionPath');
       const subconvertUrl = formData.get('subconvertUrl').trim() || null;
       const customTemplate = formData.get('customTemplate').trim() || null;
+      const useDefaultTemplate = form.querySelector('[name="useDefaultTemplate"]').checked;
 
       try {
         const response = await fetch(`/api/subscriptions/${path}/subconverter`, {
@@ -3796,7 +3803,7 @@
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
           },
-          body: JSON.stringify({ subconvert_url: subconvertUrl, custom_template: customTemplate })
+          body: JSON.stringify({ subconvert_url: subconvertUrl, custom_template: customTemplate, use_default_template: useDefaultTemplate })
         });
 
         const result = await response.json();
