@@ -29,6 +29,11 @@ It provides an intuitive web interface and supports multiple proxy protocols and
     -   Base64 (`/v2ray`)
     -   Surge (`/surge`)
     -   Clash (`/clash`)
+-   **Advanced Clash Features**:
+    -   Built-in default template with 3900+ rules
+    -   Automatic rule expansion from rule-providers
+    -   Compatible with ClashMeta, ClashX, OpenClash, Nikki and other Clash clients
+    -   Subconvert API integration for custom templates
 -   **Security Features**:
     -   Admin login authentication
     -   Session management
@@ -88,6 +93,29 @@ It provides an intuitive web interface and supports multiple proxy protocols and
 -   **Manage Nodes**: Select subscription → Add nodes → Supports single line, multiple lines, Base64
 -   **Node Sorting**: Node list → Drag-and-drop → Auto-save
 -   **Bulk Actions**: Bulk delete → Select → Confirm
+-   **Subconvert Integration**: Configure Subconvert URL and template URL for custom Clash subscription template generation
+
+## 🎯 Clash Features
+
+### Default Template
+- Built-in default Clash template with comprehensive rules
+- 8 proxy groups: Auto-select, Media, Microsoft, Apple, CDN, AI, Telegram, Speedtest
+- 3900+ rules expanded from rule-providers
+- Compatible with ClashMeta, ClashX, OpenClash, Nikki and other Clash clients
+
+### Rule Providers
+The default template includes rules from Sukkaw's ruleset:
+- Reject: Ads, malware, tracking
+- Direct: Apple, Microsoft, CDNs, domestic services
+- Proxy: Media services, AI, Telegram, global
+- IP-based rules for precise matching
+
+### Subconvert Integration
+When a Subconvert URL is configured:
+- Subscriptions will be converted via Subconvert
+- Passes locally generated Clash subscription as input
+- Supports custom templates via Subconvert
+- Falls back to local default template conversion on error
 
 ## ⚠️ Notes
 

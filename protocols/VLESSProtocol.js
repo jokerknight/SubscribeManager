@@ -111,6 +111,11 @@ class VLESSProtocol extends BaseProtocol {
   convertToFormat(node, targetFormat) {
     const format = targetFormat.toLowerCase();
 
+    // 从 Clash YAML 转换为通用格式链接
+    if (format === 'universal') {
+      return this.convertFromClash(node);
+    }
+
     if (format === 'clash') {
       const clashNode = {
         name: node.name,
@@ -174,7 +179,7 @@ class VLESSProtocol extends BaseProtocol {
           clashNode.servername = node.sni;
         }
         if (node.fingerprint) {
-          clashNode.fingerprint = node.fingerprint;
+          clashNode['client-fingerprint'] = node.fingerprint;
         }
         if (node.alpn) {
           clashNode.alpn = node.alpn.split(',');
@@ -192,6 +197,9 @@ class VLESSProtocol extends BaseProtocol {
           if (node.sni) {
             clashNode['reality-opts'].sni = node.sni;
           }
+          if (node.fingerprint) {
+            clashNode['reality-opts'].fingerprint = node.fingerprint;
+          }
 
           if (node.pbk) {
             clashNode['reality-opts']['public-key'] = node.pbk;
@@ -208,6 +216,139 @@ class VLESSProtocol extends BaseProtocol {
 
     // VLESS 不支持 surge 和 shadowsocks 格式
     return null;
+  }
+
+  /**
+   * 从 Clash YAML 节点转换为通用格式链接
+   * @param {Object} proxy Clash 节点对象
+   * @returns {string|null} 通用格式字符串
+   */
+  convertFromClash(proxy) {
+    const { name, server, port, uuid, cipher, encryption, network, tls, 'skip-cert-verify': skipCertVerify, servername, 'ws-opts': wsOpts, 'grpc-opts': grpcOpts, flow, fingerprint, 'client-fingerprint': clientFingerprint, 'reality-opts': realityOpts, udp, alpn, 'allowInsecure': allowInsecure } = proxy;
+
+    let params = new URLSearchParams();
+    params.set('type', network || 'tcp');
+    params.set('encryption', encryption || cipher || 'none');
+
+    // 处理 security 参数
+    if (tls) {
+      params.set('security', realityOpts ? 'reality' : 'tls');
+    }
+
+    // 处理网络路径
+    if (wsOpts?.path) params.set('path', wsOpts.path);
+    if (wsOpts?.headers?.Host) params.set('host', wsOpts.headers.Host);
+    if (grpcOpts?.['grpc-service-name']) params.set('serviceName', grpcOpts['grpc-service-name']);
+
+    // 处理 SNI
+    if (servername) params.set('sni', servername);
+
+    // 处理 Reality 特有参数
+    if (realityOpts) {
+      if (realityOpts['public-key']) params.set('pbk', realityOpts['public-key']);
+      if (realityOpts['short-id']) params.set('sid', realityOpts['short-id']);
+      if (realityOpts.fingerprint) params.set('fp', realityOpts.fingerprint);
+    }
+
+    // 处理 flow 参数
+    if (flow) params.set('flow', flow);
+
+    // 处理指纹参数
+    if (clientFingerprint) params.set('fp', clientFingerprint);
+    if (fingerprint && !realityOpts?.fingerprint) params.set('fp', fingerprint);
+
+    // 处理 UDP 参数
+    if (udp !== undefined) params.set('udp', udp.toString());
+
+    // 处理 ALPN 参数
+    if (alpn) params.set('alpn', Array.isArray(alpn) ? alpn.join(',') : alpn);
+
+    // 处理证书验证
+    if (skipCertVerify || allowInsecure) {
+      params.set('allowInsecure', '1');
+    }
+
+    const link = `vless://${uuid}@${server}:${port}?${params.toString()}`;
+    return name ? `${link}#${encodeURIComponent(name)}` : link;
+  }
+
+  /**
+   * 从 Surge 逗号格式节点转换为通用格式链接
+   * @param {string} name 节点名称
+   * @param {Array<string>} params 逗号分隔的参数列表
+   * @returns {string|null} 通用格式字符串
+   */
+  convertFromSurge(name, params) {
+    const [, server, port, ...rest] = params;
+
+    if (!server || !port) return null;
+
+    // 解析键值对参数
+    const keyValuePairs = rest.join(',').split(',').reduce((acc, item) => {
+      const eqIndex = item.indexOf('=');
+      if (eqIndex !== -1) {
+        const key = item.substring(0, eqIndex).trim();
+        const value = item.substring(eqIndex + 1).trim();
+        if (key) {
+          acc[key] = value;
+        }
+      }
+      return acc;
+    }, {});
+
+    // 格式: name = vless, server, port, uuid=xxx, flow=xxx, sni=xxx
+    const uuid = keyValuePairs['uuid'] || params[3];
+    const flow = keyValuePairs['flow'];
+    const sni = keyValuePairs['sni'] || keyValuePairs['sni-name'];
+    const skipCertVerify = keyValuePairs['skip-cert-verify'];
+    const pbk = keyValuePairs['pbk'];
+    const sid = keyValuePairs['sid'];
+    const fp = keyValuePairs['fp'];
+    const encryption = keyValuePairs['encryption'];
+
+    if (!uuid) {
+      return null;
+    }
+
+    const proxyConfig = {
+      name,
+      server,
+      port: parseInt(port),
+      uuid,
+      flow,
+      network: 'tcp',
+      sni,
+      'skip-cert-verify': skipCertVerify === 'true',
+      'reality-opts': pbk ? {
+        'public-key': pbk,
+        'short-id': sid,
+        fingerprint: fp
+      } : undefined,
+      encryption
+    };
+
+    return this.convertFromClash(proxyConfig);
+  }
+
+  /**
+   * 从 Clash 逗号格式节点转换为通用格式链接
+   * @param {string} name 节点名称
+   * @param {Array<string>} parts 逗号分隔的参数列表
+   * @returns {string|null} 通用格式字符串
+   */
+  convertFromClashComma(name, parts) {
+    const proxyConfig = {
+      name,
+      server: parts[2],
+      port: parts[3],
+      uuid: parts[4]
+    };
+
+    if (!proxyConfig.server || !proxyConfig.port || !proxyConfig.uuid) {
+      return null;
+    }
+
+    return this.convertFromClash(proxyConfig);
   }
 
   /**

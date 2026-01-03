@@ -6,7 +6,7 @@ async function getSubscriptions() {
     SELECT
       s.path,
       s.name,
-      s.subconvert_api,
+      s.subconvert_url,
       s.custom_template,
       COUNT(n.id) as nodeCount
     FROM subscriptions s
@@ -32,7 +32,7 @@ async function createSubscription(name, path) {
   }
 
   await dbRun(
-    'INSERT INTO subscriptions (name, path, subconvert_api, custom_template) VALUES (?, ?, NULL, NULL)',
+    'INSERT INTO subscriptions (name, path, subconvert_url, custom_template) VALUES (?, ?, NULL, NULL)',
     [name, path]
   );
 }
@@ -65,20 +65,20 @@ async function generateSubscriptionContent(path) {
   const protocol = process.env.PROTOCOL || 'http';
   const host = process.env.HOST || 'localhost';
   const port = process.env.PORT || 3000;
-  const subscriptionUrl = `${protocol}://${host}:${port}/subscribe/${path}`;
+  const subscriptionUrl = `${protocol}://${host}:${port}/${path}`;
 
   // 生成订阅内容
   return {
     nodes: nodes.map(node => node.original_link).join('\n'),
     subscriptionUrl: subscriptionUrl,
     config: {
-      subconvertApi: subscription.subconvert_api,
+      subconvertApi: subscription.subconvert_url,
       customTemplate: subscription.custom_template
     }
   };
 }
 
-async function updateSubscription(oldPath, newName, newPath, subconvertApi = null, customTemplate = null) {
+async function updateSubscription(oldPath, newName, newPath, subconvertUrl = null, customTemplate = null) {
   if (!newName || !validateSubscriptionPath(newPath)) {
     throw new ApiError(400, 'subscription.path_invalid');
   }
@@ -96,8 +96,8 @@ async function updateSubscription(oldPath, newName, newPath, subconvertApi = nul
   }
 
   await dbRun(
-    'UPDATE subscriptions SET name = ?, path = ?, subconvert_api = ?, custom_template = ? WHERE path = ?',
-    [newName, newPath, subconvertApi, customTemplate, oldPath]
+    'UPDATE subscriptions SET name = ?, path = ?, subconvert_url = ?, custom_template = ? WHERE path = ?',
+    [newName, newPath, subconvertUrl, customTemplate, oldPath]
   );
 }
 

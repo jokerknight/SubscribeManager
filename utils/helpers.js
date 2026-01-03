@@ -3,8 +3,20 @@ const crypto = require('crypto');
 // 安全Base64解码
 function safeBase64Decode(str) {
   try {
-    const buffer = Buffer.from(str, 'base64');
-    return buffer.toString('utf-8');
+
+    // 处理 URL 安全的 Base64（用 - 和 _ 替换 + 和 /）
+    let normalizedStr = str
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+
+    // 补全 padding（每4字符一组，不足的补 =）
+    const padding = '='.repeat((4 - normalizedStr.length % 4) % 4);
+    normalizedStr += padding;
+
+
+    const buffer = Buffer.from(normalizedStr, 'base64');
+    const result = buffer.toString('utf-8');
+    return result;
   } catch (e) {
     return str;
   }

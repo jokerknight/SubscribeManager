@@ -628,9 +628,16 @@
       transform: scale(1.1);
     }
 
-    .btn-link .copy-icon {
+    .btn-link .copy-icon,
+    .btn-link .import-icon {
       font-size: 9px;
       opacity: 1;
+    }
+
+    .btn-actions {
+      display: flex;
+      gap: 4px;
+      align-items: center;
     }
 
 
@@ -2258,7 +2265,7 @@
 
   <div class="container">
     <div class="d-flex justify-content-end" style="margin-bottom: 1rem;">
-      <button class="btn btn-primary action-btn" data-bs-toggle="modal" data-bs-target="#addSubscriptionModal">
+      <button class="btn btn-primary action-btn" onclick="showAddSubscriptionModal()">
         <i class="fas fa-plus"></i>
         <span data-i18n="actions.add_subscription">添加订阅</span>
       </button>
@@ -2336,10 +2343,10 @@
 
   <!-- 编辑名称和路径模态框 -->
   <div class="modal fade" id="editNameModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" data-i18n="modal.edit_sub_title">编辑订阅信息</h5>
+          <h5 class="modal-title" id="editSubscriptionModalTitle">编辑订阅信息</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
@@ -2358,17 +2365,10 @@
               <div class="form-text" data-i18n="subscription.path_help">路径只能包含小写字母、数字和连字符，长度在5-50个字符之间</div>
               <div class="path-error text-danger"></div>
             </div>
-            <hr>
-            <h6 class="mb-3" data-i18n="subscription.advanced_config">高级配置</h6>
-            <div class="mb-3">
-              <label class="form-label" data-i18n="subscription.subconvert_api">Subconvert API</label>
-              <input type="text" class="form-control" name="subconvert_api" placeholder="https://subconvert.example.com/sub?target=clash&config=https://example.com/template.ini&emoji=true">
-              <div class="form-text" data-i18n="subscription.subconvert_api_help">Subconvert API 地址，用于使用自定义模板规则。示例：https://subconvert.example.com/sub?target=clash&config=https://example.com/template.ini&emoji=true<br/>注意：系统会自动将当前订阅的地址拼接到请求中；如果需要转换外部订阅，可以在 url 参数中指定外部订阅地址。</div>
-            </div>
           </form>
         </div>
         <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+          <button type="button" class="btn btn-danger" id="deleteSubscriptionBtn" onclick="confirmDelete()" style="display: none;">
             <i class="fas fa-trash"></i> <span data-i18n="common.delete">删除</span>
           </button>
           <div>
@@ -2422,6 +2422,81 @@
     </div>
   </div>
 
+  <!-- Subconverter 配置模态框 -->
+  <div class="modal fade" id="subconverterModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" data-i18n="subconverter.title">配置 Subconverter</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="subconverterForm" onsubmit="return false;">
+            <input type="hidden" name="subscriptionPath" value="">
+            <div class="mb-3">
+              <label class="form-label" data-i18n="subconverter.subconvert_url">Subconverter API URL</label>
+              <input type="url" class="form-control" name="subconvertUrl" placeholder="https://api.example.com/sub">
+              <div class="form-text" data-i18n="subconverter.subconvert_url_hint">用于生成 Clash 配置的 API 地址</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" data-i18n="subconverter.custom_template">自定义模板 URL</label>
+              <input type="url" class="form-control" name="customTemplate" placeholder="https://example.com/template.yaml">
+              <div class="form-text" data-i18n="subconverter.custom_template_hint">留空使用默认模板</div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
+          <button type="button" class="btn btn-primary" onclick="saveSubconverterConfig()" data-i18n="common.save">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 导入节点模态框 -->
+  <div class="modal fade" id="importNodesModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" data-i18n="import.title">导入节点</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="importNodesForm" onsubmit="return false;">
+            <input type="hidden" name="subscriptionPath" value="">
+            <div class="mb-3">
+              <label class="form-label" data-i18n="import.source_type">来源类型</label>
+              <select class="form-select" name="importType" id="importTypeSelect">
+                <option value="universal" data-i18n="import.type_universal">通用链接</option>
+                <option value="v2ray" data-i18n="import.type_v2ray">V2Ray 链接</option>
+                <option value="surge" data-i18n="import.type_surge">Surge 链接</option>
+                <option value="clash" data-i18n="import.type_clash">Clash 链接</option>
+                <option value="ss" data-i18n="import.type_ss">Shadowsocks 链接</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label"><span data-i18n="import.url">订阅链接</span> <span class="text-danger">*</span></label>
+              <input type="url" class="form-control" name="importUrl" required placeholder="https://example.com/subscribe">
+              <div class="form-text" data-i18n="import.url_hint">输入订阅链接，系统将自动解析并导入节点</div>
+            </div>
+            <div id="importProgress" style="display: none;" class="mb-3">
+              <div class="progress">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%" role="progressbar">
+                  <span data-i18n="import.processing">正在处理...</span>
+                </div>
+              </div>
+            </div>
+            <div id="importResult" style="display: none;" class="alert" role="alert"></div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
+          <button type="button" class="btn btn-primary" onclick="importNodes()" data-i18n="import.button">导入</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/js/i18n.js"></script>
   <script>
@@ -2461,6 +2536,9 @@
                   <div class="edit-trigger" onclick="showEditNameModal('${sub.path}', '${sub.name}')" title="编辑订阅信息">
                     <i class="fas fa-edit"></i>
                   </div>
+                  <div class="edit-trigger" onclick="showSubconverterModal('${sub.path}', '${sub.name}')" title="配置Subconverter">
+                    <i class="fas fa-cog"></i>
+                  </div>
                 </h3>
                 <div class="subscription-meta">
                   <span class="node-badge">
@@ -2479,36 +2557,61 @@
                 <div class="link-btn clickable-client" onclick="openClientPage(event, '${sub.path}')" title="点击打开通用链接页面">
                   <i class="fas fa-link btn-icon common-icon"></i>
                   <span class="btn-label">通用</span>
-                  <span class="btn-link" onclick="copySubscriptionLink('${sub.path}', event); event.stopPropagation();" title="点击复制">
-                    <i class="fas fa-copy copy-icon"></i>
+                  <span class="btn-actions">
+                    <span class="btn-link" onclick="copySubscriptionLink('${sub.path}', event); event.stopPropagation();" title="点击复制">
+                      <i class="fas fa-copy copy-icon"></i>
+                    </span>
+                    <span class="btn-link" onclick="showImportNodesModalWithType('${sub.path}', 'universal', event); event.stopPropagation();" title="点击导入">
+                      <i class="fas fa-upload import-icon"></i>
+                    </span>
                   </span>
                 </div>
                 <div class="link-btn clickable-client" onclick="openClientPage(event, '${sub.path}/v2ray')" title="点击打开V2Ray链接页面">
                   <i class="fas fa-rocket btn-icon v2ray-icon"></i>
                   <span class="btn-label">V2Ray</span>
-                  <span class="btn-link" onclick="copySubscriptionLink('${sub.path}/v2ray', event); event.stopPropagation();" title="点击复制">
-                    <i class="fas fa-copy copy-icon"></i>
+                  <span class="btn-actions">
+                    <span class="btn-link" onclick="copySubscriptionLink('${sub.path}/v2ray', event); event.stopPropagation();" title="点击复制">
+                      <i class="fas fa-copy copy-icon"></i>
+                    </span>
+                    <span class="btn-link" onclick="showImportNodesModalWithType('${sub.path}', 'v2ray', event); event.stopPropagation();" title="点击导入">
+                      <i class="fas fa-upload import-icon"></i>
+                    </span>
                   </span>
                 </div>
                 <div class="link-btn clickable-client" onclick="openClientPage(event, '${sub.path}/surge')" title="点击打开Surge链接页面">
                   <i class="fas fa-bolt btn-icon surge-icon"></i>
                   <span class="btn-label">Surge</span>
-                  <span class="btn-link" onclick="copySubscriptionLink('${sub.path}/surge', event); event.stopPropagation();" title="点击复制">
-                    <i class="fas fa-copy copy-icon"></i>
+                  <span class="btn-actions">
+                    <span class="btn-link" onclick="copySubscriptionLink('${sub.path}/surge', event); event.stopPropagation();" title="点击复制">
+                      <i class="fas fa-copy copy-icon"></i>
+                    </span>
+                    <span class="btn-link" onclick="showImportNodesModalWithType('${sub.path}', 'surge', event); event.stopPropagation();" title="点击导入">
+                      <i class="fas fa-upload import-icon"></i>
+                    </span>
                   </span>
                 </div>
                 <div class="link-btn clickable-client" onclick="openClientPage(event, '${sub.path}/clash')" title="点击打开Clash链接页面">
                   <i class="fas fa-shield-alt btn-icon clash-icon"></i>
                   <span class="btn-label">Clash</span>
-                  <span class="btn-link" onclick="copySubscriptionLink('${sub.path}/clash', event); event.stopPropagation();" title="点击复制">
-                    <i class="fas fa-copy copy-icon"></i>
+                  <span class="btn-actions">
+                    <span class="btn-link" onclick="copySubscriptionLink('${sub.path}/clash', event); event.stopPropagation();" title="点击复制">
+                      <i class="fas fa-copy copy-icon"></i>
+                    </span>
+                    <span class="btn-link" onclick="showImportNodesModalWithType('${sub.path}', 'clash', event); event.stopPropagation();" title="点击导入">
+                      <i class="fas fa-upload import-icon"></i>
+                    </span>
                   </span>
                 </div>
                 <div class="link-btn clickable-client" onclick="openClientPage(event, '${sub.path}/shadowsocks')" title="点击打开Shadowsocks链接页面">
                   <i class="fas fa-lock btn-icon ss-icon"></i>
                   <span class="btn-label">SS</span>
-                  <span class="btn-link" onclick="copySubscriptionLink('${sub.path}/shadowsocks', event); event.stopPropagation();" title="点击复制">
-                    <i class="fas fa-copy copy-icon"></i>
+                  <span class="btn-actions">
+                    <span class="btn-link" onclick="copySubscriptionLink('${sub.path}/shadowsocks', event); event.stopPropagation();" title="点击复制">
+                      <i class="fas fa-copy copy-icon"></i>
+                    </span>
+                    <span class="btn-link" onclick="showImportNodesModalWithType('${sub.path}', 'ss', event); event.stopPropagation();" title="点击导入">
+                      <i class="fas fa-upload import-icon"></i>
+                    </span>
                   </span>
                 </div>
               </div>
@@ -3196,11 +3299,49 @@
         }
 
         showToast(_t('nodes.deleted'));
-        await loadNodeList(subscriptionPath);
-        await loadSubscriptions();
+
+        // 只删除DOM中的节点行，不重新加载整个列表
+        const nodeListArea = document.getElementById('node-list-' + subscriptionPath);
+        const nodeRow = nodeListArea.querySelector(`tr[data-id="${nodeId}"]`);
+        if (nodeRow) {
+          nodeRow.remove();
+        }
+
+        // 更新节点计数
+        const tbody = nodeListArea.querySelector('tbody');
+        const remainingNodes = tbody.querySelectorAll('.node-row').length;
+        const nodeCountBadge = document.querySelector(`[data-subscription-path="${subscriptionPath}"] .node-badge .count`);
+        if (nodeCountBadge) {
+          nodeCountBadge.textContent = remainingNodes;
+        }
+
+        // 如果没有节点了，显示空提示
+        if (remainingNodes === 0) {
+          tbody.innerHTML = '<tr><td colspan="2" class="text-center py-4" data-i18n="nodes.empty">暂无节点</td></tr>';
+          if (typeof i18nUpdate !== 'undefined') {
+            i18nUpdate();
+          }
+        }
       } catch (error) {
         showToast('' + error.message, 'danger');
       }
+    }
+
+    // 打开添加订阅模态框
+    function showAddSubscriptionModal() {
+      const form = document.getElementById('editNameForm');
+      form.reset();
+      form.querySelector('input[name="originalPath"]').value = '';
+
+      // 显示标题并隐藏删除按钮
+      document.getElementById('editSubscriptionModalTitle').textContent = _t('subscription.add_title');
+      document.getElementById('deleteSubscriptionBtn').style.display = 'none';
+
+      // 清空当前订阅路径
+      window.currentSubscriptionPath = null;
+
+      const modal = new bootstrap.Modal(document.getElementById('editNameModal'));
+      modal.show();
     }
 
     // 创建订阅
@@ -3276,9 +3417,14 @@
     // 显示编辑名称模态框
     async function showEditNameModal(path, name) {
       const form = document.getElementById('editNameForm');
+      form.reset(); // 重置表单以清除之前的值
       form.querySelector('input[name="originalPath"]').value = path;
       form.querySelector('input[name="name"]').value = name;
       form.querySelector('input[name="path"]').value = path;
+
+      // 显示标题和删除按钮
+      document.getElementById('editSubscriptionModalTitle').textContent = _t('modal.edit_sub_title');
+      document.getElementById('deleteSubscriptionBtn').style.display = 'block';
 
       // 从数据库加载现有的配置
       try {
@@ -3287,11 +3433,6 @@
           const result = await response.json();
           if (result.success && result.data) {
             const subscription = result.data;
-            // 设置 subconvert_api 的值
-            const subconvertApiInput = form.querySelector('input[name="subconvert_api"]');
-            if (subconvertApiInput) {
-              subconvertApiInput.value = subscription.subconvert_api || '';
-            }
           }
         }
       } catch (error) {
@@ -3299,8 +3440,81 @@
         // 即使加载失败也继续打开模态框
       }
 
+      // 存储当前订阅路径
+      window.currentSubscriptionPath = path;
+
       const modal = new bootstrap.Modal(document.getElementById('editNameModal'));
       modal.show();
+    }
+
+    // 在编辑表单中保存订阅信息（用于新建订阅）
+    async function saveSubscriptionInfoInEditForm() {
+      const form = document.getElementById('editNameForm');
+      const nameInput = form.querySelector('input[name="name"]');
+      const pathInput = form.querySelector('input[name="path"]');
+      const pathError = form.querySelector('.path-error');
+
+      try {
+        // 验证输入
+        if (!nameInput.value.trim()) {
+          showToast(_t('subscription.name_required'), 'danger');
+          nameInput.focus();
+          return false;
+        }
+
+        // 验证路径格式
+        const path = pathInput.value.trim();
+        if (!validateSubscriptionPathFrontend(path)) {
+          pathInput.classList.add('is-invalid');
+          pathInput.classList.remove('is-valid');
+          pathError.textContent = _t('subscription.path_invalid');
+          pathError.style.display = 'block';
+          pathInput.focus();
+          return false;
+        }
+
+        // 检查路径是否已存在
+        const checkResponse = await fetch('/api/subscriptions/' + path);
+        if (checkResponse.ok) {
+          pathInput.classList.add('is-invalid');
+          pathInput.classList.remove('is-valid');
+          pathError.textContent = _t('subscription.path_used');
+          pathError.style.display = 'block';
+          pathInput.focus();
+          return false;
+        }
+
+        const response = await fetch('/api/subscriptions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({
+            name: nameInput.value.trim(),
+            path: path
+          })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || '');
+        }
+
+        showToast(_t('subscription.created'));
+
+        // 更新 originalPath 为新创建的路径
+        form.querySelector('input[name="originalPath"]').value = path;
+
+        // 刷新订阅列表
+        await loadSubscriptions();
+        return true;
+      } catch (error) {
+        console.error('保存订阅信息失败:', error);
+        showToast('' + error.message, 'danger');
+        return false;
+      }
     }
 
     // 更新订阅信息
@@ -3309,7 +3523,6 @@
       const originalPath = form.querySelector('input[name="originalPath"]').value;
       const nameInput = form.querySelector('input[name="name"]');
       const pathInput = form.querySelector('input[name="path"]');
-      const subconvertApiInput = form.querySelector('input[name="subconvert_api"]');
       const pathError = form.querySelector('.path-error');
 
       try {
@@ -3352,8 +3565,7 @@
           },
           body: JSON.stringify({
             name: nameInput.value.trim(),
-            path: path,
-            subconvert_api: subconvertApiInput.value.trim() || null
+            path: path
           })
         });
 
@@ -3548,57 +3760,155 @@
       }
     }
 
-    // 从 URL 加载模板
-    async function loadTemplateFromUrl() {
-      const urlInput = document.getElementById('templateUrlInput');
-      const templateTextarea = document.getElementById('customTemplateTextarea');
-      const url = urlInput.value.trim();
+    // 显示 Subconverter 配置模态框
+    function showSubconverterModal(path, name) {
+      const form = document.getElementById('subconverterForm');
+      form.querySelector('[name="subscriptionPath"]').value = path;
 
-      if (!url) {
-        showToast(_t('subscription.template_url_invalid'), 'danger');
+      // 获取当前订阅配置
+      fetch(`/api/subscriptions/${path}`)
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+            const sub = result.data;
+            form.querySelector('[name="subconvertUrl"]').value = sub.subconvert_url || '';
+            form.querySelector('[name="customTemplate"]').value = sub.custom_template || '';
+          }
+        })
+        .catch(error => console.error('获取订阅配置失败:', error));
+
+      const modal = new bootstrap.Modal(document.getElementById('subconverterModal'));
+      modal.show();
+    }
+
+    // 保存 Subconverter 配置
+    async function saveSubconverterConfig() {
+      const form = document.getElementById('subconverterForm');
+      const formData = new FormData(form);
+      const path = formData.get('subscriptionPath');
+      const subconvertUrl = formData.get('subconvertUrl').trim() || null;
+      const customTemplate = formData.get('customTemplate').trim() || null;
+
+      try {
+        const response = await fetch(`/api/subscriptions/${path}/subconverter`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({ subconvert_url: subconvertUrl, custom_template: customTemplate })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) throw new Error(result.message || '保存失败');
+
+        showToast(_t('common.success'), 'success');
+        bootstrap.Modal.getInstance(document.getElementById('subconverterModal')).hide();
+        loadSubscriptions();
+      } catch (error) {
+        showToast(error.message || _t('common.error'), 'danger');
+      }
+    }
+
+    // 显示导入节点模态框
+    function showImportNodesModal(path) {
+      const form = document.getElementById('importNodesForm');
+      form.querySelector('[name="subscriptionPath"]').value = path;
+      form.querySelector('[name="importUrl"]').value = '';
+      document.getElementById('importResult').style.display = 'none';
+      document.getElementById('importProgress').style.display = 'none';
+
+      const modal = new bootstrap.Modal(document.getElementById('importNodesModal'));
+      modal.show();
+    }
+
+    // 显示导入节点模态框（带类型选择）
+    function showImportNodesModalWithType(path, type, event) {
+      event && event.stopPropagation();
+      const form = document.getElementById('importNodesForm');
+      form.querySelector('[name="subscriptionPath"]').value = path;
+      form.querySelector('[name="importUrl"]').value = '';
+      document.getElementById('importResult').style.display = 'none';
+      document.getElementById('importProgress').style.display = 'none';
+
+      // 设置导入类型
+      const typeSelect = document.getElementById('importTypeSelect');
+      if (typeSelect) {
+        typeSelect.value = type;
+      }
+
+      const modal = new bootstrap.Modal(document.getElementById('importNodesModal'));
+      modal.show();
+    }
+
+    // 导入节点
+    async function importNodes() {
+      const form = document.getElementById('importNodesForm');
+      const formData = new FormData(form);
+      const path = formData.get('subscriptionPath');
+      const importUrl = formData.get('importUrl').trim();
+
+      if (!importUrl) {
+        showToast(_t('import.url_required'), 'danger');
         return;
       }
 
       // 验证 URL 格式
       try {
-        new URL(url);
+        new URL(importUrl);
       } catch (e) {
-        showToast(_t('subscription.template_url_invalid'), 'danger');
+        showToast(_t('import.invalid_url'), 'danger');
         return;
       }
 
-      try {
-        showToast(_t('subscription.template_loading'), 'info');
+      const progressDiv = document.getElementById('importProgress');
+      const resultDiv = document.getElementById('importResult');
 
-        const response = await fetch(url, {
-          method: 'GET',
-          mode: 'cors',
+      progressDiv.style.display = 'block';
+      resultDiv.style.display = 'none';
+
+      try {
+        const response = await fetch(`/api/subscriptions/${path}/import-nodes`, {
+          method: 'POST',
           headers: {
-            'Accept': 'text/plain, text/*'
-          }
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({ importUrl })
         });
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
+        const result = await response.json();
+
+        if (!response.ok) throw new Error(result.message || '导入失败');
+
+        progressDiv.style.display = 'none';
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'alert alert-' + (result.success ? 'success' : 'danger');
+
+        if (result.success) {
+          const data = result.data;
+          resultDiv.innerHTML = `
+            <div class="mb-2"><strong>${_t('common.success')}</strong></div>
+            <div>
+              <span data-i18n="import.imported">导入:</span> ${data.importedCount} |
+              <span data-i18n="import.updated">跳过重复:</span> ${data.updatedCount} |
+              <span data-i18n="import.failed">失败:</span> ${data.failedCount}
+            </div>
+            <div class="mt-2">
+              <span data-i18n="import.total_after">导入后总节点数:</span> <strong>${data.totalAfterImport}</strong>
+            </div>
+          `;
+          loadSubscriptions();
+          setTimeout(() => {
+            bootstrap.Modal.getInstance(document.getElementById('importNodesModal')).hide();
+          }, 2000);
         }
-
-        const templateContent = await response.text();
-
-        if (!templateContent.trim()) {
-          throw new Error('Template content is empty');
-        }
-
-        // 将加载的内容填入 textarea
-        templateTextarea.value = templateContent;
-
-        showToast(_t('subscription.template_loaded'), 'success');
-
-        // 清空 URL 输入框
-        urlInput.value = '';
-
       } catch (error) {
-        console.error('加载模板失败:', error);
-        showToast(_t('subscription.template_load_failed') + ': ' + error.message, 'danger');
+        progressDiv.style.display = 'none';
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'alert alert-danger';
+        resultDiv.textContent = error.message || _t('common.error');
       }
     }
   </script>

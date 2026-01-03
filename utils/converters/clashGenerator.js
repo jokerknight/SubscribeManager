@@ -2,38 +2,60 @@
  * 简化的 YAML 生成器，专门用于 Clash 配置
  */
 
-/**
- * 生成 Clash 配置文件
- * @param {Array} proxies 代理节点数组
- * @param {string} customTemplate 自定义模板内容（已废弃，请使用 Subconvert API）
- * @returns {Promise<string>} Clash 配置文件内容
- */
-async function generateConfig(proxies, customTemplate = null) {
-  // 自定义模板功能已废弃，请配置 Subconvert API 来使用自定义规则
-  if (customTemplate && customTemplate.trim()) {
-    console.warn('自定义模板功能已废弃，请配置 Subconvert API 来使用自定义规则');
-  }
+const https = require('https');
 
-  // 直接使用默认模板
-  return generateDefaultConfig(proxies);
+/**
+ * 使用自定义模板生成 Clash 配置
+ * @param {Array} proxies 代理节点数组
+ * @param {string} template 模板内容
+ * @returns {string} Clash 配置文件内容
+ */
+function generateConfigWithTemplate(proxies, template) {
+  // 生成节点配置
+  const proxyConfigs = proxies.map(proxy => generateProxyConfig(proxy));
+
+  // 替换模板中的占位符
+  let config = template.replace(/{{proxies}}/g, proxyConfigs.join('\n'));
+  config = config.replace(/{{proxy_names}}/g, JSON.stringify(['DIRECT', ...proxies.map(p => p.name)]));
+  config = config.replace(/{{proxy_names_comma}}/g, proxies.map(p => `"${p.name}"`).join(', '));
+
+  return config;
 }
 
 /**
- * 生成默认的 Clash 配置
+ * 生成 Clash 配置文件
+ * @param {Array} proxies 代理节点数组
+ * @param {string} customTemplate 自定义模板内容（可选）
+ * @returns {Promise<string>} Clash 配置文件内容
+ */
+async function generateConfig(proxies, customTemplate = null) {
+  // 如果有自定义模板，使用自定义模板
+  if (customTemplate && customTemplate.trim()) {
+    console.log('使用自定义模板生成 Clash 配置');
+    return generateConfigWithTemplate(proxies, customTemplate);
+  }
+
+  // 直接使用默认模板
+  return await generateDefaultConfig(proxies);
+}
+
+/**
+ * 生成简单的 Clash 配置（用于传给 Subconvert API）
  * @param {Array} proxies 代理节点数组
  * @returns {string} Clash 配置文件内容
  */
-function generateDefaultConfig(proxies) {
+function generateSimpleConfig(proxies) {
   const proxyNames = proxies.map(proxy => proxy.name);
-  
+
   return `# Clash 配置文件 - Subscribe-Manager 自动生成
 # 生成时间: ${new Date().toISOString()}
 
-global-ua: clash
 mode: rule
 mixed-port: 7890
 allow-lan: true
 external-controller: "0.0.0.0:9090"
+log-level: info
+secret: ""
 
 proxies:
 ${proxies.map(proxy => generateProxyConfig(proxy)).join('\n')}
@@ -73,180 +95,121 @@ proxy-groups:
     icon: "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Speedtest.png"
 
 rules:
-  - RULE-SET,reject_non_ip,REJECT
-  - RULE-SET,reject_domainset,REJECT
-  - RULE-SET,reject_extra_domainset,REJECT
-  - RULE-SET,reject_non_ip_drop,REJECT-DROP
-  - RULE-SET,reject_non_ip_no_drop,REJECT
-  - RULE-SET,speedtest,Speedtest
-  - RULE-SET,telegram_non_ip,Telegram
-  - RULE-SET,apple_cdn,DIRECT
-  - RULE-SET,apple_cn_non_ip,DIRECT
-  - RULE-SET,microsoft_cdn_non_ip,DIRECT
-  - RULE-SET,apple_services,苹果服务
-  - RULE-SET,microsoft_non_ip,微软服务
-  - RULE-SET,download_domainset,CDN服务
-  - RULE-SET,download_non_ip,CDN服务
-  - RULE-SET,cdn_domainset,CDN服务
-  - RULE-SET,cdn_non_ip,CDN服务
-  - RULE-SET,stream_non_ip,媒体服务
-  - RULE-SET,ai_non_ip,AI服务
-  - RULE-SET,global_non_ip,节点选择
-  - RULE-SET,domestic_non_ip,DIRECT
-  - RULE-SET,direct_non_ip,DIRECT
-  - RULE-SET,lan_non_ip,DIRECT
-  - GEOSITE,CN,DIRECT
-  - RULE-SET,reject_ip,REJECT
-  - RULE-SET,telegram_ip,Telegram
-  - RULE-SET,stream_ip,媒体服务
-  - RULE-SET,lan_ip,DIRECT
-  - RULE-SET,domestic_ip,DIRECT
-  - RULE-SET,china_ip,DIRECT
-  - GEOIP,LAN,DIRECT
-  - GEOIP,CN,DIRECT
   - MATCH,节点选择
+`;
+}
 
-rule-providers:
-  reject_non_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/non_ip/reject.txt
-    path: ./rule_set/sukkaw_ruleset/reject_non_ip.txt
-    interval: 43200
-  reject_domainset:
-    type: http
-    url: https://ruleset.skk.moe/Clash/domainset/reject.txt
-    path: ./rule_set/sukkaw_ruleset/reject_domainset.txt
-    interval: 43200
-  reject_extra_domainset:
-    type: http
-    url: https://ruleset.skk.moe/Clash/domainset/reject_extra.txt
-    path: ./rule_set/sukkaw_ruleset/reject_domainset_extra.txt
-    interval: 43200
-  reject_non_ip_drop:
-    type: http
-    url: https://ruleset.skk.moe/Clash/non_ip/reject-drop.txt
-    path: ./rule_set/sukkaw_ruleset/reject_non_ip_drop.txt
-    interval: 43200
-  reject_non_ip_no_drop:
-    type: http
-    url: https://ruleset.skk.moe/Clash/non_ip/reject-no-drop.txt
-    path: ./rule_set/sukkaw_ruleset/reject_non_ip_no_drop.txt
-    interval: 43200
-  speedtest:
-    type: http
-    url: https://ruleset.skk.moe/Clash/domainset/speedtest.txt
-    path: ./rule_set/sukkaw_ruleset/speedtest.txt
-    interval: 43200
-  telegram_non_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/non_ip/telegram.txt
-    path: ./rule_set/sukkaw_ruleset/telegram_non_ip.txt
-    interval: 43200
-  apple_cdn:
-    type: http
-    url: https://ruleset.skk.moe/Clash/domainset/apple_cdn.txt
-    path: ./rule_set/sukkaw_ruleset/apple_cdn.txt
-    interval: 43200
-  apple_cn_non_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/non_ip/apple_cn.txt
-    path: ./rule_set/sukkaw_ruleset/apple_cn_non_ip.txt
-    interval: 43200
-  microsoft_cdn_non_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/non_ip/microsoft_cdn.txt
-    path: ./rule_set/sukkaw_ruleset/microsoft_cdn_non_ip.txt
-    interval: 43200
-  apple_services:
-    type: http
-    url: https://ruleset.skk.moe/Clash/non_ip/apple_services.txt
-    path: ./rule_set/sukkaw_ruleset/apple_services.txt
-    interval: 43200
-  microsoft_non_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/non_ip/microsoft.txt
-    path: ./rule_set/sukkaw_ruleset/microsoft_non_ip.txt
-    interval: 43200
-  download_domainset:
-    type: http
-    url: https://ruleset.skk.moe/Clash/domainset/download.txt
-    path: ./rule_set/sukkaw_ruleset/download_domainset.txt
-    interval: 43200
-  download_non_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/non_ip/download.txt
-    path: ./rule_set/sukkaw_ruleset/download_non_ip.txt
-    interval: 43200
-  cdn_domainset:
-    type: http
-    url: https://ruleset.skk.moe/Clash/domainset/cdn.txt
-    path: ./rule_set/sukkaw_ruleset/cdn_domainset.txt
-    interval: 43200
-  cdn_non_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/non_ip/cdn.txt
-    path: ./rule_set/sukkaw_ruleset/cdn_non_ip.txt
-    interval: 43200
-  stream_non_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/non_ip/stream.txt
-    path: ./rule_set/sukkaw_ruleset/stream_non_ip.txt
-    interval: 43200
-  stream_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/ip/stream.txt
-    path: ./rule_set/sukkaw_ruleset/stream_ip.txt
-    interval: 43200
-  ai_non_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/non_ip/ai.txt
-    path: ./rule_set/sukkaw_ruleset/ai_non_ip.txt
-    interval: 43200
-  telegram_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/ip/telegram.txt
-    path: ./rule_set/sukkaw_ruleset/telegram_ip.txt
-    interval: 43200
-  lan_non_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/non_ip/lan.txt
-    path: ./rule_set/sukkaw_ruleset/lan_non_ip.txt
-    interval: 43200
-  lan_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/ip/lan.txt
-    path: ./rule_set/sukkaw_ruleset/lan_ip.txt
-    interval: 43200
-  domestic_non_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/non_ip/domestic.txt
-    path: ./rule_set/sukkaw_ruleset/domestic_non_ip.txt
-    interval: 43200
-  domestic_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/ip/domestic.txt
-    path: ./rule_set/sukkaw_ruleset/domestic_ip.txt
-    interval: 43200
-  china_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/ip/china_ip.txt
-    path: ./rule_set/sukkaw_ruleset/china_ip.txt
-    interval: 43200
-  direct_non_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/non_ip/direct.txt
-    path: ./rule_set/sukkaw_ruleset/direct_non_ip.txt
-    interval: 43200
-  global_non_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/non_ip/global.txt
-    path: ./rule_set/sukkaw_ruleset/global_non_ip.txt
-    interval: 43200
-  reject_ip:
-    type: http
-    url: https://ruleset.skk.moe/Clash/ip/reject.txt
-    path: ./rule_set/sukkaw_ruleset/reject_ip.txt
-    interval: 43200
+/**
+ * 生成完整的 Clash 配置（展开 rule-providers 为实际规则）
+ * @param {Array} proxies 代理节点数组
+ * @returns {Promise<string>} Clash 配置文件内容
+ */
+async function generateDefaultConfig(proxies) {
+  const proxyNames = proxies.map(proxy => proxy.name);
+
+  // 定义 rule-providers 和对应的策略
+  const ruleProviders = [
+    { name: 'reject_non_ip', url: 'https://ruleset.skk.moe/Clash/non_ip/reject.txt', policy: 'REJECT' },
+    { name: 'reject_domainset', url: 'https://ruleset.skk.moe/Clash/domainset/reject.txt', policy: 'REJECT' },
+    { name: 'reject_extra_domainset', url: 'https://ruleset.skk.moe/Clash/domainset/reject_extra.txt', policy: 'REJECT' },
+    { name: 'reject_non_ip_drop', url: 'https://ruleset.skk.moe/Clash/non_ip/reject-drop.txt', policy: 'REJECT-DROP' },
+    { name: 'reject_non_ip_no_drop', url: 'https://ruleset.skk.moe/Clash/non_ip/reject-no-drop.txt', policy: 'REJECT' },
+    { name: 'speedtest', url: 'https://ruleset.skk.moe/Clash/domainset/speedtest.txt', policy: 'Speedtest' },
+    { name: 'telegram_non_ip', url: 'https://ruleset.skk.moe/Clash/non_ip/telegram.txt', policy: 'Telegram' },
+    { name: 'apple_cdn', url: 'https://ruleset.skk.moe/Clash/domainset/apple_cdn.txt', policy: 'DIRECT' },
+    { name: 'apple_cn_non_ip', url: 'https://ruleset.skk.moe/Clash/non_ip/apple_cn.txt', policy: 'DIRECT' },
+    { name: 'microsoft_cdn_non_ip', url: 'https://ruleset.skk.moe/Clash/non_ip/microsoft_cdn.txt', policy: 'DIRECT' },
+    { name: 'apple_services', url: 'https://ruleset.skk.moe/Clash/non_ip/apple_services.txt', policy: '苹果服务' },
+    { name: 'microsoft_non_ip', url: 'https://ruleset.skk.moe/Clash/non_ip/microsoft.txt', policy: '微软服务' },
+    { name: 'download_domainset', url: 'https://ruleset.skk.moe/Clash/domainset/download.txt', policy: 'CDN服务' },
+    { name: 'download_non_ip', url: 'https://ruleset.skk.moe/Clash/non_ip/download.txt', policy: 'CDN服务' },
+    { name: 'cdn_domainset', url: 'https://ruleset.skk.moe/Clash/domainset/cdn.txt', policy: 'CDN服务' },
+    { name: 'cdn_non_ip', url: 'https://ruleset.skk.moe/Clash/non_ip/cdn.txt', policy: 'CDN服务' },
+    { name: 'stream_non_ip', url: 'https://ruleset.skk.moe/Clash/non_ip/stream.txt', policy: '媒体服务' },
+    { name: 'ai_non_ip', url: 'https://ruleset.skk.moe/Clash/non_ip/ai.txt', policy: 'AI服务' },
+    { name: 'global_non_ip', url: 'https://ruleset.skk.moe/Clash/non_ip/global.txt', policy: '节点选择' },
+    { name: 'domestic_non_ip', url: 'https://ruleset.skk.moe/Clash/non_ip/domestic.txt', policy: 'DIRECT' },
+    { name: 'direct_non_ip', url: 'https://ruleset.skk.moe/Clash/non_ip/direct.txt', policy: 'DIRECT' },
+    { name: 'lan_non_ip', url: 'https://ruleset.skk.moe/Clash/non_ip/lan.txt', policy: 'DIRECT' },
+    { name: 'reject_ip', url: 'https://ruleset.skk.moe/Clash/ip/reject.txt', policy: 'REJECT' },
+    { name: 'telegram_ip', url: 'https://ruleset.skk.moe/Clash/ip/telegram.txt', policy: 'Telegram' },
+    { name: 'stream_ip', url: 'https://ruleset.skk.moe/Clash/ip/stream.txt', policy: '媒体服务' },
+    { name: 'lan_ip', url: 'https://ruleset.skk.moe/Clash/ip/lan.txt', policy: 'DIRECT' },
+    { name: 'domestic_ip', url: 'https://ruleset.skk.moe/Clash/ip/domestic.txt', policy: 'DIRECT' },
+    { name: 'china_ip', url: 'https://ruleset.skk.moe/Clash/ip/china_ip.txt', policy: 'DIRECT' },
+  ];
+
+  // 并行获取所有规则集
+  console.log('[clashGenerator] 开始获取规则集，数量:', ruleProviders.length);
+  const rulesetPromises = ruleProviders.map(async (provider) => {
+    const content = await fetchRuleset(provider.url);
+    const rules = parseRuleset(content, provider.policy);
+    return { name: provider.name, rules };
+  });
+
+  const rulesets = await Promise.all(rulesetPromises);
+
+  // 展开所有规则
+  const expandedRules = [];
+  for (const ruleset of rulesets) {
+    expandedRules.push(...ruleset.rules);
+    console.log(`[clashGenerator] 规则集 ${ruleset.name} 展开 ${ruleset.rules.length} 条规则`);
+  }
+
+  console.log(`[clashGenerator] 总共展开 ${expandedRules.length} 条规则`);
+
+  // 添加固定的规则
+  const staticRules = [
+    '  - GEOSITE,CN,DIRECT',
+    '  - GEOIP,LAN,DIRECT',
+    '  - GEOIP,CN,DIRECT',
+    '  - MATCH,节点选择'
+  ];
+
+  const allRules = [...expandedRules, ...staticRules];
+
+  return `# Clash 配置文件 - Subscribe-Manager 自动生成
+# 生成时间: ${new Date().toISOString()}
+# 已展开 ${expandedRules.length} 条规则
+
+mode: rule
+mixed-port: 7890
+allow-lan: true
+external-controller: "0.0.0.0:9090"
+log-level: info
+secret: ""
+
+proxies:
+${proxies.map(proxy => generateProxyConfig(proxy)).join('\n')}
+
+proxy-groups:
+  - name: 节点选择
+    type: select
+    proxies: [${['DIRECT', ...proxyNames].map(name => `"${name}"`).join(', ')}]
+  - name: 媒体服务
+    type: select
+    proxies: ["节点选择", "DIRECT"${proxyNames.length > 0 ? ', ' + proxyNames.map(name => `"${name}"`).join(', ') : ''}]
+  - name: 微软服务
+    type: select
+    proxies: ["节点选择", "DIRECT"${proxyNames.length > 0 ? ', ' + proxyNames.map(name => `"${name}"`).join(', ') : ''}]
+  - name: 苹果服务
+    type: select
+    proxies: ["节点选择", "DIRECT"${proxyNames.length > 0 ? ', ' + proxyNames.map(name => `"${name}"`).join(', ') : ''}]
+  - name: CDN服务
+    type: select
+    proxies: ["节点选择", "DIRECT"${proxyNames.length > 0 ? ', ' + proxyNames.map(name => `"${name}"`).join(', ') : ''}]
+  - name: AI服务
+    type: select
+    proxies: ["节点选择", "DIRECT"${proxyNames.length > 0 ? ', ' + proxyNames.map(name => `"${name}"`).join(', ') : ''}]
+  - name: Telegram
+    type: select
+    proxies: ["节点选择", "DIRECT"${proxyNames.length > 0 ? ', ' + proxyNames.map(name => `"${name}"`).join(', ') : ''}]
+  - name: Speedtest
+    type: select
+    proxies: ["节点选择", "DIRECT"${proxyNames.length > 0 ? ', ' + proxyNames.map(name => `"${name}"`).join(', ') : ''}]
+
+rules:
+${allRules.join('\n')}
 `;
 }
 
@@ -281,7 +244,7 @@ function generateProxyConfig(proxy) {
         config += `    flow: ${proxy.flow}\n`;
       }
       if (proxy.fingerprint) {
-        config += `    fingerprint: ${proxy.fingerprint}\n`;
+        config += `    client-fingerprint: ${proxy.fingerprint}\n`;
       }
       // 处理网络选项
       if (proxy['ws-opts']) {
@@ -350,7 +313,7 @@ function generateProxyConfig(proxy) {
         config += `    servername: ${proxy.servername}\n`;
       }
       if (proxy.fingerprint) {
-        config += `    fingerprint: ${proxy.fingerprint}\n`;
+        config += `    client-fingerprint: ${proxy.fingerprint}\n`;
       }
       // VMess 网络选项
       if (proxy['ws-opts']) {
@@ -383,7 +346,7 @@ function generateProxyConfig(proxy) {
         config += `    servername: ${proxy.sni}\n`;
       }
       if (proxy.fingerprint) {
-        config += `    fingerprint: ${proxy.fingerprint}\n`;
+        config += `    client-fingerprint: ${proxy.fingerprint}\n`;
       }
       if (proxy.alpn) {
         config += `    alpn: ${proxy.alpn}\n`;
@@ -486,12 +449,101 @@ function generateProxyConfig(proxy) {
  * @param {string} customTemplate 自定义模板内容（可选）
  * @returns {Promise<string>} 空的 Clash 配置文件
  */
-function generateEmptyConfig(customTemplate = null) {
-  return generateConfig([], customTemplate);
+async function generateEmptyConfig(customTemplate = null) {
+  return await generateConfig([], customTemplate);
+}
+
+/**
+ * 从 URL 获取规则集内容
+ * @param {string} url 规则集 URL
+ * @returns {Promise<string>} 规则集内容
+ */
+async function fetchRuleset(url) {
+  return new Promise((resolve, reject) => {
+    try {
+      const urlObj = new URL(url);
+      const options = {
+        hostname: urlObj.hostname,
+        port: urlObj.port || 443,
+        path: urlObj.pathname + urlObj.search,
+        method: 'GET',
+        headers: {
+          'User-Agent': 'clash'
+        }
+      };
+
+      const req = https.request(options, (res) => {
+        let data = '';
+        res.on('data', (chunk) => { data += chunk; });
+        res.on('end', () => {
+          if (res.statusCode === 200) {
+            resolve(data);
+          } else {
+            console.warn(`Failed to fetch ruleset from ${url}: status ${res.statusCode}`);
+            resolve(''); // 失败时返回空字符串
+          }
+        });
+      });
+
+      req.on('error', (error) => {
+        console.warn(`Failed to fetch ruleset from ${url}: ${error.message}`);
+        resolve(''); // 失败时返回空字符串
+      });
+
+      req.setTimeout(10000, () => {
+        req.destroy();
+        console.warn(`Timeout fetching ruleset from ${url}`);
+        resolve(''); // 超时返回空字符串
+      });
+
+      req.end();
+    } catch (error) {
+      console.warn(`Failed to fetch ruleset from ${url}: ${error.message}`);
+      resolve('');
+    }
+  });
+}
+
+/**
+ * 解析规则集内容并应用策略和目标
+ * @param {string} content 规则集内容
+ * @param {string} policy 策略名称（如 REJECT, DIRECT 等）
+ * @returns {Array<string>} 规则数组
+ */
+function parseRuleset(content, policy) {
+  if (!content || !content.trim()) return [];
+
+  const rules = [];
+  const lines = content.split('\n');
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('//')) continue;
+
+    // 规则格式: type,value
+    // 或者: type,value,no-resolve
+    const parts = trimmed.split(',');
+    if (parts.length >= 2) {
+      const type = parts[0].trim();
+      const value = parts[1].trim();
+      const noResolve = parts[2]?.trim() === 'no-resolve';
+
+      // 构建规则
+      let rule = `  - ${type},${value},${policy}`;
+      if (noResolve) {
+        rule += ',no-resolve';
+      }
+      rules.push(rule);
+    }
+  }
+
+  return rules;
 }
 
 module.exports = {
   generateConfig,
+  generateSimpleConfig,
+  generateDefaultConfig,
   generateEmptyConfig,
   generateProxyConfig
 };

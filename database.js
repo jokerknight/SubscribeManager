@@ -29,7 +29,7 @@ async function createTables() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
       path TEXT UNIQUE NOT NULL,
-      subconvert_api TEXT,
+      subconvert_url TEXT,
       custom_template TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
@@ -54,10 +54,26 @@ async function createTables() {
 
   // Add new columns if they don't exist (for existing databases)
   try {
-    await db.exec(`ALTER TABLE subscriptions ADD COLUMN subconvert_api TEXT`);
+    await db.exec(`ALTER TABLE subscriptions ADD COLUMN subconvert_url TEXT`);
   } catch (e) {
     // Column already exists
   }
+
+  // Migration: rename subconvert_api to subconvert_url (for existing databases)
+  try {
+    // Check if old column exists
+    const tables = await db.exec(`PRAGMA table_info(subscriptions)`);
+    const hasOldColumn = tables.some(col => col.name === 'subconvert_api');
+    const hasNewColumn = tables.some(col => col.name === 'subconvert_url');
+
+    if (hasOldColumn && hasNewColumn) {
+      // Migrate data from old column to new column
+      await db.exec(`UPDATE subscriptions SET subconvert_url = subconvert_api WHERE subconvert_url IS NULL AND subconvert_api IS NOT NULL`);
+    }
+  } catch (e) {
+    // Migration error, ignore
+  }
+
   try {
     await db.exec(`ALTER TABLE subscriptions ADD COLUMN custom_template TEXT`);
   } catch (e) {

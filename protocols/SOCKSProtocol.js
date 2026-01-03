@@ -49,11 +49,16 @@ class SOCKSProtocol extends BaseProtocol {
   /**
    * 将节点转换为指定目标格式
    * @param {Object} node 节点对象
-   * @param {string} targetFormat 目标格式 ('surge', 'shadowsocks', 'clash')
+   * @param {string} targetFormat 目标格式 ('surge', 'shadowsocks', 'clash', 'universal')
    * @returns {string|Object|null} 转换后的内容
    */
   convertToFormat(node, targetFormat) {
     const format = targetFormat.toLowerCase();
+
+    // 从 Clash YAML 转换为通用格式链接
+    if (format === 'universal' && node.server && node.port) {
+      return this.convertFromClash(node);
+    }
 
     if (format === 'surge') {
       const parts = [
@@ -84,6 +89,23 @@ class SOCKSProtocol extends BaseProtocol {
 
     // SOCKS 不支持 shadowsocks 格式
     return null;
+  }
+
+  /**
+   * 从 Clash YAML 节点转换为通用格式链接
+   * @param {Object} proxy Clash 节点对象
+   * @returns {string|null} 通用格式字符串
+   */
+  convertFromClash(proxy) {
+    const { name, server, port, username, password } = proxy;
+
+    if (username && password) {
+      const link = `socks://${encodeURIComponent(username)}:${encodeURIComponent(password)}@${server}:${port}`;
+      return name ? `${link}#${encodeURIComponent(name)}` : link;
+    }
+
+    const link = `socks://${server}:${port}`;
+    return name ? `${link}#${encodeURIComponent(name)}` : link;
   }
 }
 

@@ -1,26 +1,26 @@
 const express = require('express');
 const router = express.Router();
-const { 
-  getSubscriptions, 
-  createSubscription, 
-  generateSubscriptionContent, 
-  updateSubscription: updateSub, 
-  deleteSubscription: deleteSub 
+const {
+  getSubscriptions,
+  createSubscription,
+  generateSubscriptionContent,
+  updateSubscription: updateSub,
+  deleteSubscription: deleteSub
 } = require('../services/subscriptionService');
-const { 
-  SubscriptionRepository, 
-  NodeRepository, 
-  safeBase64Encode, 
-  filterSnellNodes,
-  convertSubscription 
+const { ConversionService } = require('../services/conversionService');
+const {
+  SubscriptionRepository,
+  NodeRepository,
+  safeBase64Encode,
+  filterSnellNodes
 } = require('../utils');
 
-// 获取订阅内容 - 支持查询参数格式和路径参数格式
+// 获取订阅内容 - 支持 /path 格式
 router.get('/:path', async (req, res) => {
   await handleSubscriptionRequest(req, res, req.params.path, req.query.format);
 });
 
-// 获取订阅内容 - 支持 /path/format 路径参数格式
+// 获取订阅内容 - 支持 /path/format 格式
 router.get('/:path/:format', async (req, res) => {
   await handleSubscriptionRequest(req, res, req.params.path, req.params.format);
 });
@@ -42,22 +42,28 @@ async function handleSubscriptionRequest(req, res, path, format) {
     // 根据格式返回内容
     let response;
     if (format) {
+      const conversionService = new ConversionService();
+
       switch (format) {
         case 'clash':
-          // 优先使用订阅配置中的 Subconvert API
-          const subconvertApi = config.subconvertApi;
-          response = {
-            content: await convertSubscription(content, format, null, subconvertApi, subscriptionUrl),
-            type: 'text/yaml; charset=utf-8'
-          };
-          break;
         case 'surge':
-        case 'shadowsocks':
+        case 'shadowsocks': {
+          const contentType = format === 'clash'
+            ? 'text/yaml; charset=utf-8'
+            : 'text/plain; charset=utf-8';
+
+          const convertedContent = await conversionService.convert(content, format, {
+            customTemplate: config.customTemplate,
+            subconvertUrl: config.subconvertApi,
+            subscriptionUrl: subscriptionUrl
+          });
+
           response = {
-            content: await convertSubscription(content, format, null, config.subconvertApi, subscriptionUrl),
-            type: 'text/plain; charset=utf-8'
+            content: convertedContent,
+            type: contentType
           };
           break;
+        }
         case 'v2ray':
           response = {
             content: safeBase64Encode(filterSnellNodes(content)),

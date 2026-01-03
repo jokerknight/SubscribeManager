@@ -192,10 +192,10 @@ class NodeRepository {
    * @returns {Promise<Object>} 创建结果
    */
   static async create(data) {
-    const { subscriptionId, name, originalLink, nodeOrder = 0 } = data;
+    const { subscriptionId, name, originalLink, nodeOrder = 0, type } = data;
     return await dbRun(
-      'INSERT INTO nodes (subscription_id, name, original_link, node_order) VALUES (?, ?, ?, ?)',
-      [subscriptionId, name, originalLink, nodeOrder]
+      'INSERT INTO nodes (subscription_id, name, original_link, node_order, type) VALUES (?, ?, ?, ?, ?)',
+      [subscriptionId, name, originalLink, nodeOrder, type]
     );
   }
 

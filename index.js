@@ -104,6 +104,7 @@ async function startApp() {
     
     // 订阅路由，排除管理路径
     const subscriptionRoutes = require("./routes/subscriptionRoutes");
+    // 同时支持 /subscribe/path 和 /path 两种格式
     app.use("/", (req, res, next) => {
       // 如果路径以adminPath开头，跳过订阅路由
       if (req.path.startsWith(`/${config.adminPath}`)) {
