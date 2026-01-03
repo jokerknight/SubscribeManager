@@ -39,6 +39,11 @@ async function handleSubscriptionRequest(req, res, path, format) {
 
     const { nodes: content, subscriptionUrl, config } = subscriptionData;
 
+    // 构建真实的订阅 URL（使用请求中的真实域名）
+    const protocol = req.protocol;
+    const host = req.get('host');
+    const realBaseUrl = `${protocol}://${host}`;
+
     // 根据格式返回内容
     let response;
     if (format) {
@@ -56,6 +61,7 @@ async function handleSubscriptionRequest(req, res, path, format) {
             customTemplate: config.customTemplate,
             subconvertUrl: config.subconvertApi,
             subscriptionUrl: subscriptionUrl,
+            realBaseUrl: realBaseUrl,  // 传入真实的 baseUrl
             useDefaultTemplate: config.useDefaultTemplate
           });
 

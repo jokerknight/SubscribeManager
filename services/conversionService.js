@@ -22,6 +22,7 @@ class ConversionService {
       customTemplate = null,
       subconvertUrl = null,
       subscriptionUrl = null,
+      realBaseUrl = null,  // 新增：真实的 baseUrl
       useDefaultTemplate = null
     } = options;
 
@@ -31,6 +32,7 @@ class ConversionService {
     console.log('[ConversionService]   - customTemplate:', customTemplate);
     console.log('[ConversionService]   - subconvertUrl:', subconvertUrl);
     console.log('[ConversionService]   - subscriptionUrl:', subscriptionUrl);
+    console.log('[ConversionService]   - realBaseUrl:', realBaseUrl);
     console.log('[ConversionService]   - useDefaultTemplate:', useDefaultTemplate);
 
     // 空内容处理
@@ -41,7 +43,7 @@ class ConversionService {
     // 如果配置了 Subconvert URL，使用 Subconvert API（优先级最高）
     if (subconvertUrl && subconvertUrl.trim()) {
       console.log('[ConversionService] 配置了 Subconvert URL，使用 Subconvert API');
-      return await this._convertViaSubconvert(content, format, customTemplate, subconvertUrl, subscriptionUrl);
+      return await this._convertViaSubconvert(content, format, customTemplate, subconvertUrl, subscriptionUrl, realBaseUrl);
     }
 
     // 没有配置 Subconvert URL，根据 checkbox 决定模板类型
@@ -62,22 +64,24 @@ class ConversionService {
    * 通过 Subconvert API 转换
    * @private
    */
-  async _convertViaSubconvert(content, format, customTemplate, subconvertUrl, subscriptionUrl) {
+  async _convertViaSubconvert(content, format, customTemplate, subconvertUrl, subscriptionUrl, realBaseUrl) {
     try {
       console.log('[ConversionService] 使用 Subconvert API 进行转换');
       console.log('[ConversionService] customTemplate:', customTemplate);
+      console.log('[ConversionService] realBaseUrl:', realBaseUrl);
 
       // 构建一个仅包含节点的本地订阅 URL，作为 Subconvert 的输入
-      // 从 subscriptionUrl 中提取基础 URL，然后构建一个 /clash 的 URL
+      // 从 subscriptionUrl 中提取路径，然后使用 realBaseUrl 替换域名
       let nodesOnlyUrl = null;
       if (subscriptionUrl) {
         try {
           const urlObj = new URL(subscriptionUrl);
           const pathParts = urlObj.pathname.split('/').filter(Boolean);
-          // 提取订阅路径，构建 /path/clash URL
+          // 提取订阅路径，使用 realBaseUrl 构建 /path/clash URL
           if (pathParts.length >= 1) {
             const subscriptionPath = pathParts[0];
-            nodesOnlyUrl = `${urlObj.origin}/${subscriptionPath}/clash`;
+            // 使用真实的 baseUrl（从请求中获取），而不是 localhost
+            nodesOnlyUrl = `${realBaseUrl}/${subscriptionPath}/clash`;
           }
         } catch (e) {
           console.error('[ConversionService] 解析 subscriptionUrl 失败:', e.message);
@@ -89,11 +93,11 @@ class ConversionService {
       console.log('[ConversionService] nodesOnlyUrl (传给 Subconvert):', nodesOnlyUrl);
 
       console.log('[ConversionService] Subconvert 请求 URL (raw):', subconvertUrl);
-      console.log('[ConversionService] Subconvert 请求 subscriptionUrl:', nodesOnlyUrl);
 
+      // 调用 Subconvert API，传入 nodesOnlyUrl 作为直接 URL
       const convertedContent = await this._callSubconvertApi(
         subconvertUrl,
-        subscriptionUrl,
+        null, // subscriptionUrl 设为 null，使用 nodesOnlyUrl
         format,
         templateUrl,
         nodesOnlyUrl
