@@ -31,7 +31,7 @@ async function createTables() {
       path TEXT UNIQUE NOT NULL,
       subconvert_url TEXT,
       custom_template TEXT,
-      use_default_template BOOLEAN DEFAULT 1,
+      use_default_template BOOLEAN DEFAULT 0,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -82,7 +82,7 @@ async function createTables() {
   }
 
   try {
-    await db.exec(`ALTER TABLE subscriptions ADD COLUMN use_default_template BOOLEAN DEFAULT 1`);
+    await db.exec(`ALTER TABLE subscriptions ADD COLUMN use_default_template BOOLEAN DEFAULT 0`);
   } catch (e) {
     // Column already exists
   }

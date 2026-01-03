@@ -74,18 +74,26 @@ async function generateSubscriptionContent(path) {
     config: {
       subconvertApi: subscription.subconvert_url,
       customTemplate: subscription.custom_template,
-      useDefaultTemplate: subscription.use_default_template
+      useDefaultTemplate: subscription.use_default_template === 1  // 转换为布尔值
     }
   };
 }
 
 async function updateSubscription(oldPath, newName, newPath, subconvertUrl = null, customTemplate = null, useDefaultTemplate = null) {
-  if (!newName || !validateSubscriptionPath(newPath)) {
-    throw new ApiError(400, 'subscription.path_invalid');
+  console.log('[updateSubscription] 参数:', { oldPath, newName, newPath, subconvertUrl, customTemplate, useDefaultTemplate });
+
+  if (!newName) {
+    throw new ApiError(400, 'subscription.name_required');
   }
 
-  // 如果路径被修改，检查新路径是否已存在
+  // 只有当路径被修改时，才验证新路径的有效性
+  // 如果路径未改变，不进行验证（允许已存在的短路径订阅继续使用）
   if (newPath !== oldPath) {
+    if (!validateSubscriptionPath(newPath)) {
+      throw new ApiError(400, 'subscription.path_invalid');
+    }
+
+    // 检查新路径是否已存在
     const existing = await dbQuery(
       'SELECT COUNT(*) as count FROM subscriptions WHERE path = ?',
       [newPath]
