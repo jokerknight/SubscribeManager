@@ -71,17 +71,18 @@ class ConversionService {
       console.log('[ConversionService] realBaseUrl:', realBaseUrl);
 
       // 构建一个仅包含节点的本地订阅 URL，作为 Subconvert 的输入
-      // 从 subscriptionUrl 中提取路径，然后使用 realBaseUrl 替换域名
+      // 使用专门的 /path/nodes 端点
       let nodesOnlyUrl = null;
       if (subscriptionUrl) {
         try {
           const urlObj = new URL(subscriptionUrl);
           const pathParts = urlObj.pathname.split('/').filter(Boolean);
-          // 提取订阅路径，使用 realBaseUrl 构建 /path/clash URL
+          // 提取订阅路径，使用 realBaseUrl 构建 /path/nodes URL（专用端点，避免死循环）
           if (pathParts.length >= 1) {
             const subscriptionPath = pathParts[0];
             // 使用真实的 baseUrl（从请求中获取），而不是 localhost
-            nodesOnlyUrl = `${realBaseUrl}/${subscriptionPath}/clash`;
+            // 使用 /nodes 端点，这个端点只返回节点不含规则
+            nodesOnlyUrl = `${realBaseUrl}/${subscriptionPath}/nodes`;
           }
         } catch (e) {
           console.error('[ConversionService] 解析 subscriptionUrl 失败:', e.message);
@@ -178,7 +179,6 @@ class ConversionService {
    * @private
    */
   async _getSimpleTemplateOnlyNodes() {
-    const clashGenerator = require('../utils/converters/clashGenerator');
     // 使用一个空的模板，只返回节点，不包含规则
     return `# Clash 配置文件 - 仅节点（无规则）
 # 生成时间: ${new Date().toISOString()}
@@ -199,6 +199,23 @@ proxy-groups:
    */
   _isTemplateUrl(template) {
     return template && (template.startsWith('http://') || template.startsWith('https://'));
+  }
+
+  /**
+   * 获取仅节点的订阅内容
+   * @param {string} content 订阅内容
+   * @param {string} format 目标格式
+   * @returns {Promise<string>} 仅节点的配置内容
+   */
+  async getNodesOnly(content, format) {
+    console.log('[ConversionService] 获取仅节点内容，format:', format);
+    if (format !== 'clash') {
+      // 非 Clash 格式，直接返回原始内容
+      return content;
+    }
+
+    // Clash 格式，返回仅节点配置
+    return await this._convertLocally(content, format, await this._getSimpleTemplateOnlyNodes());
   }
 
   /**
