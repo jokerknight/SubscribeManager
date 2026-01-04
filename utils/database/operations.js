@@ -173,7 +173,7 @@ class NodeRepository {
    */
   static async findBySubscriptionPath(subscriptionPath) {
     return await dbQuery(`
-      SELECT 
+      SELECT
         n.id,
         n.name,
         n.original_link,
@@ -184,6 +184,21 @@ class NodeRepository {
       WHERE s.path = ?
       ORDER BY n.node_order ASC
     `, [subscriptionPath]);
+  }
+
+  /**
+   * 统计订阅下的节点数量
+   * @param {string} subscriptionPath 订阅路径
+   * @returns {Promise<number>} 节点数量
+   */
+  static async countBySubscriptionPath(subscriptionPath) {
+    const result = await dbQuery(`
+      SELECT COUNT(*) as count
+      FROM nodes n
+      JOIN subscriptions s ON n.subscription_id = s.id
+      WHERE s.path = ?
+    `, [subscriptionPath]);
+    return result[0]?.count || 0;
   }
 
   /**

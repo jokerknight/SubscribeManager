@@ -1,8 +1,8 @@
 const sqlite3 = require('sqlite3').verbose();
 const { open } = require('sqlite');
 const config = require('./config');
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 let db;
 
@@ -56,7 +56,7 @@ async function createTables() {
   // Add new columns if they don't exist (for existing databases)
   try {
     await db.exec(`ALTER TABLE subscriptions ADD COLUMN subconvert_url TEXT`);
-  } catch (e) {
+  } catch {
     // Column already exists
   }
 
@@ -71,19 +71,19 @@ async function createTables() {
       // Migrate data from old column to new column
       await db.exec(`UPDATE subscriptions SET subconvert_url = subconvert_api WHERE subconvert_url IS NULL AND subconvert_api IS NOT NULL`);
     }
-  } catch (e) {
+  } catch {
     // Migration error, ignore
   }
 
   try {
     await db.exec(`ALTER TABLE subscriptions ADD COLUMN custom_template TEXT`);
-  } catch (e) {
+  } catch {
     // Column already exists
   }
 
   try {
     await db.exec(`ALTER TABLE subscriptions ADD COLUMN use_default_template BOOLEAN DEFAULT 0`);
-  } catch (e) {
+  } catch {
     // Column already exists
   }
 }

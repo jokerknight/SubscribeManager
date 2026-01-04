@@ -1,19 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const {
-  getSubscriptions,
-  createSubscription,
-  generateSubscriptionContent,
-  updateSubscription: updateSub,
-  deleteSubscription: deleteSub
-} = require('../services/subscriptionService');
+const { generateSubscriptionContent } = require('../services/subscriptionService');
 const { ConversionService } = require('../services/conversionService');
-const {
-  SubscriptionRepository,
-  NodeRepository,
-  safeBase64Encode,
-  filterSnellNodes
-} = require('../utils');
+const { safeBase64Encode, filterSnellNodes } = require('../utils');
 
 // 获取订阅内容 - 支持 /path 格式
 router.get('/:path', async (req, res) => {
@@ -107,7 +96,7 @@ async function handleSubscriptionRequest(req, res, path, format) {
 }
 
 // 处理仅节点的订阅请求（用于 Subconvert）
-async function handleNodesOnlyRequest(req, res, path, format) {
+async function handleNodesOnlyRequest(_req, res, path, format) {
   try {
     // 获取订阅内容
     const subscriptionData = await generateSubscriptionContent(path);

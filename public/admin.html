@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="/api-utils.js"></script>
   <style>
     :root {
       --primary-color: #667eea;
@@ -2958,6 +2959,7 @@
         if (!content) {
           throw new Error('Please fill node content');
         }
+
         // 分割成行
         const lines = content.split(/\r?\n/);
         const validNodes = [];
@@ -2997,35 +2999,22 @@
 
         // 批量创建节点，按顺序添加
         const results = [];
-        const timestamp = Date.now(); // 使用时间戳作为基础序号
+        const timestamp = Date.now();
 
         for (let i = 0; i < validNodes.length; i++) {
           const node = validNodes[i];
           try {
-            // 创建节点，使用时间戳+索引作为顺序值
-            const response = await fetch('/api/subscriptions/' + subscriptionPath + '/nodes', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-              },
-              body: JSON.stringify({
-                name: node.name,
-                content: node.content,
-                type: getNodeType(node.content),
-                order: timestamp + i  // 使用时间戳确保顺序唯一且递增
-              })
+            await apiPost(`/api/subscriptions/${subscriptionPath}/nodes`, {
+              name: node.name,
+              content: node.content,
+              type: getNodeType(node.content),
+              order: timestamp + i
             });
-
-            const result = await response.json();
-            results.push({ success: response.ok, message: result.message, link: node.content, order: i });
+            results.push({ success: true, link: node.content, order: i });
           } catch (error) {
             results.push({ success: false, message: error.message, link: node.content, order: i });
           }
         }
-
-        // 按原始顺序排序结果
-        results.sort((a, b) => a.order - b.order);
 
         // 统计结果
         const successful = results.filter(r => r.success).length;
@@ -3057,8 +3046,7 @@
         }
 
       } catch (error) {
-        console.error('添加节点失败:', error);
-        showToast('' + error.message, 'danger');
+        handleApiError(error);
       }
     }
 
@@ -3373,25 +3361,13 @@
       }
 
       try {
-        const response = await fetch('/api/subscriptions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-          },
-          body: JSON.stringify({ name, path })
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) throw new Error(result.message || '');
-
+        await apiPost('/api/subscriptions', { name, path });
         showToast(_t('subscription.created'));
         bootstrap.Modal.getInstance(document.getElementById('addSubscriptionModal')).hide();
         form.reset();
         await loadSubscriptions();
       } catch (error) {
-        showToast('' + error.message, 'danger');
+        handleApiError(error);
       }
     }
 
@@ -3437,7 +3413,7 @@
         if (response.ok) {
           const result = await response.json();
           if (result.success && result.data) {
-            const subscription = result.data;
+            // Subscription data loaded successfully
           }
         }
       } catch (error) {
@@ -3812,24 +3788,16 @@
       const useDefaultTemplate = form.querySelector('[name="useDefaultTemplate"]').checked;
 
       try {
-        const response = await fetch(`/api/subscriptions/${path}/subconverter`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-          },
-          body: JSON.stringify({ subconvert_url: subconvertUrl, custom_template: customTemplate, use_default_template: useDefaultTemplate })
+        await apiPut(`/api/subscriptions/${path}/subconverter`, {
+          subconvert_url: subconvertUrl,
+          custom_template: customTemplate,
+          use_default_template: useDefaultTemplate
         });
-
-        const result = await response.json();
-
-        if (!response.ok) throw new Error(result.message || '保存失败');
-
         showToast(_t('common.success'), 'success');
         bootstrap.Modal.getInstance(document.getElementById('subconverterModal')).hide();
         loadSubscriptions();
       } catch (error) {
-        showToast(error.message || _t('common.error'), 'danger');
+        handleApiError(error);
       }
     }
 
@@ -3891,18 +3859,7 @@
       resultDiv.style.display = 'none';
 
       try {
-        const response = await fetch(`/api/subscriptions/${path}/import-nodes`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-          },
-          body: JSON.stringify({ importUrl })
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) throw new Error(result.message || '导入失败');
+        const result = await apiPost(`/api/subscriptions/${path}/import-nodes`, { importUrl });
 
         progressDiv.style.display = 'none';
         resultDiv.style.display = 'block';

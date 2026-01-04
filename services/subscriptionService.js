@@ -42,7 +42,7 @@ async function getSubscription(path) {
     'SELECT * FROM subscriptions WHERE path = ?',
     [path]
   );
-  return results[0];
+  return results?.[0];
 }
 
 async function generateSubscriptionContent(path) {
@@ -80,8 +80,6 @@ async function generateSubscriptionContent(path) {
 }
 
 async function updateSubscription(oldPath, newName, newPath, subconvertUrl = null, customTemplate = null, useDefaultTemplate = null) {
-  console.log('[updateSubscription] 参数:', { oldPath, newName, newPath, subconvertUrl, customTemplate, useDefaultTemplate });
-
   if (!newName) {
     throw new ApiError(400, 'subscription.name_required');
   }
@@ -104,9 +102,13 @@ async function updateSubscription(oldPath, newName, newPath, subconvertUrl = nul
     }
   }
 
+  const useDefaultTemplateValue = useDefaultTemplate !== null
+    ? (useDefaultTemplate ? 1 : 0)
+    : null;
+
   await dbRun(
     'UPDATE subscriptions SET name = ?, path = ?, subconvert_url = ?, custom_template = ?, use_default_template = ? WHERE path = ?',
-    [newName, newPath, subconvertUrl, customTemplate, useDefaultTemplate !== null ? (useDefaultTemplate ? 1 : 0) : null, oldPath]
+    [newName, newPath, subconvertUrl, customTemplate, useDefaultTemplateValue, oldPath]
   );
 }
 

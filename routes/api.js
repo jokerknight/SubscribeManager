@@ -2,16 +2,12 @@ const express = require('express');
 const router = express.Router();
 const subscriptionService = require('../services/subscriptionService');
 const nodeService = require('../services/nodeService');
+const { importNodes } = require('../services/importService');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiError = require('../utils/ApiError');
-const https = require('https');
-const http = require('http');
-const { extractNodeName, getNodeType } = require('../utils/validators/nodeParser');
-const { parseSubscriptionNodes } = require('../utils/converters/subscriptionParser');
-const { NodeRepository } = require('../utils/database/operations');
 
 // 获取订阅列表
-router.get('/subscriptions', asyncHandler(async (req, res) => {
+router.get('/subscriptions', asyncHandler(async (_req, res) => {
   const subscriptions = await subscriptionService.getSubscriptions();
   res.json({ success: true, data: subscriptions });
 }));
@@ -99,124 +95,18 @@ router.post('/subscriptions/:path/import-nodes', asyncHandler(async (req, res) =
   const { path: subscriptionPath } = req.params;
   const { importUrl } = req.body;
 
-  console.log(`[导入] 收到请求 - 订阅路径: ${subscriptionPath}, 导入URL: ${importUrl}`);
+  const result = await importNodes(subscriptionPath, importUrl);
 
-  if (!importUrl || !importUrl.trim()) {
-    throw new ApiError(400, 'import.url_required');
-  }
-
-  try {
-    new URL(importUrl);
-  } catch (e) {
-    console.error('[导入] URL 解析失败:', importUrl, e.message);
-    throw new ApiError(400, 'import.invalid_url');
-  }
-
-  try {
-    // 获取订阅内容
-    const content = await fetchSubscriptionContent(importUrl);
-
-    if (!content) {
-      console.error('[导入] 获取到 null 或 undefined 内容');
-      throw new ApiError(400, 'import.empty_content');
+  res.json({
+    success: true,
+    message: 'import.nodes_imported',
+    data: {
+      importedCount: result.importedCount,
+      updatedCount: result.skippedCount,
+      failedCount: result.failedCount,
+      totalAfterImport: result.totalAfterImport
     }
-
-    console.log(`[导入] 获取到内容长度: ${content.length} 字节`);
-    console.log(`[导入] 内容预览: ${content.length > 0 ? content.substring(0, 200) : '(空)'}`);
-
-    const trimmedContent = content.trim();
-    if (trimmedContent.length === 0) {
-      console.error('[导入] 订阅内容为空（只有空白字符）');
-      throw new ApiError(400, 'import.empty_content');
-    }
-
-    // 使用订阅解析器自动检测格式并解析节点
-    const nodeLinks = await parseSubscriptionNodes(content);
-
-    console.log(`[导入] 解析到 ${nodeLinks.length} 个节点`);
-    const ssNodes = nodeLinks.filter(n => n.startsWith('ss://'));
-    console.log(`[导入] 其中 ${ssNodes.length} 个 SS 节点`);
-
-    if (nodeLinks.length === 0) {
-      throw new ApiError(400, 'import.no_valid_nodes');
-    }
-
-    // 获取现有节点以检查重复
-    const existingNodes = await NodeRepository.findBySubscriptionPath(subscriptionPath);
-
-    // 获取现有节点名称用于去重
-    const existingNodeNames = new Set();
-    for (const node of existingNodes) {
-      if (node.name) {
-        const trimmedName = node.name.trim();
-        existingNodeNames.add(trimmedName);
-        console.log(`[导入] 现有节点名称: "${trimmedName}" (原始: "${node.name}")`);
-      }
-    }
-
-    console.log(`[导入] 订阅中现有 ${existingNodes.length} 个节点，现有节点名称:`, Array.from(existingNodeNames).map(n => `"${n}"`).join(', '));
-
-    // 保存节点到数据库
-    let importedCount = 0;
-    let skippedCount = 0;  // 跳过的重复节点
-    let failedCount = 0;
-
-    // 获取订阅ID
-    const subscription = await subscriptionService.getSubscription(subscriptionPath);
-    const subscriptionId = subscription.id;
-
-    for (let i = 0; i < nodeLinks.length; i++) {
-      const nodeLink = nodeLinks[i];
-
-      try {
-        // 提取节点名称
-        const nodeName = extractNodeName(nodeLink);
-        const trimmedName = nodeName.trim();
-
-        console.log(`[导入] 检查节点 "${trimmedName}" 是否在现有名称中:`, existingNodeNames.has(trimmedName));
-
-        // 检查是否重复（通过节点名称）
-        if (existingNodeNames.has(trimmedName)) {
-          skippedCount++;
-          console.log(`[导入] 节点 ${i + 1} 已存在（名称: ${trimmedName}），跳过`);
-          continue;
-        }
-
-        // 直接插入数据库
-        const nodeType = getNodeType(nodeLink);
-
-        await NodeRepository.create({
-          subscriptionId,
-          name: nodeName,
-          originalLink: nodeLink,
-          nodeOrder: 0,
-          type: nodeType
-        });
-        importedCount++;
-        existingNodeNames.add(nodeName.trim());
-        console.log(`[导入] 节点 ${i + 1} 导入成功: ${nodeName}`);
-      } catch (error) {
-        failedCount++;
-        console.error(`[导入] 节点 ${i + 1} 处理失败:`, error.message);
-      }
-    }
-
-    console.log(`[导入] 完成 - 解析: ${nodeLinks.length}, 导入: ${importedCount}, 跳过: ${skippedCount}, 失败: ${failedCount}`);
-
-    res.json({
-      success: true,
-      message: 'import.nodes_imported',
-      data: {
-        importedCount: importedCount,
-        updatedCount: skippedCount,
-        failedCount: failedCount,
-        totalAfterImport: existingNodes.length + importedCount
-      }
-    });
-  } catch (error) {
-    console.error('[导入错误]', error);
-    throw new ApiError(500, 'import.failed', error.message);
-  }
+  });
 }));
 
 // 获取订阅内容
@@ -307,7 +197,7 @@ router.post('/clash/generate', asyncHandler(async (req, res) => {
 router.post('/clash/load-template', asyncHandler(async (req, res) => {
   const { templateUrl } = req.body;
 
-  if (!templateUrl || !templateUrl.trim()) {
+  if (!templateUrl?.trim()) {
     throw new ApiError(400, 'template.url_required');
   }
 

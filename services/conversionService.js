@@ -2,7 +2,7 @@
  * 转换服务 - 统一管理订阅格式转换逻辑
  */
 const { convertSubscription } = require('../utils/converters/subscriptionConverter');
-const { buildSubconvertApiUrl, determineConversionStrategy } = require('../utils/converters/urlHandler');
+const { buildSubconvertApiUrl } = require('../utils/converters/urlHandler');
 const https = require('node:https');
 
 class ConversionService {
@@ -41,7 +41,7 @@ class ConversionService {
     }
 
     // 如果配置了 Subconvert URL，使用 Subconvert API（优先级最高）
-    if (subconvertUrl && subconvertUrl.trim()) {
+    if (subconvertUrl?.trim()) {
       console.log('[ConversionService] 配置了 Subconvert URL，使用 Subconvert API');
       return await this._convertViaSubconvert(content, format, customTemplate, subconvertUrl, subscriptionUrl, realBaseUrl);
     }
