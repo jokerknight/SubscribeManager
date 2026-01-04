@@ -24,7 +24,6 @@ async function convertViaSubconvert(subconvertUrl, subscriptionUrl, targetFormat
 
       // 构建完整的 Subconvert API URL
       const fullUrl = buildSubconvertApiUrl(subconvertUrl, subscriptionUrl, targetFormat, customTemplateUrl);
-      console.log('Subconvert 请求 URL:', fullUrl);
 
       const req = https.get(fullUrl, (res) => {
         let data = '';
@@ -81,16 +80,13 @@ async function convertSubscription(content, targetFormat, customTemplate = null,
     // 如果是 URL，加载模板内容
     if (isTemplateUrl) {
       try {
-        console.log('[local] 加载自定义模板 URL:', customTemplate);
         templateContent = await loadTemplateFromUrl(customTemplate);
-        console.log('[local] 模板加载成功，长度:', templateContent.length);
       } catch (error) {
         console.error('[local] 模板加载失败，使用默认模板:', error.message);
         templateContent = null;
       }
     } else {
       // 已经是模板内容
-      console.log('[local] 使用已加载的模板内容，长度:', customTemplate.length);
       templateContent = customTemplate;
     }
   }
@@ -101,14 +97,10 @@ async function convertSubscription(content, targetFormat, customTemplate = null,
       const strategy = determineConversionStrategy(subscriptionUrl, subconvertUrl, targetFormat);
 
       if (strategy.useSubconvert) {
-        console.log('使用 Subconvert URL 进行转换...');
-
         // 如果有自定义模板 URL，传递给 convertViaSubconvert
         const templateUrl = isTemplateUrl ? customTemplate : null;
         const convertedContent = await convertViaSubconvert(subconvertUrl, subscriptionUrl, targetFormat, templateUrl);
         return convertedContent;
-      } else {
-        console.log(`不使用 Subconvert: ${strategy.reason}，降级到本地转换`);
       }
     } catch (error) {
       console.error('Subconvert 转换失败，降级到本地转换:', error.message);
@@ -122,14 +114,6 @@ async function convertSubscription(content, targetFormat, customTemplate = null,
     const lines = content.split(/\r?\n/);
     const processedNodes = [];
 
-    console.log('[local] 原始内容长度:', content.length);
-    console.log('[local] 原始内容行数:', lines.length);
-    console.log('[local] 前5行预览:');
-    lines.slice(0, 5).forEach((line, idx) => {
-      console.log(`  [${idx}] ${line.substring(0, 80)}`);
-    });
-
-    let parsedCount = 0;
     for (const line of lines) {
       const trimmedLine = line.trim();
       if (!trimmedLine) continue;
@@ -139,7 +123,6 @@ async function convertSubscription(content, targetFormat, customTemplate = null,
         const node = protocolFactory.parseNode(trimmedLine);
 
         if (node) {
-          parsedCount++;
           // 根据目标格式转换节点
           const convertedNode = protocolFactory.convertNodeFormat(node, targetFormat);
 
@@ -152,8 +135,6 @@ async function convertSubscription(content, targetFormat, customTemplate = null,
       }
     }
 
-    console.log('[local] 成功解析节点数:', parsedCount);
-    console.log('[local] 使用本地 Clash 生成器生成配置，节点数:', processedNodes.length);
     return formatOutput(processedNodes, targetFormat, templateContent);
 
   } catch (error) {
@@ -178,10 +159,8 @@ function formatOutput(processedNodes, format, customTemplate = null) {
     case 'clash':
       // 如果有自定义模板，使用模板；否则使用完整默认配置（包含 rule-provider）
       if (customTemplate && customTemplate.trim()) {
-        console.log('使用自定义模板生成 Clash 配置');
         return clashGenerator.generateConfig(processedNodes, customTemplate);
       } else {
-        console.log('使用默认完整模板生成 Clash 配置（包含 rule-provider）');
         return clashGenerator.generateDefaultConfig(processedNodes);
       }
     case 'surge':

@@ -26,15 +26,6 @@ class ConversionService {
       useDefaultTemplate = null
     } = options;
 
-    console.log('[ConversionService] convert 开始');
-    console.log('[ConversionService]   - content 长度:', content?.length || 0);
-    console.log('[ConversionService]   - format:', format);
-    console.log('[ConversionService]   - customTemplate:', customTemplate);
-    console.log('[ConversionService]   - subconvertUrl:', subconvertUrl);
-    console.log('[ConversionService]   - subscriptionUrl:', subscriptionUrl);
-    console.log('[ConversionService]   - realBaseUrl:', realBaseUrl);
-    console.log('[ConversionService]   - useDefaultTemplate:', useDefaultTemplate);
-
     // 空内容处理
     if (!content?.trim()) {
       return format === 'clash' ? await this._getEmptyClashConfig() : '';
@@ -42,14 +33,11 @@ class ConversionService {
 
     // 如果配置了 Subconvert URL，使用 Subconvert API（优先级最高）
     if (subconvertUrl?.trim()) {
-      console.log('[ConversionService] 配置了 Subconvert URL，使用 Subconvert API');
       return await this._convertViaSubconvert(content, format, customTemplate, subconvertUrl, subscriptionUrl, realBaseUrl);
     }
 
     // 没有配置 Subconvert URL，根据 checkbox 决定模板类型
     const useDefault = useDefaultTemplate !== false; // null 或 true 都使用默认模板，false 使用仅节点
-    console.log('[ConversionService] 没有配置 Subconvert URL');
-    console.log('[ConversionService]   - useDefaultTemplate:', useDefaultTemplate, '->', useDefault ? '默认模板' : '仅节点');
 
     if (useDefault) {
       // 使用默认完整模板（含规则）
@@ -66,10 +54,6 @@ class ConversionService {
    */
   async _convertViaSubconvert(content, format, customTemplate, subconvertUrl, subscriptionUrl, realBaseUrl) {
     try {
-      console.log('[ConversionService] 使用 Subconvert API 进行转换');
-      console.log('[ConversionService] customTemplate:', customTemplate);
-      console.log('[ConversionService] realBaseUrl:', realBaseUrl);
-
       // 构建一个仅包含节点的本地订阅 URL，作为 Subconvert 的输入
       // 使用专门的 /path/nodes 端点
       let nodesOnlyUrl = null;
@@ -90,10 +74,6 @@ class ConversionService {
       }
 
       const templateUrl = this._isTemplateUrl(customTemplate) ? customTemplate : null;
-      console.log('[ConversionService] templateUrl (传给 Subconvert):', templateUrl);
-      console.log('[ConversionService] nodesOnlyUrl (传给 Subconvert):', nodesOnlyUrl);
-
-      console.log('[ConversionService] Subconvert 请求 URL (raw):', subconvertUrl);
 
       // 调用 Subconvert API，传入 nodesOnlyUrl 作为直接 URL
       const convertedContent = await this._callSubconvertApi(
@@ -108,7 +88,6 @@ class ConversionService {
     } catch (error) {
       console.error('[ConversionService] Subconvert 转换失败，降级到本地转换:', error.message);
       // 降级时，使用默认完整模板
-      console.log('[ConversionService] 降级使用默认完整模板');
       return await this._convertLocally(content, format, null);
     }
   }
@@ -164,13 +143,6 @@ class ConversionService {
    * @private
    */
   async _convertLocally(content, format, templateUrl = null) {
-    if (templateUrl) {
-      console.log(`[ConversionService] 使用本地转换器（自定义模板 URL）`);
-      console.log(`[ConversionService] 模板 URL: ${templateUrl}`);
-    } else {
-      console.log(`[ConversionService] 使用本地转换器（默认完整模板）`);
-    }
-
     return await convertSubscription(content, format, templateUrl, null, null);
   }
 
@@ -208,7 +180,6 @@ proxy-groups:
    * @returns {Promise<string>} 仅节点的配置内容
    */
   async getNodesOnly(content, format) {
-    console.log('[ConversionService] 获取仅节点内容，format:', format);
     if (format !== 'clash') {
       // 非 Clash 格式，直接返回原始内容
       return content;

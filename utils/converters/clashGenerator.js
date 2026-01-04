@@ -14,10 +14,17 @@ function generateConfigWithTemplate(proxies, template) {
   // 生成节点配置
   const proxyConfigs = proxies.map(proxy => generateProxyConfig(proxy));
 
+  // 先标准化模板中的键名为小写格式（Clash Meta / ClashX 推荐格式）
+  let config = template
+    .replace(/^Proxy\b/gm, 'proxies')
+    .replace(/^Proxy Group\b/gm, 'proxy-groups')
+    .replace(/^Rule\b/gm, 'rules');
+
   // 替换模板中的占位符
-  let config = template.replace(/{{proxies}}/g, proxyConfigs.join('\n'));
-  config = config.replace(/{{proxy_names}}/g, JSON.stringify(['DIRECT', ...proxies.map(p => p.name)]));
-  config = config.replace(/{{proxy_names_comma}}/g, proxies.map(p => `"${p.name}"`).join(', '));
+  config = config.replace(/{{proxies}}/g, proxyConfigs.join('\n'));
+  const proxyNames = proxies.map(p => p.name);
+  config = config.replace(/{{proxy_names}}/g, JSON.stringify(['DIRECT', ...proxyNames]));
+  config = config.replace(/{{proxy_names_comma}}/g, proxyNames.map(name => `"${name}"`).join(', '));
 
   return config;
 }
@@ -31,7 +38,6 @@ function generateConfigWithTemplate(proxies, template) {
 async function generateConfig(proxies, customTemplate = null) {
   // 如果有自定义模板，使用自定义模板
   if (customTemplate && customTemplate.trim()) {
-    console.log('使用自定义模板生成 Clash 配置');
     return generateConfigWithTemplate(proxies, customTemplate);
   }
 
@@ -140,7 +146,6 @@ async function generateDefaultConfig(proxies) {
   ];
 
   // 并行获取所有规则集
-  console.log('[clashGenerator] 开始获取规则集，数量:', ruleProviders.length);
   const rulesetPromises = ruleProviders.map(async (provider) => {
     const content = await fetchRuleset(provider.url);
     const rules = parseRuleset(content, provider.policy);
@@ -153,10 +158,7 @@ async function generateDefaultConfig(proxies) {
   const expandedRules = [];
   for (const ruleset of rulesets) {
     expandedRules.push(...ruleset.rules);
-    console.log(`[clashGenerator] 规则集 ${ruleset.name} 展开 ${ruleset.rules.length} 条规则`);
   }
-
-  console.log(`[clashGenerator] 总共展开 ${expandedRules.length} 条规则`);
 
   // 添加固定的规则
   const staticRules = [
