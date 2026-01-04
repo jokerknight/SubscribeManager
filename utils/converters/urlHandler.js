@@ -182,7 +182,7 @@ function buildSubconvertApiUrl(subconvertUrl, subscriptionUrl, targetFormat, cus
     scv: 'false',
     fdn: 'false',
     sort: 'false',
-    new_name: 'false',
+    new_name: 'true',
     append_type: 'false',
     expand: 'true',
     'xudp': 'false'
