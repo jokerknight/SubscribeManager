@@ -96,7 +96,7 @@ async function handleSubscriptionRequest(req, res, path, format) {
 }
 
 // 处理仅节点的订阅请求（用于 Subconvert）
-async function handleNodesOnlyRequest(_req, res, path, format) {
+async function handleNodesOnlyRequest(req, res, path, format) {
   try {
     // 获取订阅内容
     const subscriptionData = await generateSubscriptionContent(path);
@@ -107,14 +107,26 @@ async function handleNodesOnlyRequest(_req, res, path, format) {
       });
     }
 
-    const { nodes: content } = subscriptionData;
+    const { nodes: content, subscriptionUrl, config } = subscriptionData;
 
-    // 只返回节点的 Clash 配置（不含规则）
+    // 构建真实的订阅 URL（使用请求中的真实域名）
+    const protocol = req.protocol;
+    const host = req.get('host');
+    const realBaseUrl = `${protocol}://${host}`;
+
+    // 使用默认模板生成完整的 Clash 配置（包含 proxies、proxy-groups、rules）
+    // 这样传给 Subconverter 后就不会出现缺少 proxies 的问题
     const conversionService = new ConversionService();
-    const nodesOnlyContent = await conversionService.getNodesOnly(content, format);
+    const fullConfigContent = await conversionService.convert(content, format, {
+      customTemplate: null,  // 不使用自定义模板
+      subconvertUrl: null,  // 不通过 Subconvert，直接生成
+      subscriptionUrl: subscriptionUrl,
+      realBaseUrl: realBaseUrl,
+      useDefaultTemplate: true  // 强制使用默认模板
+    });
 
     res.set('Content-Type', 'text/yaml; charset=utf-8');
-    res.send(nodesOnlyContent);
+    res.send(fullConfigContent);
 
   } catch (error) {
     console.error('Nodes-only subscription generation error:', error);
