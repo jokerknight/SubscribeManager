@@ -26,13 +26,14 @@ async function convertViaSubconvert(subconvertUrl, subscriptionUrl, targetFormat
       const fullUrl = buildSubconvertApiUrl(subconvertUrl, subscriptionUrl, targetFormat, customTemplateUrl);
 
       const req = https.get(fullUrl, (res) => {
-        let data = '';
+        let chunks = [];
 
         res.on('data', (chunk) => {
-          data += chunk;
+          chunks.push(chunk);
         });
 
         res.on('end', () => {
+          const data = Buffer.concat(chunks).toString('utf8');
           if (res.statusCode === 200) {
             resolve(data);
           } else {

@@ -80,9 +80,14 @@ async function handleSubscriptionRequest(req, res, path, format) {
       };
     }
 
-    res.set('Content-Type', response.type);
-    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-    res.send(response.content);
+    res.set('Content-Type', 'text/plain; charset=utf-8');
+    // 为 Clash 格式添加 UTF-8 BOM 头，解决乱码问题
+    if (format === 'clash' || format === 'surge' || format === 'shadowsocks') {
+      const utf8Bom = '\uFEFF';
+      res.send(utf8Bom + response.content);
+    } else {
+      res.send(response.content);
+    }
 
   } catch (error) {
     console.error('Subscription generation error:', error);
@@ -111,8 +116,9 @@ async function handleNodesOnlyRequest(_req, res, path, format) {
     const nodesOnlyContent = await conversionService.getNodesOnly(content, format);
 
     res.set('Content-Type', 'text/plain; charset=utf-8');
-    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-    res.send(nodesOnlyContent);
+    // 添加 UTF-8 BOM 头，解决乱码问题
+    const utf8Bom = '\uFEFF';
+    res.send(utf8Bom + nodesOnlyContent);
 
   } catch (error) {
     console.error('Nodes-only subscription generation error:', error);
