@@ -48,10 +48,6 @@ async function handleSubscriptionRequest(req, res, path, format) {
         case 'clash':
         case 'surge':
         case 'shadowsocks': {
-          const contentType = format === 'clash'
-            ? 'text/yaml; charset=utf-8'
-            : 'text/plain; charset=utf-8';
-
           const convertedContent = await conversionService.convert(content, format, {
             customTemplate: config.customTemplate,
             subconvertUrl: config.subconvertApi,
@@ -62,7 +58,7 @@ async function handleSubscriptionRequest(req, res, path, format) {
 
           response = {
             content: convertedContent,
-            type: contentType
+            type: 'text/plain; charset=utf-8'
           };
           break;
         }
@@ -85,6 +81,7 @@ async function handleSubscriptionRequest(req, res, path, format) {
     }
 
     res.set('Content-Type', response.type);
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.send(response.content);
 
   } catch (error) {
@@ -113,7 +110,8 @@ async function handleNodesOnlyRequest(_req, res, path, format) {
     const conversionService = new ConversionService();
     const nodesOnlyContent = await conversionService.getNodesOnly(content, format);
 
-    res.set('Content-Type', 'text/yaml; charset=utf-8');
+    res.set('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.send(nodesOnlyContent);
 
   } catch (error) {
