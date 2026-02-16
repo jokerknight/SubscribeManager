@@ -124,6 +124,7 @@ function fetchSubscriptionContent(urlString) {
       port: urlObj.port || (urlObj.protocol === 'https:' ? 443 : 80),
       path: urlObj.pathname + urlObj.search,
       method: 'GET',
+      rejectUnauthorized: false, // 允许自签名证书
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         'Accept': '*/*',

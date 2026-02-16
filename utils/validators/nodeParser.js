@@ -1,4 +1,4 @@
-const { safeBase64Decode } = require('../helpers');
+const { safeBase64Decode, safeDecodeURIComponent } = require('../helpers');
 const { NODE_TYPES } = require('../constants');
 
 /**
@@ -116,7 +116,10 @@ function tryDecodeNodeContent(content) {
 function cleanNodeLink(link) {
   if (!link) return '';
 
-  return link
+  // 先进行 URL 解码，处理 %3A 等编码符号
+  let decodedLink = safeDecodeURIComponent(link);
+
+  return decodedLink
     .replace(/[\r\n\s]+$/, '') // 移除尾部的换行和空格
     .trim();
 }

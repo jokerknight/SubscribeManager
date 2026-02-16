@@ -5,7 +5,7 @@
 
 const YAML = require('js-yaml');
 const { cleanNodeLink } = require('../validators/nodeParser');
-const { safeBase64Decode } = require('../helpers');
+const { safeBase64Decode, safeDecodeURIComponent } = require('../helpers');
 
 // 协议类映射
 const VLESSProtocol = require('../../protocols/VLESSProtocol');
@@ -99,7 +99,9 @@ async function parseSubscriptionNodes(content) {
   // 尝试 Base64 解码（如果是通用格式且没有协议前缀）
   if (format === 'universal' && !content.includes('://')) {
     try {
-      decodedContent = safeBase64Decode(content);
+      // 先尝试 URL 解码，处理双重编码情况
+      let contentToDecode = safeDecodeURIComponent(content);
+      decodedContent = safeBase64Decode(contentToDecode);
     } catch (e) {
       console.log('Base64 解码失败，使用原始内容');
     }

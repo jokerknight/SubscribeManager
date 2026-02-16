@@ -61,7 +61,7 @@ async function updateNode(subscriptionPath, nodeId, content) {
 
   // 获取订阅ID
   const subscriptionId = await baseService.getSubscriptionIdByPath(subscriptionPath);
-  let originalLink = content.replace(/[\r\n\s]+$/, '');
+  let originalLink = cleanNodeLink(content);
 
   // 使用统一的解码逻辑
   originalLink = tryDecodeNodeContent(originalLink);

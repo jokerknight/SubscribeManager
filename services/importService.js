@@ -6,6 +6,7 @@ const { extractNodeName, getNodeType } = require('../utils/validators/nodeParser
 const { NodeRepository } = require('../utils/database/operations');
 const subscriptionService = require('./subscriptionService');
 const https = require('node:https');
+const http = require('node:http');
 
 /**
  * 从外部 URL 获取订阅内容
@@ -15,7 +16,22 @@ const https = require('node:https');
 async function fetchSubscriptionContent(url) {
   return new Promise((resolve, reject) => {
     try {
-      const req = https.get(url, (res) => {
+      const urlObj = new URL(url);
+      const protocol = urlObj.protocol === 'https:' ? https : http;
+
+      const options = {
+        hostname: urlObj.hostname,
+        port: urlObj.port || (urlObj.protocol === 'https:' ? 443 : 80),
+        path: urlObj.pathname + urlObj.search,
+        method: 'GET',
+        timeout: 15000,
+        rejectUnauthorized: false, // 允许自签名证书
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+      };
+
+      const req = protocol.request(options, (res) => {
         if (res.statusCode !== 200) {
           reject(new Error(`HTTP ${res.statusCode}`));
           return;
@@ -36,6 +52,8 @@ async function fetchSubscriptionContent(url) {
         req.destroy();
         reject(new Error('Request timeout'));
       });
+
+      req.end();
     } catch (error) {
       reject(error);
     }
