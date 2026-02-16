@@ -22,7 +22,9 @@ router.post('/subscriptions', asyncHandler(async (req, res) => {
 // 获取单个订阅
 router.get('/subscriptions/:path', asyncHandler(async (req, res) => {
   const { path } = req.params;
+  console.log('Path:', path);
   const subscription = await subscriptionService.getSubscription(path);
+  console.log('Subscription:', subscription);
   if (!subscription) {
     throw new ApiError(404, 'subscription.not_found');
   }

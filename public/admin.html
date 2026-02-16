@@ -3525,7 +3525,35 @@
           return;
         }
 
-        // 如果路径被修改，检查新路径是否已存在
+        // 判断是添加还是编辑
+        if (!originalPath) {
+          // 添加新订阅
+          const response = await fetch('/api/subscriptions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+              name: nameInput.value.trim(),
+              path: path
+            })
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.message || '');
+          }
+
+          showToast(_t('subscription.created'));
+          bootstrap.Modal.getInstance(document.getElementById('editNameModal')).hide();
+          form.reset();
+          await loadSubscriptions();
+          return;
+        }
+
+        // 编辑现有订阅 - 如果路径被修改，检查新路径是否已存在
         if (path !== originalPath) {
           const checkResponse = await fetch('/api/subscriptions/' + path);
           if (checkResponse.ok) {

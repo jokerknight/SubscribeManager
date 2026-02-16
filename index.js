@@ -17,21 +17,23 @@ const errorHandler = require("./middleware/errorHandler");
 const sessionService = require("./services/sessionService");
 
 async function requireAuth(req, res, next) {
+  const isApiRequest = req.originalUrl.startsWith('/api/');
+
   if (!req.session.sessionId) {
     // 如果是API调用，返回401而不是重定向
-    if (req.path.startsWith('/api/')) {
+    if (isApiRequest) {
       return res.status(401).json({ error: { code: 401, message: 'Unauthorized' } });
     }
     return res.redirect(`/${config.adminPath}/auth/login`);
   }
-  
+
   try {
     // 验证 session 是否有效
     const isValid = await sessionService.verifyAndRenewSession(req.session.sessionId);
     if (!isValid) {
       delete req.session.sessionId;
       // 如果是API调用，返回401而不是重定向
-      if (req.path.startsWith('/api/')) {
+      if (isApiRequest) {
         return res.status(401).json({ error: { code: 401, message: 'Unauthorized' } });
       }
       return res.redirect(`/${config.adminPath}/auth/login`);
@@ -41,7 +43,7 @@ async function requireAuth(req, res, next) {
     console.error('Session verification error:', error);
     delete req.session.sessionId;
     // 如果是API调用，返回401而不是重定向
-    if (req.path.startsWith('/api/')) {
+    if (isApiRequest) {
       return res.status(401).json({ error: { code: 401, message: 'Unauthorized' } });
     }
     return res.redirect(`/${config.adminPath}/auth/login`);
