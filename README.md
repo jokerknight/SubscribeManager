@@ -1,3 +1,5 @@
+
+
 # SubscribeManager
 
 [中文](https://github.com/baixiaoshengofficial/SubscribeManager/blob/main/README_ZH.md) | EN
@@ -24,8 +26,7 @@ Provides an intuitive web interface and supports multiple proxy protocols and su
 
 ## 🌐 Live Demo
 
-[SubscribeManager Sponsor By FOSSVPS](https://subscribe.baixiaosheng.de
-)
+[SubscribeManager Sponsor By FOSSVPS](https://subscribe.baixiaosheng.de)
 **username:** `admin`
 **password:** `admin`
 
